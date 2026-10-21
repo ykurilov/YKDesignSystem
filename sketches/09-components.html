@@ -154,7 +154,7 @@
   .banner { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px 14px; background: var(--surface); font-size: 14px; line-height: 1.45; }
   .banner.danger { border-color: color-mix(in srgb, var(--danger) 35%, transparent); background: var(--danger-soft); }
   .banner .mark { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
-  .banner.danger .mark { background: var(--danger); color: #fff; }
+  .banner.danger .mark { color: var(--danger); }
   .banner .mark.agent { background: transparent; }
   .banner b { font-weight: 600; }
 
@@ -171,7 +171,7 @@
 <div class="page">
   <div class="page-head">
     <div><div class="mono-label">YKDesignSystem · набросок 09</div><h1>Базовые элементы</h1></div>
-    <button class="btn outline sm theme-btn" onclick="document.body.classList.toggle('theme-dark')">◐ Тема</button>
+    <button class="btn outline sm theme-btn" onclick="document.body.classList.toggle('theme-dark')"><i class="ph" data-icon="circle-half" data-size="15"></i> Тема</button>
   </div>
 
   <section>
@@ -209,7 +209,7 @@
         <button class="btn primary">Обычная</button><button class="btn primary is-hover">Наведение</button><button class="btn primary is-pressed">Нажата</button><button class="btn primary is-focus">Фокус</button><button class="btn primary" disabled>Отключена</button><button class="btn primary"><canvas class="sphere" data-size="16" style="--accent: var(--on-ink)"></canvas>Агент пишет…</button>
       </div>
       <div class="line"><span class="mono-label">Размеры</span>
-        <button class="btn primary sm">Маленькая</button><button class="btn primary">Средняя</button><button class="btn primary lg">Большая · телефон</button><button class="btn secondary icon"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M8 13.5v-11M3.5 7 8 2.5 12.5 7"/></svg></button><button class="btn primary">Создать <kbd>⌘N</kbd></button>
+        <button class="btn primary sm">Маленькая</button><button class="btn primary">Средняя</button><button class="btn primary lg">Большая · телефон</button><button class="btn secondary icon"><i class="ph" data-icon="arrow-up" data-size="16"></i></button><button class="btn primary">Создать <kbd>⌘N</kbd></button>
       </div>
     </div>
   </section>
@@ -220,8 +220,8 @@
       <div class="field"><span class="mono-label">Название</span><input class="input" placeholder="Например, «Марафон»"><span class="hint">Видно участникам</span></div>
       <div class="field"><span class="mono-label">Название</span><input class="input is-focus" value="Марафон по ИИ"><span class="hint">Видно участникам</span></div>
       <div class="field"><span class="mono-label">Почта</span><input class="input is-error" value="yuri@gmail"><span class="hint error">Похоже, не хватает «.com»</span></div>
-      <div class="field"><span class="mono-label">Курс</span><div class="input select">Вайб-кодинг<span>⌄</span></div></div>
-      <div class="field"><span class="mono-label">Поиск</span><div class="input search">⌕ Найти проект<kbd>⌘K</kbd></div></div>
+      <div class="field"><span class="mono-label">Курс</span><div class="input select">Вайб-кодинг<i class="ph" data-icon="caret-down" data-size="14"></i></div></div>
+      <div class="field"><span class="mono-label">Поиск</span><div class="input search"><i class="ph" data-icon="magnifying-glass" data-size="16"></i> Найти проект<kbd>⌘K</kbd></div></div>
       <div class="field"><span class="mono-label">Отключено</span><input class="input" value="Только чтение" disabled></div>
       <div class="field" style="grid-column: span 2"><span class="mono-label">Задание агенту</span><textarea class="input">Собери план рассылки к вебинару: 5 писем, от анонса до дожима.</textarea></div>
     </div>
@@ -230,7 +230,7 @@
   <section>
     <header><span class="mono-label">05</span><h2>Выбор</h2><p>Включённое — оранжевым.</p></header>
     <div class="demo">
-      <div class="line"><span class="mono-label">Флажки</span><span class="choice"><i class="check on">✓</i>Напоминать</span><span class="choice"><i class="check"></i>Только мои</span><span class="choice"><i class="radio on"></i>Каждый день</span><span class="choice"><i class="radio"></i>Раз в неделю</span></div>
+      <div class="line"><span class="mono-label">Флажки</span><span class="choice"><i class="check on"><i class="ph" data-icon="check" data-size="13"></i></i>Напоминать</span><span class="choice"><i class="check"></i>Только мои</span><span class="choice"><i class="radio on"></i>Каждый день</span><span class="choice"><i class="radio"></i>Раз в неделю</span></div>
       <div class="line"><span class="mono-label">Переключ.</span><span class="choice"><i class="switch on"></i>Агент может отправлять письма</span><span class="choice"><i class="switch"></i>Тёмная тема</span></div>
       <div class="line"><span class="mono-label">Сегменты</span><div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div></div>
       <div class="line"><span class="mono-label">Вкладки</span><div class="tabs"><a class="on" href="#">Обзор</a><a href="#">Задачи <span class="mono-num">27</span></a><a href="#">Файлы <span class="mono-num">8</span></a><a href="#">История</a></div></div>
@@ -240,8 +240,8 @@
   <section>
     <header><span class="mono-label">06</span><h2>Метки и приметы</h2><p>Сфера — «агент работает». Точка — «есть новое».</p></header>
     <div class="demo">
-      <div class="line"><span class="mono-label">Статусы</span><span class="chip">Черновик</span><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span><span class="chip success">✓ Готово</span><span class="chip danger">Ошибка</span><span class="chip solid">Новое</span></div>
-      <div class="line"><span class="mono-label">Теги</span><span class="tag">Вебинар <span class="x">×</span></span><span class="tag">Рассылка <span class="x">×</span></span><span class="tag">+ тег</span></div>
+      <div class="line"><span class="mono-label">Статусы</span><span class="chip">Черновик</span><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span><span class="chip success"><i class="ph" data-icon="check" data-size="12"></i>Готово</span><span class="chip danger">Ошибка</span><span class="chip solid">Новое</span></div>
+      <div class="line"><span class="mono-label">Теги</span><span class="tag">Вебинар <span class="x"><i class="ph" data-icon="x" data-size="12"></i></span></span><span class="tag">Рассылка <span class="x"><i class="ph" data-icon="x" data-size="12"></i></span></span><span class="tag"><i class="ph" data-icon="plus" data-size="12"></i>тег</span></div>
       <div class="line"><span class="mono-label">Аватары</span><span class="avatar">ЮК</span><span class="avatar">МК<i class="new-dot"></i></span><span class="avatar agent"><canvas class="sphere" data-size="18"></canvas></span><span class="avatar sm">АИ</span></div>
       <div class="line"><span class="mono-label">Прогресс</span><div class="steps"><i class="done"></i><i class="done"></i><i></i><i></i><i></i></div><div class="steps live"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div><span class="mono-num" style="font-size:12px;color:var(--muted)">3/5</span></div>
       <div class="line"><span class="mono-label">Сфера</span><canvas class="sphere" data-size="12"></canvas><canvas class="sphere" data-size="16"></canvas><canvas class="sphere" data-size="24"></canvas><canvas class="sphere" data-size="48"></canvas><canvas class="sphere" data-size="96"></canvas></div>
@@ -252,11 +252,11 @@
     <header><span class="mono-label">07</span><h2>Карточки и списки</h2></header>
     <div class="cols">
       <div class="card"><div class="top"><h3>Лендинг вебинара</h3><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span></div><span class="mono-label" style="font-size:10.5px">Обновлено 2 ч назад · 3/5</span><div class="steps live" style="width:auto"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div></div>
-      <div class="card stat"><span class="mono-label">Задач открыто</span><span class="value">27<small>/ 64</small></span><span class="delta">▲ 12% за неделю</span></div>
+      <div class="card stat"><span class="mono-label">Задач открыто</span><span class="value">27<small>/ 64</small></span><span class="delta"><i class="ph" data-icon="trend-up" data-size="13"></i> 12% за неделю</span></div>
       <div class="list">
-        <div class="row selected"><div class="ic">✦</div><div class="grow">Идеи для рассылки<small>8 заметок</small></div><i class="new-dot"></i><span class="chev">›</span></div>
-        <div class="row"><div class="ic">◐</div><div class="grow">Обложки курса<small>14 файлов</small></div><span class="chev">›</span></div>
-        <div class="row"><div class="ic">▤</div><div class="grow">Напоминания агенту</div><i class="switch on"></i></div>
+        <div class="row selected"><div class="ic"><i class="ph" data-icon="sparkle" data-size="16"></i></div><div class="grow">Идеи для рассылки<small>8 заметок</small></div><i class="new-dot"></i><span class="chev"><i class="ph" data-icon="caret-right" data-size="14"></i></span></div>
+        <div class="row"><div class="ic"><i class="ph" data-icon="image" data-size="16"></i></div><div class="grow">Обложки курса<small>14 файлов</small></div><span class="chev"><i class="ph" data-icon="caret-right" data-size="14"></i></span></div>
+        <div class="row"><div class="ic"><i class="ph" data-icon="bell" data-size="16"></i></div><div class="grow">Напоминания агенту</div><i class="switch on"></i></div>
       </div>
     </div>
   </section>
@@ -266,14 +266,14 @@
     <div class="demo">
       <div class="stage">
         <div class="dialog"><span class="mono-label">Удаление</span><h3>Удалить «Квиз по уроку 7»?</h3><p>Проект и 5 задач исчезнут. Вернуть их можно в течение 30 дней из архива.</p><div class="actions"><button class="btn ghost">Отмена</button><button class="btn danger">Удалить</button></div></div>
-        <div class="menu"><a href="#" class="hover">✎ Переименовать<kbd>R</kbd></a><a href="#">⧉ Дублировать<kbd>⌘D</kbd></a><a href="#">◯ Спросить агента<kbd>⌘J</kbd></a><hr><a href="#" class="danger">Удалить<kbd>⌫</kbd></a></div>
+        <div class="menu"><a href="#" class="hover"><i class="ph" data-icon="pencil-simple" data-size="16"></i> Переименовать<kbd>R</kbd></a><a href="#"><i class="ph" data-icon="copy" data-size="16"></i> Дублировать<kbd>⌘D</kbd></a><a href="#"><i class="ph" data-icon="sparkle" data-size="16"></i> Спросить агента<kbd>⌘J</kbd></a><hr><a href="#" class="danger"><i class="ph" data-icon="trash" data-size="16"></i> Удалить<kbd>⌫</kbd></a></div>
         <div class="sheet"><i class="grip"></i><h3>Новый проект</h3><input class="input is-focus" value="Марафон по ИИ"><button class="btn primary lg">Создать</button></div>
       </div>
       <div class="line">
         <div class="toast">Проект удалён<button class="btn">Вернуть</button></div>
         <div class="banner" style="width:420px"><span class="mark agent"><canvas class="sphere" data-size="18"></canvas></span><div><b>Агент собирает план рассылки.</b> Можно закрыть окно — пришлём уведомление, когда будет готово.</div></div>
       </div>
-      <div class="banner danger" style="max-width:820px"><span class="mark">!</span><div><b>Письмо не отправлено.</b> Почтовый сервис не отвечает. Агент повторит через 5 минут.</div></div>
+      <div class="banner danger" style="max-width:820px"><span class="mark"><i class="ph" data-icon="warning-circle" data-size="20" data-weight="regular"></i></span><div><b>Письмо не отправлено.</b> Почтовый сервис не отвечает. Агент повторит через 5 минут.</div></div>
     </div>
   </section>
 
@@ -286,5 +286,6 @@
   </section>
 </div>
 <script src="shared/sphere.js"></script>
+<script src="shared/icons.js"></script>
 </body>
 </html>

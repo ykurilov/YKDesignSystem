@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Набросок 08 — веб-версия на компьютере</title>
+<link rel="stylesheet" href="shared/tokens.css">
 <style>
   :root {
     --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3; --sidebar: #FAFAF9;
@@ -124,13 +125,13 @@
 <div class="app">
 
   <aside class="sidebar">
-    <div class="workspace"><div class="logo">ЮК</div><b>Мастерская</b><span>⌄</span></div>
+    <div class="workspace"><div class="logo">ЮК</div><b>Мастерская</b><i class="ph" data-icon="caret-down" data-size="14"></i></div>
     <nav class="nav">
       <div class="mono-label">Работа</div>
-      <a class="on" href="#"><span class="ic">◇</span>Проекты<span class="count">12</span></a>
-      <a href="#"><span class="ic">◯</span>Чат с агентом<i class="new-dot"></i></a>
-      <a href="#"><span class="ic">▤</span>Материалы<span class="count">48</span></a>
-      <a href="#"><span class="ic">◷</span>Расписание</a>
+      <a class="on" href="#"><span class="ic"><i class="ph" data-icon="folder-simple" data-size="16" data-weight="fill"></i></span>Проекты<span class="count">12</span></a>
+      <a href="#"><span class="ic"><i class="ph" data-icon="chat-circle" data-size="16"></i></span>Чат с агентом<i class="new-dot"></i></a>
+      <a href="#"><span class="ic"><i class="ph" data-icon="file-text" data-size="16"></i></span>Материалы<span class="count">48</span></a>
+      <a href="#"><span class="ic"><i class="ph" data-icon="calendar-blank" data-size="16"></i></span>Расписание</a>
     </nav>
     <nav class="nav">
       <div class="mono-label">Курсы</div>
@@ -148,8 +149,8 @@
   <main class="main">
     <div class="topbar">
       <span class="crumb">Мастерская / <b>Проекты</b></span>
-      <div class="search">⌕ Поиск по проектам<kbd>⌘K</kbd></div>
-      <button class="theme-btn" onclick="document.body.classList.toggle('theme-dark')">◐ Тема</button>
+      <div class="search"><i class="ph" data-icon="magnifying-glass" data-size="15"></i> Поиск по проектам<kbd>⌘K</kbd></div>
+      <button class="theme-btn" onclick="document.body.classList.toggle('theme-dark')"><i class="ph" data-icon="circle-half" data-size="15"></i> Тема</button>
     </div>
 
     <div class="content">
@@ -176,7 +177,7 @@
           <tr class="selected"><td class="name"><span>Лендинг вебинара</span></td><td><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span></td><td><div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div></td><td class="num">3/5</td><td class="num">2 ч назад</td><td><span class="owner">ЮК</span></td></tr>
           <tr><td class="name"><span>Идеи для рассылки<i class="new-dot"></i></span></td><td><span class="chip">Черновик</span></td><td><div class="steps"><i class="done"></i><i></i><i></i><i></i><i></i></div></td><td class="num">1/5</td><td class="num">вчера</td><td><span class="owner">АИ</span></td></tr>
           <tr><td class="name"><span>Обложки курса</span></td><td><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span></td><td><div class="steps live"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i></i></div></td><td class="num">4/5</td><td class="num">вчера</td><td><span class="owner">ЮК</span></td></tr>
-          <tr><td class="name"><span>Марафон по ИИ — неделя 2</span></td><td><span class="chip done">✓ Готово</span></td><td><div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></div></td><td class="num">5/5</td><td class="num">12 окт</td><td><span class="owner">МК</span></td></tr>
+          <tr><td class="name"><span>Марафон по ИИ — неделя 2</span></td><td><span class="chip done"><i class="ph" data-icon="check" data-size="12"></i>Готово</span></td><td><div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></div></td><td class="num">5/5</td><td class="num">12 окт</td><td><span class="owner">МК</span></td></tr>
           <tr><td class="name"><span>Квиз по уроку 7</span></td><td><span class="chip">Черновик</span></td><td><div class="steps"><i></i><i></i><i></i><i></i><i></i></div></td><td class="num">0/5</td><td class="num">10 окт</td><td><span class="owner">ЮК</span></td></tr>
         </tbody>
       </table>
@@ -190,8 +191,8 @@
       <div class="msg-agent">
         <div class="who mono-label"><canvas class="sphere" data-size="16"></canvas>Агент · шаг 2/5</div>
         <div class="tool">
-          <div class="line"><span class="ok">✓</span>прочитал лендинг вебинара</div>
-          <div class="line"><span class="ok">✓</span>нашёл 3 прошлые рассылки</div>
+          <div class="line"><span class="ok"><i class="ph" data-icon="check" data-size="13"></i></span>прочитал лендинг вебинара</div>
+          <div class="line"><span class="ok"><i class="ph" data-icon="check" data-size="13"></i></span>нашёл 3 прошлые рассылки</div>
           <div class="line"><canvas class="sphere" data-size="12"></canvas>пишу структуру писем…</div>
         </div>
         <div>Предварительно так:</div>
@@ -201,7 +202,7 @@
     </div>
     <div class="composer">
       <div class="placeholder">Спросить агента…</div>
-      <div class="bar"><span class="mono-label">+ файл</span><span class="mono-label">@ проект</span><button class="send" style="display:grid;place-items:center"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M8 13.5v-11M3.5 7 8 2.5 12.5 7"/></svg></button></div>
+      <div class="bar"><span class="mono-label" style="display:inline-flex;gap:4px;align-items:center"><i class="ph" data-icon="paperclip" data-size="13"></i>файл</span><span class="mono-label" style="display:inline-flex;gap:4px;align-items:center"><i class="ph" data-icon="at" data-size="13"></i>проект</span><button class="send" style="display:grid;place-items:center"><i class="ph" data-icon="arrow-up" data-size="16"></i></button></div>
     </div>
   </aside>
 
@@ -240,5 +241,6 @@
   const tick = (t) => { spheres.forEach((cv) => drawSphere(cv, t)); requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 </script>
+<script src="shared/icons.js"></script>
 </body>
 </html>

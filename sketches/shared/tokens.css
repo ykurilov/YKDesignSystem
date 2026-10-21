@@ -30,3 +30,7 @@
 .mono-num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .new-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; display: inline-block; }
 canvas.sphere { flex: none; display: inline-block; vertical-align: middle; }
+
+/* Значки Phosphor: <i class="ph" data-icon="copy"></i>, размер — data-size (16 по умолчанию), залитый — data-weight="fill" */
+.ph { display: inline-grid; place-items: center; width: var(--ph-size, 16px); height: var(--ph-size, 16px); flex: none; vertical-align: -0.15em; }
+.ph svg { width: 100%; height: 100%; display: block; }
