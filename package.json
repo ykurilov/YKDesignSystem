@@ -1,0 +1,9 @@
+{
+  "name": "ykdesignsystem",
+  "private": true,
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
+  }
+}

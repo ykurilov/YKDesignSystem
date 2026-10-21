@@ -1,2 +1,7 @@
 .playwright-mcp/
 .DS_Store
+node_modules/
+dist/
+.build/
+DerivedData/
+*.xcuserstate
