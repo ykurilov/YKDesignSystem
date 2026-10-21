@@ -1,5 +1,6 @@
 // Сфера из точек — индикатор «агент работает».
-// Любой <canvas class="sphere" data-size="16"> на странице оживает сам.
+// Любой <canvas class="sphere" data-size="16"> на странице оживает сам;
+// появившиеся позже — через window.YKSphere.attach(canvas) или YKSphere.scan(root).
 (() => {
   const POINTS = (() => {
     const n = 46, pts = [];
@@ -10,11 +11,14 @@
     return pts;
   })();
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvases = new Set();
 
-  function prepare(canvas) {
+  function attach(canvas) {
+    if (canvases.has(canvas)) return;
     const size = +canvas.dataset.size || 16, dpr = 3;
     canvas.width = canvas.height = size * dpr;
     canvas.style.width = canvas.style.height = size + 'px';
+    canvases.add(canvas);
   }
 
   function draw(canvas, t) {
@@ -34,11 +38,16 @@
     }
   }
 
-  const canvases = [...document.querySelectorAll('canvas.sphere')];
-  canvases.forEach(prepare);
+  const scan = (root = document) => root.querySelectorAll('canvas.sphere').forEach(attach);
+  window.YKSphere = { attach, scan };
+  scan();
+
   const tick = (t) => {
-    canvases.forEach((cv) => draw(cv, reduceMotion ? 0 : t));
-    if (!reduceMotion) requestAnimationFrame(tick);
+    for (const cv of canvases) {
+      if (!cv.isConnected) { canvases.delete(cv); continue; }
+      draw(cv, reduceMotion ? 0 : t);
+    }
+    requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
 })();

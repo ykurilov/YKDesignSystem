@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 12 — живое поле ввода чата</title>
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: var(--sans); background: #DCDCD9; color: var(--text); -webkit-font-smoothing: antialiased; font-size: 14px; padding: 32px; }
+  body.theme-dark { background: #050505; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; color: #222; }
+  .theme-dark .page-head { color: #ddd; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .lead { font-size: 13px; color: #555; margin-bottom: 24px; }
+  .theme-dark .lead { color: #999; }
+  .toggle { padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  h2.block { font-size: 13px; font-weight: 600; color: #222; margin: 0 0 14px; }
+  .theme-dark h2.block { color: #ddd; }
+
+  /* ---------- Компьютер: три панели чата рядом ---------- */
+  .desk { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; max-width: 1640px; margin-bottom: 40px; }
+  .panel { background: var(--bg); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; height: 640px; }
+  .panel header b { font-size: 15px; font-weight: 600; }
+  .panel header p { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  /* ---------- Лента сообщений ---------- */
+  .thread { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; line-height: 1.5; font-size: 15px; padding: 4px 2px; }
+  .thread .empty { margin: auto; text-align: center; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 14px; }
+  .msg-user { align-self: flex-end; max-width: 85%; background: var(--surface-2); border-radius: 16px 16px 4px 16px; padding: 9px 13px; white-space: pre-wrap; }
+  .msg-user .att { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border-radius: 8px; padding: 4px 8px; font-size: 13px; }
+  .msg-agent { display: flex; flex-direction: column; gap: 8px; }
+  .msg-agent .live { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .work { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .work header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--sidebar); font-size: 13px; font-weight: 500; }
+  .work header .mono-label { margin-left: auto; font-size: 10px; }
+  .work .line { display: flex; align-items: center; gap: 9px; padding: 5px 12px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .work .line:first-of-type { padding-top: 8px; }
+  .work .line:last-child { padding-bottom: 9px; }
+  .work .line .ok { width: 14px; display: grid; place-items: center; color: var(--text); }
+  .thought { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); padding: 2px 0; }
+  .thought .caret { transition: transform .2s var(--ease-out); }
+  .thought[aria-expanded="true"] .caret { transform: rotate(90deg); }
+  .thought-text { font-size: 13px; color: var(--muted); border-left: 2px solid var(--border); padding-left: 10px; line-height: 1.5; }
+  .answer { white-space: pre-wrap; }
+  .meta { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .meta.stopped { color: var(--danger); }
+
+  /* ---------- Поле ввода ---------- */
+  .anchor { position: relative; }
+  .composer { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 16px; display: flex; flex-direction: column; gap: 6px; padding: 12px 8px 8px 12px; transition: border-color .15s, box-shadow .15s; }
+  .composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .composer textarea { border: 0; outline: none; resize: none; background: transparent; font: inherit; font-size: 15px; line-height: 20px; color: var(--text); padding: 0 4px 0 0; max-height: 120px; }
+  .composer textarea::placeholder { color: var(--muted); }
+  .composer textarea:focus-visible { outline: none; }
+  .bar { display: flex; align-items: center; gap: 4px; height: 32px; }
+  .tool { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); flex: none; }
+  .tool:hover, .tool[aria-expanded="true"] { background: var(--surface-2); color: var(--text); }
+  .bar > .tool:first-child { margin-left: -9px; }
+  .tool.rec { background: var(--accent-soft); color: var(--accent-text); }
+  /* Микрофон — справа, рядом с отправкой */
+  .tool.mic { margin-left: auto; }
+  .tool.mic + .send { margin-left: 4px; }
+  .send { margin-left: auto; width: 32px; height: 32px; border-radius: 9px; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; flex: none; transition: transform .15s var(--ease-out), background .15s; }
+  .send:active { transform: scale(.94); }
+  .send:disabled { background: var(--surface-2); color: var(--faint); cursor: default; }
+  .send.stop { background: var(--surface-2); color: var(--text); }
+  .attachments { display: flex; gap: 6px; flex-wrap: wrap; }
+  .attachments:empty { display: none; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 9px; border-radius: 8px; background: var(--surface-2); font-size: 13px; }
+  .pill button { width: 20px; height: 20px; border-radius: 5px; display: grid; place-items: center; color: var(--muted); }
+  .pill button:hover { background: var(--surface-3); color: var(--text); }
+
+  /* Сжатое: одна строка */
+  .composer.compact { flex-direction: row; align-items: flex-end; padding: 6px 6px 6px 14px; border-radius: 14px; }
+  .composer.compact textarea { flex: 1; align-self: center; }
+  .composer.compact .send { margin-left: 8px; }
+
+  /* Фишки настроек */
+  .chip { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 8px; border-radius: 8px; color: var(--text); font-size: 13px; white-space: nowrap; min-width: 0; }
+  .chip:hover:not(:disabled), .chip[aria-expanded="true"] { background: var(--surface-2); }
+  .chip:disabled { opacity: .45; cursor: default; }
+  .chip > .ph:first-child { color: var(--muted); }
+  .chip .caret { color: var(--faint); }
+  .chip .mono-num { font-size: 11px; color: var(--muted); }
+  .chip .name { overflow: hidden; text-overflow: ellipsis; }
+  .chip.ctx { height: 24px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0 7px; }
+
+  /* ---------- Всплывающие панели ---------- */
+  .pop { position: absolute; bottom: calc(100% + 8px); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-pop); padding: 6px; display: flex; flex-direction: column; z-index: 5; width: 380px; max-height: 470px; overflow-y: auto; animation: pop-in .18s var(--ease-out); }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(4px); } }
+  .pop .search { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px; color: var(--muted); border-bottom: 1px solid var(--border); margin: -6px -6px 6px; }
+  .pop .search input { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--text); }
+  .pop .group { padding: 8px 10px 4px; }
+  .pop .group .mono-label { font-size: 10px; }
+  .opt { width: 100%; text-align: left; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
+  .opt:hover { background: var(--surface-2); }
+  .opt .grow { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .opt .grow b { font-weight: 500; font-size: 14px; }
+  .opt .grow small { font-size: 12.5px; color: var(--muted); }
+  .opt .tags { display: flex; gap: 4px; }
+  .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; white-space: nowrap; }
+  .opt .check { width: 16px; color: var(--accent-text); display: grid; place-items: center; }
+  .pop hr { border: 0; border-top: 1px solid var(--border); margin: 6px 0; }
+  .pop .nothing { padding: 14px 10px; color: var(--muted); font-size: 13px; }
+  .via { display: flex; align-items: center; gap: 8px; padding: 2px 10px 8px; flex-wrap: wrap; }
+  .via .mono-label { font-size: 10px; }
+  .seg { display: inline-flex; background: var(--surface-2); padding: 3px; border-radius: 10px; }
+  .seg button { font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 5px 10px; border-radius: 8px; white-space: nowrap; }
+  .seg button:hover { color: var(--text); }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent-text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .theme-dark .seg button[aria-pressed="true"] { background: var(--surface-3); }
+  .seg.wide { display: flex; }
+  .seg.wide button { flex: 1; }
+  .pane { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+  .pane p { font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .pane .mono-label { font-size: 10px; }
+  .row { width: 100%; padding: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; text-align: left; }
+  .row > span { display: flex; gap: 8px; align-items: center; }
+  .switch { width: 38px; height: 22px; border-radius: 99px; background: var(--surface-3); position: relative; flex: none; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .25s var(--ease-out); }
+  [aria-checked="true"] > .switch { background: var(--accent); }
+  [aria-checked="true"] > .switch::after { left: 19px; }
+  .menu-pop { width: 220px; }
+  .menu-pop .opt { padding: 7px 10px; }
+
+  /* ---------- Телефоны ---------- */
+  .phones { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .label { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #222; }
+  .theme-dark .label { color: #ddd; }
+  .label span { font-weight: 400; opacity: .6; }
+  .phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative; background: var(--bg); color: var(--text); box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25); display: flex; flex-direction: column; }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; flex: none; }
+  .chat-head { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--border); flex: none; }
+  .chat-head .who { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .chat-head .who b { font-size: 15px; font-weight: 600; }
+  .chat-head .who .mono-label { font-size: 9.5px; }
+  .chat-head .side { width: 28px; display: grid; place-items: center; }
+  .phone .thread { padding: 16px; }
+  .phone .anchor { padding: 8px 12px 30px; flex: none; }
+  .phone .chip { height: 30px; background: var(--surface-2); }
+  .phone .chip .caret { display: none; }
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 8; animation: fade .2s; }
+  @keyframes fade { from { opacity: 0; } }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--surface); border-radius: 22px 22px 0 0; padding: 8px 16px 30px; display: flex; flex-direction: column; gap: 14px; max-height: 88%; overflow-y: auto; animation: sheet-in .3s var(--ease-out); }
+  @keyframes sheet-in { from { transform: translateY(40%); opacity: 0; } }
+  .sheet .grip { width: 36px; height: 5px; border-radius: 3px; background: var(--surface-3); align-self: center; flex: none; }
+  .sheet .head { display: flex; align-items: center; justify-content: space-between; }
+  .sheet .head b { font-size: 17px; font-weight: 600; }
+  .sheet .head button { font-weight: 600; font-size: 15px; }
+  .sheet .list { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .sheet .list .opt { border-radius: 0; padding: 11px 12px; }
+  .sheet .list > * + * { border-top: 1px solid var(--border); }
+  .sheet .list .row { padding: 11px 12px; }
+  .sheet .sec { display: flex; flex-direction: column; gap: 8px; }
+  .sheet .sec > .mono-label { font-size: 10px; }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Набросок 12 — живое поле ввода чата</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+  <p class="lead">Всё кликается: пишите и отправляйте (Enter — отправить, Shift+Enter — новая строка), открывайте фишки, выбирайте модель, провайдера и рассуждения, жмите «Стоп». Ответы агента — заглушка.</p>
+
+  <h2 class="block">Компьютер</h2>
+  <div class="desk">
+    <section class="panel" data-chat="compact" data-layout="desk"><header><b>1 · Сжатое</b><p>Одна строка: текст и отправка. Для встроенных помощников, виджетов, узких панелей.</p></header></section>
+    <section class="panel" data-chat="standard" data-layout="desk" data-sub="Мастерская"><header><b>2 · Обычное</b><p>Файл, контекст, голос. По умолчанию в приложениях.</p></header></section>
+    <section class="panel" data-chat="extended" data-layout="desk"><header><b>3 · Расширенное</b><p>Модель, провайдер, рассуждения, инструменты — прямо в строке.</p></header></section>
+  </div>
+
+  <h2 class="block">Телефон</h2>
+  <div class="phones">
+    <div><div class="label">1 · Сжатое <span>— одна строка</span></div>
+      <div class="phone" data-chat="compact" data-layout="phone" data-title="Помощник" data-sub="Курс · урок 7"></div></div>
+    <div><div class="label">2 · Обычное</div>
+      <div class="phone" data-chat="standard" data-layout="phone" data-title="Агент" data-sub="Мастерская"></div></div>
+    <div><div class="label">3 · Расширенное <span>— нажмите на фишку</span></div>
+      <div class="phone" data-chat="extended" data-layout="phone" data-title="План рассылки" data-sub="Агент"></div></div>
+  </div>
+
+<script src="shared/sphere.js?v=2"></script>
+<script src="shared/icons.js?v=2"></script>
+<script>
+  // ---------- Данные ----------
+  const MODELS = [
+    { id: 'ds', name: 'DeepSeek 4.1 Flash', short: 'DeepSeek 4.1', note: 'Повседневные задачи, черновики', group: 'Быстрые и недорогие', price: '$0.3', tags: ['быстрая'], providers: ['OpenRouter', 'DeepSeek', 'Fireworks'] },
+    { id: 'qwen', name: 'Qwen 4 Turbo', short: 'Qwen 4', note: 'Короткие ответы, классификация', group: 'Быстрые и недорогие', price: '$0.2', tags: [], providers: ['OpenRouter', 'Together'] },
+    { id: 'sonnet', name: 'Claude Sonnet 5.5', short: 'Sonnet 5.5', note: 'Тексты, код, длинные документы', group: 'Умные', price: '$3', tags: ['картинки'], providers: ['OpenRouter', 'Anthropic'] },
+    { id: 'gpt', name: 'GPT 6.1', short: 'GPT 6.1', note: 'Рассуждения, сложные задачи', group: 'Умные', price: '$5', tags: ['картинки'], providers: ['OpenRouter', 'OpenAI'] },
+  ];
+  const REASONING = ['Выкл', 'Низко', 'Средне', 'Высоко'];
+  const TOOLS = [
+    { id: 'web', icon: 'globe', name: 'Поиск в интернете', on: true },
+    { id: 'files', icon: 'paperclip', name: 'Файлы проекта', on: true },
+    { id: 'shot', icon: 'image', name: 'Скриншот страницы', on: true },
+    { id: 'mail', icon: 'lightning', name: 'Отправка писем', on: false },
+  ];
+  const STEPS = ['читаю задачу', 'ищу похожие материалы', 'пишу ответ'];
+  const I = (name, size, weight) => `<i class="ph" data-icon="${name}"${size ? ` data-size="${size}"` : ''}${weight ? ` data-weight="${weight}"` : ''}></i>`;
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function fakeAnswer(text) {
+    return `Понял задачу: «${text.slice(0, 60)}${text.length > 60 ? '…' : ''}».\n\nПредлагаю так:\n1. Коротко собрать, что уже есть.\n2. Выделить, что работает лучше всего.\n3. Сделать черновик и показать вам.\n\nНачать с первого пункта?`;
+  }
+
+  // ---------- Один чат: лента + поле ввода ----------
+  function createChat(root) {
+    const variant = root.dataset.chat, layout = root.dataset.layout;
+    const state = { model: MODELS[0], provider: MODELS[0].providers[0], reasoning: 2, showThoughts: true, tools: TOOLS.map((t) => ({ ...t })), busy: false, recording: false, attachments: [], run: 0 };
+
+    if (layout === 'phone') {
+      root.insertAdjacentHTML('beforeend', `<div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="chat-head"><span class="side">${I('caret-left', 22)}</span><div class="who"><b>${root.dataset.title}</b><span class="mono-label">${root.dataset.sub}</span></div><span class="side">${I('dots-three', 22)}</span></div>`);
+    }
+    const thread = document.createElement('div');
+    thread.className = 'thread';
+    thread.innerHTML = `<div class="empty"><canvas class="sphere" data-size="${layout === 'phone' ? 64 : 48}"></canvas>Напишите что-нибудь агенту</div>`;
+    const anchor = document.createElement('div');
+    anchor.className = 'anchor';
+    root.append(thread, anchor);
+
+    // --- поле ввода
+    const composer = document.createElement('div');
+    composer.className = 'composer' + (variant === 'compact' ? ' compact' : '');
+    anchor.append(composer);
+    const attachments = document.createElement('div');
+    attachments.className = 'attachments';
+    const ta = document.createElement('textarea');
+    ta.rows = 1;
+    ta.placeholder = variant === 'compact' ? 'Спросить…' : 'Спросить агента…';
+    ta.setAttribute('aria-label', 'Сообщение агенту');
+    const send = document.createElement('button');
+    send.className = 'send';
+
+    if (variant === 'compact') {
+      composer.append(ta, send);
+    } else {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      composer.append(attachments, ta, bar);
+      bar.append(button('tool', I('plus', 18), 'Добавить', (b) => togglePop('plus', b)));
+      if (variant === 'standard') {
+        bar.insertAdjacentHTML('beforeend', `<span class="chip ctx">@ ${root.dataset.sub || 'Мастерская'}</span>`);
+        const mic = button('tool mic', I('microphone', 18), 'Голосовой ввод', () => toggleMic(mic));
+        bar.append(mic);
+      } else {
+        state.chips = {
+          model: button('chip', '', 'Модель', (b) => openSettings('model', b)),
+          reason: button('chip', '', 'Рассуждения', (b) => openSettings('reason', b)),
+          tools: button('chip', '', 'Инструменты', (b) => openSettings('tools', b)),
+        };
+        bar.append(state.chips.model, state.chips.reason);
+        if (layout === 'desk') bar.append(state.chips.tools);
+        const mic = button('tool mic', I('microphone', 18), 'Голосовой ввод', () => toggleMic(mic));
+        bar.append(mic);
+      }
+      bar.append(send);
+    }
+
+    function button(cls, html, label, onClick) {
+      const b = document.createElement('button');
+      b.className = cls; b.innerHTML = html; b.setAttribute('aria-label', label); b.title = label;
+      b.addEventListener('click', (e) => { e.stopPropagation(); onClick(b); });
+      return b;
+    }
+
+    function renderChips() {
+      if (!state.chips) return;
+      const m = state.model, short = layout === 'phone';
+      state.chips.model.innerHTML = `${I('cpu')}<span class="name">${short ? m.short : m.name}</span>${I('caret-down', 12)}`;
+      state.chips.reason.innerHTML = `${I('brain')}<span class="name">${REASONING[state.reasoning]}</span>${I('caret-down', 12)}`;
+      state.chips.tools.innerHTML = `${I('wrench')}<span class="mono-num">${state.tools.filter((t) => t.on).length}</span>`;
+      Object.values(state.chips).forEach((c) => { c.querySelector('.ph:last-child')?.classList.add('caret'); c.disabled = state.busy; });
+      YKIcons.render(composer);
+    }
+
+    function renderSend() {
+      const empty = !ta.value.trim() && !state.attachments.length;
+      send.classList.toggle('stop', state.busy);
+      send.disabled = !state.busy && empty;
+      send.innerHTML = state.busy ? I('stop', 14, 'fill') : I('arrow-up');
+      send.setAttribute('aria-label', state.busy ? 'Остановить' : 'Отправить');
+      YKIcons.render(send);
+    }
+
+    function renderAttachments() {
+      attachments.innerHTML = state.attachments.map((a, i) => `<span class="pill">${I(a.icon, 14)}${esc(a.name)}<button data-i="${i}" aria-label="Убрать">${I('x', 12)}</button></span>`).join('');
+      attachments.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { state.attachments.splice(+b.dataset.i, 1); renderAttachments(); renderSend(); }));
+      YKIcons.render(attachments);
+    }
+
+    // --- автоувеличение поля, Enter — отправить
+    ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; renderSend(); });
+    ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!state.busy) submit(); } });
+    send.addEventListener('click', () => (state.busy ? stop() : submit()));
+
+    function toggleMic(mic) {
+      state.recording = !state.recording;
+      mic.classList.toggle('rec', state.recording);
+      mic.setAttribute('aria-pressed', state.recording);
+      ta.placeholder = state.recording ? 'Слушаю… нажмите ещё раз, чтобы закончить' : 'Спросить агента…';
+      ta.focus();
+      if (!state.recording) { ta.value = (ta.value ? ta.value + ' ' : '') + 'Сделай план короче, на три пункта'; ta.dispatchEvent(new Event('input')); ta.focus(); }
+    }
+
+    // --- всплывающие панели (компьютер) и шторка (телефон)
+    let openPop = null;
+    function closePop() {
+      if (!openPop) return;
+      openPop.el.remove(); openPop.trigger?.setAttribute('aria-expanded', 'false');
+      openPop = null;
+    }
+    function togglePop(kind, trigger) {
+      if (openPop?.kind === kind) return closePop();
+      closePop();
+      const el = document.createElement('div');
+      el.className = 'pop' + (kind === 'plus' ? ' menu-pop' : '');
+      el.addEventListener('click', (e) => e.stopPropagation());
+      fillPop(kind, el);
+      anchor.append(el);
+      const left = trigger.getBoundingClientRect().left - composer.getBoundingClientRect().left;
+      el.style.left = Math.max(0, Math.min(left - 6, composer.offsetWidth - el.offsetWidth)) + 'px';
+      trigger.setAttribute('aria-expanded', 'true');
+      openPop = { kind, el, trigger };
+      YKIcons.render(el);
+      (el.querySelector('input') || el.querySelector('button'))?.focus({ preventScroll: true });
+    }
+    function openSettings(kind, trigger) {
+      if (layout === 'phone') return openSheet(trigger);
+      togglePop(kind, trigger);
+    }
+    document.addEventListener('click', () => closePop());
+    root.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (openPop) { const t = openPop.trigger; closePop(); t.focus(); }
+      closeSheet();
+    });
+
+    function fillPop(kind, el) {
+      if (kind === 'plus') {
+        el.innerHTML = [['file-text', 'Файл', 'План рассылки.md'], ['image', 'Картинка', 'Обложка.png'], ['at', 'Проект', 'Лендинг вебинара']]
+          .map(([icon, label, name]) => `<button class="opt" data-icon="${icon}" data-name="${name}">${I(icon)}<span class="grow"><b>${label}</b></span></button>`).join('');
+        el.querySelectorAll('.opt').forEach((b) => b.addEventListener('click', () => { state.attachments.push({ icon: b.dataset.icon, name: b.dataset.name }); renderAttachments(); renderSend(); closePop(); ta.focus(); }));
+      }
+      if (kind === 'model') {
+        el.innerHTML = `<label class="search">${I('magnifying-glass')}<input placeholder="Найти модель" aria-label="Найти модель"></label><div class="list"></div>`;
+        const list = el.querySelector('.list'), input = el.querySelector('input');
+        const draw = () => { list.innerHTML = modelListHtml(input.value); bindModelList(list, draw); YKIcons.render(list); };
+        input.addEventListener('input', draw);
+        draw();
+      }
+      if (kind === 'reason') { el.style.width = '340px'; el.innerHTML = reasonHtml(); bindReason(el); }
+      if (kind === 'tools') { el.style.width = '300px'; el.innerHTML = `<div class="pane">${toolsHtml()}</div>`; bindTools(el); }
+    }
+
+    function modelListHtml(query) {
+      const q = query.trim().toLowerCase();
+      const found = MODELS.filter((m) => !q || (m.name + m.note).toLowerCase().includes(q));
+      if (!found.length) return `<div class="nothing">Ничего не нашлось</div>`;
+      let html = '', group = '';
+      for (const m of found) {
+        if (m.group !== group) { html += `${group ? '<hr>' : ''}<div class="group"><span class="mono-label">${m.group}</span></div>`; group = m.group; }
+        const on = m.id === state.model.id;
+        html += `<button class="opt" data-model="${m.id}" aria-pressed="${on}"><span class="grow"><b>${m.name}</b><small>${m.note}</small></span><span class="tags"><span class="tag" title="Цена за миллион токенов">${m.price}</span>${m.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</span><span class="check">${on ? I('check') : ''}</span></button>`;
+        if (on) html += `<div class="via"><span class="mono-label">Через</span><div class="seg" role="group" aria-label="Провайдер">${m.providers.map((p) => `<button data-provider="${p}" aria-pressed="${p === state.provider}">${p}</button>`).join('')}</div></div>`;
+      }
+      return html;
+    }
+    function bindModelList(list, redraw) {
+      list.querySelectorAll('[data-model]').forEach((b) => b.addEventListener('click', () => {
+        state.model = MODELS.find((m) => m.id === b.dataset.model);
+        if (!state.model.providers.includes(state.provider)) state.provider = state.model.providers[0];
+        renderChips(); redraw();
+      }));
+      list.querySelectorAll('[data-provider]').forEach((b) => b.addEventListener('click', () => { state.provider = b.dataset.provider; redraw(); }));
+    }
+
+    function reasonHtml() {
+      return `<div class="pane"><span class="mono-label">Рассуждения</span>
+        <div class="seg wide" role="group" aria-label="Уровень рассуждений">${REASONING.map((r, i) => `<button data-level="${i}" aria-pressed="${i === state.reasoning}">${r}</button>`).join('')}</div>
+        <p>Чем дольше модель думает, тем точнее ответ — но он дольше и дороже.</p>
+        <button class="row" role="switch" data-switch="thoughts" aria-checked="${state.showThoughts}">Показывать ход мысли<i class="switch"></i></button></div>`;
+    }
+    function bindReason(el) {
+      el.querySelectorAll('[data-level]').forEach((b) => b.addEventListener('click', () => {
+        state.reasoning = +b.dataset.level;
+        el.querySelectorAll('[data-level]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+        renderChips();
+      }));
+      el.querySelector('[data-switch="thoughts"]').addEventListener('click', (e) => { state.showThoughts = !state.showThoughts; e.currentTarget.setAttribute('aria-checked', state.showThoughts); });
+    }
+    function toolsHtml() {
+      return `<span class="mono-label">Инструменты</span>${state.tools.map((t, i) => `<button class="row" role="switch" data-tool="${i}" aria-checked="${t.on}"><span>${I(t.icon)}${t.name}</span><i class="switch"></i></button>`).join('')}`;
+    }
+    function bindTools(el) {
+      el.querySelectorAll('[data-tool]').forEach((b) => b.addEventListener('click', () => {
+        const t = state.tools[+b.dataset.tool]; t.on = !t.on; b.setAttribute('aria-checked', t.on); renderChips();
+      }));
+    }
+
+    // Шторка на телефоне — все настройки в одном месте
+    let sheet = null;
+    function openSheet(trigger) {
+      closeSheet();
+      const dim = document.createElement('div'); dim.className = 'dim';
+      const el = document.createElement('div'); el.className = 'sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Настройки ответа');
+      const draw = () => {
+        el.innerHTML = `<i class="grip"></i><div class="head"><b>Настройки ответа</b><button data-done>Готово</button></div>
+          <div class="sec"><span class="mono-label">Модель</span><div class="list">${MODELS.map((m) => `<button class="opt" data-model="${m.id}" aria-pressed="${m.id === state.model.id}"><span class="grow"><b>${m.name}</b><small>${m.note}</small></span><span class="tag">${m.price}</span><span class="check">${m.id === state.model.id ? I('check') : ''}</span></button>`).join('')}</div></div>
+          <div class="sec"><span class="mono-label">Провайдер</span><div class="seg wide" role="group" aria-label="Провайдер">${state.model.providers.map((p) => `<button data-provider="${p}" aria-pressed="${p === state.provider}">${p}</button>`).join('')}</div></div>
+          ${reasonHtml().replace('class="pane"', 'class="sec"')}
+          <div class="sec"><span class="mono-label">Инструменты</span><div class="list">${state.tools.map((t, i) => `<button class="row" role="switch" data-tool="${i}" aria-checked="${t.on}"><span>${I(t.icon)}${t.name}</span><i class="switch"></i></button>`).join('')}</div></div>`;
+        el.querySelector('[data-done]').addEventListener('click', closeSheet);
+        bindModelList(el, draw); bindReason(el); bindTools(el);
+        YKIcons.render(el);
+      };
+      draw();
+      dim.addEventListener('click', closeSheet);
+      el.addEventListener('click', (e) => e.stopPropagation());
+      root.append(dim, el);
+      sheet = { dim, el, trigger };
+      el.querySelector('[data-done]').focus({ preventScroll: true });
+    }
+    function closeSheet() {
+      if (!sheet) return;
+      sheet.dim.remove(); sheet.el.remove(); sheet.trigger?.focus({ preventScroll: true }); sheet = null;
+    }
+
+    // --- отправка и «ответ агента»
+    function scrollDown() { thread.scrollTop = thread.scrollHeight; }
+    async function submit() {
+      const text = ta.value.trim();
+      if (!text && !state.attachments.length) return;
+      closePop();
+      thread.querySelector('.empty')?.remove();
+      const user = document.createElement('div');
+      user.className = 'msg-user';
+      user.innerHTML = esc(text || 'Посмотри вложение') + state.attachments.map((a) => `<div class="att">${I(a.icon, 13)}${esc(a.name)}</div>`).join('');
+      thread.append(user);
+      ta.value = ''; ta.style.height = 'auto'; state.attachments = []; renderAttachments();
+      const run = ++state.run;
+      state.busy = true; renderSend(); renderChips();
+
+      const agent = document.createElement('div');
+      agent.className = 'msg-agent';
+      thread.append(agent);
+      YKIcons.render(thread); scrollDown();
+      const alive = () => run === state.run;
+
+      if (variant === 'compact') {
+        agent.innerHTML = `<span class="live"><canvas class="sphere" data-size="14"></canvas>думаю…</span>`;
+        YKSphere.scan(agent); await wait(900);
+        if (!alive()) return;
+      } else {
+        agent.innerHTML = `<div class="work"><header><canvas class="sphere" data-size="14"></canvas>Работаю<span class="mono-label">Шаг 1/${STEPS.length}</span></header></div>`;
+        YKSphere.scan(agent);
+        const work = agent.querySelector('.work');
+        for (let i = 0; i < STEPS.length; i++) {
+          if (!alive()) return;
+          work.querySelector('.mono-label').textContent = `Шаг ${i + 1}/${STEPS.length}`;
+          const prev = work.querySelector('.line.now');
+          if (prev) { prev.classList.remove('now'); prev.querySelector('.ok').innerHTML = I('check', 13); YKIcons.render(prev); }
+          work.insertAdjacentHTML('beforeend', `<div class="line now"><span class="ok"><canvas class="sphere" data-size="12"></canvas></span>${STEPS[i]}…</div>`);
+          YKSphere.scan(work); scrollDown();
+          await wait(variant === 'extended' ? 500 + state.reasoning * 250 : 650);
+        }
+        if (!alive()) return;
+        const last = work.querySelector('.line.now');
+        last.classList.remove('now'); last.querySelector('.ok').innerHTML = I('check', 13);
+        work.querySelector('header').innerHTML = `${I('check', 14)}Готово<span class="mono-label">${STEPS.length}/${STEPS.length}</span>`;
+        YKIcons.render(work);
+      }
+
+      if (variant === 'extended' && state.reasoning > 0 && state.showThoughts) {
+        const secs = 2 + state.reasoning * 3;
+        agent.insertAdjacentHTML('beforeend', `<button class="thought" aria-expanded="false">${I('brain', 14)}Думал ${secs} с${I('caret-right', 12)}</button><div class="thought-text" hidden>Сначала уточню, что именно нужно. Посмотрю похожие материалы, выделю главное и предложу короткий план, а не длинный текст.</div>`);
+        const t = agent.querySelector('.thought');
+        t.querySelector('.ph:last-child').classList.add('caret');
+        t.addEventListener('click', () => { const open = t.getAttribute('aria-expanded') !== 'true'; t.setAttribute('aria-expanded', open); t.nextElementSibling.hidden = !open; });
+        YKIcons.render(agent);
+      }
+
+      agent.querySelector('.live')?.remove();
+      const answer = document.createElement('div');
+      answer.className = 'answer';
+      agent.append(answer);
+      const words = fakeAnswer(text || 'вложение').split(/(\s+)/);
+      for (const w of words) {
+        if (!alive()) return;
+        answer.textContent += w; scrollDown();
+        await wait(28);
+      }
+      finish(agent, false);
+    }
+    function finish(agent, stopped) {
+      state.busy = false; renderSend(); renderChips();
+      const m = variant === 'extended' ? `${state.model.name} · ${state.provider} · ${REASONING[state.reasoning]}` : '';
+      const stoppedLabel = stopped && !agent.querySelector('.work') ? 'Остановлено' : '';
+      const text = [stoppedLabel, m].filter(Boolean).join(' · ');
+      if (text) agent.insertAdjacentHTML('beforeend', `<span class="meta${stoppedLabel ? ' stopped' : ''}">${text}</span>`);
+      agent.querySelectorAll('.line.now').forEach((l) => { l.classList.remove('now'); l.querySelector('.ok').innerHTML = I('x', 13); });
+      YKIcons.render(agent); scrollDown();
+    }
+    function stop() {
+      state.run++;
+      const agent = thread.querySelector('.msg-agent:last-child');
+      agent.querySelector('.live')?.remove();
+      const head = agent.querySelector('.work header');
+      if (head && !head.textContent.includes('Готово')) head.innerHTML = `${I('stop', 13, 'fill')}Остановлено`;
+      finish(agent, true);
+      ta.focus();
+    }
+
+    renderChips(); renderSend();
+    YKIcons.render(root); YKSphere.scan(root);
+  }
+
+  document.querySelectorAll('[data-chat]').forEach(createChat);
+</script>
+</body>
+</html>

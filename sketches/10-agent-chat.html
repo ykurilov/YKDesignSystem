@@ -89,6 +89,8 @@
   .composer .bar { display: flex; align-items: center; gap: 4px; height: 32px; }
   .composer .tool { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); }
   .composer .tool:first-child { margin-left: -9px; }
+  .composer .tool.mic { margin-left: auto; }
+  .composer .tool.mic + .send { margin-left: 4px; }
   .composer .ctx { height: 24px; display: inline-flex; align-items: center; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 0 7px; }
   .send { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 9px; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; }
   .send.stop { background: var(--surface-2); color: var(--text); }
@@ -129,7 +131,7 @@
         </div>
         <div class="composer-wrap"><div class="composer">
           <div class="text">Спросить агента…</div>
-          <div class="bar"><span class="tool"><i class="ph" data-icon="plus" data-size="18"></i></span><span class="ctx">@ Мастерская</span><span class="tool"><i class="ph" data-icon="microphone" data-size="18"></i></span><button class="send"><i class="ph" data-icon="arrow-up" data-size="16"></i></button></div>
+          <div class="bar"><span class="tool"><i class="ph" data-icon="plus" data-size="18"></i></span><span class="ctx">@ Мастерская</span><span class="tool mic"><i class="ph" data-icon="microphone" data-size="18"></i></span><button class="send"><i class="ph" data-icon="arrow-up" data-size="16"></i></button></div>
         </div></div>
       </div>
     </div>
