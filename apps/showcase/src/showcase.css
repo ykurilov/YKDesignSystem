@@ -66,3 +66,5 @@ body {
   color: var(--yk-text); background: var(--yk-surface); border: 1px solid var(--yk-border-strong); border-radius: var(--yk-radius-md);
 }
 .sc-input:focus { outline: none; border-color: var(--yk-accent); box-shadow: 0 0 0 3px var(--yk-accent-soft); }
+
+.sc-edge { margin-left: auto; }

@@ -1,4 +1,4 @@
-import { CopyIcon, PencilSimpleIcon, SparkleIcon, TrashIcon } from "@phosphor-icons/react";
+import { CopyIcon, DotsThreeIcon, PencilSimpleIcon, SparkleIcon, TrashIcon } from "@phosphor-icons/react";
 import { Banner, Button, Dialog, Menu, Sheet, ToastProvider, useToast } from "@ykurilov/ds-react";
 import { useState } from "react";
 import { DemoLine, DemoStack } from "../layout/Demo.js";
@@ -35,6 +35,11 @@ function OverlaysDemo() {
           <Menu label="Действия" trigger={<Button variant="outline">Меню</Button>} entries={MENU_ENTRIES} />
           <Button variant="outline" onClick={() => setSheet(true)}>Шторка</Button>
           <ToastButton />
+        </DemoLine>
+        <DemoLine label="У края экрана">
+          <div className="sc-edge">
+            <Menu label="Действия у края" trigger={<Button variant="outline" icon={DotsThreeIcon} aria-label="Действия у края" />} entries={MENU_ENTRIES} />
+          </div>
         </DemoLine>
         <div className="sc-stage">
           <div className="sc-static yk-dialog sc-static--dialog" aria-hidden="true">

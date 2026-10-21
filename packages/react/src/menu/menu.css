@@ -4,6 +4,7 @@
   background: var(--yk-surface); border-radius: var(--yk-radius-lg); box-shadow: var(--yk-shadow-pop);
   display: flex; flex-direction: column; animation: yk-menu-in .14s var(--yk-ease-out);
 }
+.yk-menu--up { top: auto; bottom: calc(100% + 6px); animation-name: yk-menu-in-up; }
 .yk-menu--start { left: 0; }
 .yk-menu--end { right: 0; }
 .yk-menu__item {
@@ -23,4 +24,5 @@
 }
 .yk-menu__separator { border: 0; border-top: 1px solid var(--yk-border); margin: 5px 0; }
 @keyframes yk-menu-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes yk-menu-in-up { from { opacity: 0; transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { .yk-menu { animation: none; } }

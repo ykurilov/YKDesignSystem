@@ -1,9 +1,10 @@
 import {
-  cloneElement, useEffect, useId, useRef, useState,
+  cloneElement, useEffect, useId, useLayoutEffect, useRef, useState,
   type KeyboardEvent, type MouseEvent, type ReactElement, type ReactNode,
 } from "react";
 import { classNames } from "../classNames.js";
 import { Icon, type IconComponent } from "../icon/Icon.js";
+import { placeMenu, type MenuPlacement } from "./placeMenu.js";
 
 export interface MenuItemSpec {
   label: string;
@@ -24,7 +25,7 @@ export interface MenuProps {
   /** Кнопка, открывающая меню. Должна принимать onClick, onKeyDown и aria-атрибуты (подходит Button). */
   trigger: ReactElement<TriggerProps>;
   entries: MenuEntry[];
-  /** С какого края кнопки выровнять меню. */
+  /** Ручное выравнивание по краю кнопки. Без него меню само выбирает сторону, где оно помещается. */
   align?: "start" | "end";
 }
 
@@ -39,8 +40,9 @@ interface TriggerProps {
 const ITEM_SELECTOR = "[role=menuitem]:not([aria-disabled=true])";
 
 /** Выпадающее меню у кнопки: стрелки, Enter, Esc, подсказки клавиш. */
-export function Menu({ label, trigger, entries, align = "start" }: MenuProps) {
+export function Menu({ label, trigger, entries, align }: MenuProps) {
   const [open, setOpen] = useState(false);
+  const [placement, setPlacement] = useState<MenuPlacement>({ vertical: "down", align: align ?? "start" });
   const anchorRef = useRef<HTMLSpanElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -52,6 +54,19 @@ export function Menu({ label, trigger, entries, align = "start" }: MenuProps) {
     setOpen(false);
     triggerElement()?.focus();
   };
+
+  // До отрисовки кадра меряем, где меню помещается, чтобы оно не мигало не на своём месте
+  useLayoutEffect(() => {
+    const anchor = anchorRef.current?.getBoundingClientRect();
+    const menu = menuRef.current;
+    if (!open || !anchor || !menu) return;
+    setPlacement(placeMenu({
+      anchor,
+      menu: { width: menu.offsetWidth, height: menu.offsetHeight },
+      viewport: { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight },
+      align,
+    }));
+  }, [open, align, entries.length]);
 
   useEffect(() => {
     if (open) items()[0]?.focus();
@@ -120,7 +135,7 @@ export function Menu({ label, trigger, entries, align = "start" }: MenuProps) {
           id={menuId}
           role="menu"
           aria-label={label}
-          className={classNames("yk-menu", `yk-menu--${align}`)}
+          className={classNames("yk-menu", `yk-menu--${placement.align}`, placement.vertical === "up" && "yk-menu--up")}
           onKeyDown={handleMenuKeyDown}
         >
           {entries.map((entry, index) =>
