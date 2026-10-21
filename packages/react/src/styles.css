@@ -1,0 +1,9 @@
+/* Все стили @ykurilov/ds-react. Подключать после @ykurilov/ds-tokens/tokens.css */
+@import "./icon/icon.css";
+@import "./sphere/sphere.css";
+@import "./marks/marks.css";
+@import "./button/button.css";
+@import "./chip/chip.css";
+@import "./tag/tag.css";
+@import "./steps/steps.css";
+@import "./avatar/avatar.css";

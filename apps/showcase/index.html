@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YKDesignSystem — витрина</title>
+  <script>
+    // Тема до первой отрисовки, чтобы не мигало
+    const saved = localStorage.getItem("yk-theme");
+    if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

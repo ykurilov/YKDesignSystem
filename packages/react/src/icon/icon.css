@@ -1,0 +1,2 @@
+/* Значок стоит в строке рядом с текстом: не сжимается и садится на середину строчных букв */
+.yk-icon { flex: none; display: inline-block; vertical-align: -0.15em; }

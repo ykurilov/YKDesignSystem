@@ -1,0 +1,12 @@
+.yk-chip {
+  height: 22px; padding: 0 8px; border: 1px solid var(--yk-border); border-radius: var(--yk-radius-sm);
+  display: inline-flex; align-items: center; gap: 6px; flex: none; box-sizing: border-box;
+  font-family: var(--yk-font-mono); font-size: 10.5px; line-height: 1; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--yk-muted); white-space: nowrap;
+}
+.yk-chip--live { background: var(--yk-accent-soft); border-color: transparent; color: var(--yk-accent-text); }
+.yk-chip--success { background: var(--yk-success-soft); border-color: transparent; color: var(--yk-success); }
+.yk-chip--danger { background: var(--yk-danger-soft); border-color: transparent; color: var(--yk-danger); }
+.yk-chip--solid { background: var(--yk-ink); border-color: transparent; color: var(--yk-on-ink); }
+/* Поправка на поле внутри значка Phosphor (1/8 от 12px) */
+.yk-chip--with-icon { padding-left: 6.5px; }

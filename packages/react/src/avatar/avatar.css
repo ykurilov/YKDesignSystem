@@ -1,0 +1,9 @@
+.yk-avatar {
+  position: relative; display: inline-grid; place-items: center; flex: none;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--yk-surface-2); color: var(--yk-text);
+  font-family: var(--yk-font-sans); font-size: 12px; font-weight: 600; line-height: 1;
+}
+.yk-avatar--sm { width: 24px; height: 24px; font-size: 10px; }
+.yk-avatar--agent { background: var(--yk-ink); }
+.yk-avatar__new { position: absolute; right: -1px; top: -1px; box-shadow: 0 0 0 2px var(--yk-bg); }

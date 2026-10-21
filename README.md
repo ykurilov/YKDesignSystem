@@ -7,7 +7,8 @@
 ```
 packages/tokens/   @ykurilov/ds-tokens — переменные: цвета двух тем, тени, радиусы, шрифты, отступы
   src/tokens.ts    единственный источник правды; всё остальное генерируется из него
-apps/              приложения-витрины (позже)
+packages/react/    @ykurilov/ds-react — React-компоненты; каждый в своей папке src/<компонент>/ (код + css)
+apps/showcase/     витрина всех компонентов (Vite), разделы — src/sections/*.tsx
 swift/YKDesign/    Swift-пакет (этап 4); сейчас только Sources/YKDesign/Generated/Tokens.swift
 sketches/          наброски — история, не править
 ```
@@ -16,6 +17,45 @@ sketches/          наброски — история, не править
 - `dist/tokens.css` — переменные `--yk-*`; светлая тема в `:root`, тёмная — по `data-theme="dark"` и сама по системной настройке; классы `.yk-mono-label`, `.yk-mono-num`;
 - `dist/index.js` + `.d.ts` — те же значения для JS;
 - `swift/YKDesign/Sources/YKDesign/Generated/Tokens.swift` — `enum YKTokens` (коммитится).
+
+## Подключение в React-приложении
+
+```bash
+pnpm add @ykurilov/ds-tokens @ykurilov/ds-react @phosphor-icons/react
+```
+
+```tsx
+// один раз, в корне приложения: сначала переменные, потом стили компонентов
+import "@ykurilov/ds-tokens/tokens.css";
+import "@ykurilov/ds-react/styles.css";
+
+import { ArrowUpIcon } from "@phosphor-icons/react";
+import { Button, Chip, Sphere } from "@ykurilov/ds-react";
+
+export function Composer({ busy }: { busy: boolean }) {
+  return (
+    <>
+      <Chip tone="live">В работе</Chip>
+      <Button loading={busy} kbd="⌘↵">Отправить</Button>
+      <Button variant="secondary" icon={ArrowUpIcon} aria-label="Отправить" />
+      <Sphere size={24} label="Агент пишет ответ" />
+    </>
+  );
+}
+```
+
+Тема: светлая по умолчанию, тёмная — сама по системной настройке. Задать вручную: `<html data-theme="dark">` или `data-theme="light"`.
+
+Компоненты: `Icon`, `Sphere`, `NewDot`, `MonoLabel`, `MonoNum`, `Button`, `Chip`, `Tag`, `Steps`, `Avatar`. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
+
+## Витрина
+
+```bash
+pnpm --filter @ykurilov/ds-showcase dev        # http://localhost:5173, компоненты берутся из исходников
+pnpm --filter @ykurilov/ds-showcase snapshots http://localhost:5173/   # снимки светлой и тёмной темы в apps/showcase/snapshots/
+```
+
+Новый раздел — новый файл `apps/showcase/src/sections/NN-название.tsx` с `export default { order, title, description, Demo } satisfies ShowcaseSection`. Список разделов собирается сам, общий файл править не нужно. Номера: 01 цвета, 02 шрифт, 03 кнопки, 04 поля, 05 выбор, 06 метки, 07 карточки и списки, 08 всплывающее, 09 пусто и загрузка. Строка примеров — `DemoLine` и `DemoStack` из `src/layout/Demo.tsx`.
 
 ## Команды
 
