@@ -1,0 +1,20 @@
+.yk-stat { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.yk-stat__value {
+  font-family: var(--yk-font-mono); font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.yk-stat__value--accent { color: var(--yk-accent-text); }
+.yk-stat__unit { font-size: 12px; font-weight: 400; color: var(--yk-muted); margin-left: 4px; letter-spacing: 0; }
+.yk-stat__change { display: inline-flex; align-items: center; gap: 4px; font-family: var(--yk-font-mono); font-size: 11px; line-height: 1.2; }
+/* Рисунок значка стоит на 1/8 размера правее края коробки: убираем, чтобы он начинался вровень с числом */
+.yk-stat__change > .yk-icon { margin-left: -1.6px; }
+.yk-stat__change--up { color: var(--yk-success); }
+.yk-stat__change--down { color: var(--yk-danger); }
+
+.yk-stat-group {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  border: 1px solid var(--yk-border); border-radius: var(--yk-radius-lg); background: var(--yk-surface);
+}
+.yk-stat-group > .yk-stat { padding: 14px 16px; }
+.yk-stat-group > .yk-stat + .yk-stat { border-left: 1px solid var(--yk-border); }
+.yk-stat-group .yk-stat__value { font-size: 24px; }

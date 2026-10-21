@@ -1,0 +1,26 @@
+.yk-menu-anchor { position: relative; display: inline-flex; }
+.yk-menu {
+  position: absolute; top: calc(100% + 6px); z-index: 50; width: 220px; box-sizing: border-box; padding: 6px;
+  background: var(--yk-surface); border-radius: var(--yk-radius-lg); box-shadow: var(--yk-shadow-pop);
+  display: flex; flex-direction: column; animation: yk-menu-in .14s var(--yk-ease-out);
+}
+.yk-menu--start { left: 0; }
+.yk-menu--end { right: 0; }
+.yk-menu__item {
+  height: 32px; padding: 0 10px; border: 0; border-radius: 7px; margin: 0; background: transparent; color: var(--yk-text);
+  display: flex; align-items: center; gap: 10px; font: inherit; font-size: 14px; line-height: 1; text-align: left;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+/* У значка Phosphor поле в 1/8 размера: сдвигаем так, чтобы рисунок начинался там же, где текст пунктов без значка */
+.yk-menu__item--with-icon { padding-left: 8px; }
+.yk-menu__item--with-icon > .yk-icon { margin-right: -2px; }
+.yk-menu__item:focus-visible { outline: none; background: var(--yk-surface-2); }
+.yk-menu__item[aria-disabled="true"] { opacity: .4; cursor: not-allowed; }
+.yk-menu__item--danger { color: var(--yk-danger); }
+.yk-menu__kbd { margin-left: auto; font-family: var(--yk-font-mono); font-size: 10.5px; color: var(--yk-faint); }
+@media (hover: hover) {
+  .yk-menu__item:hover:not([aria-disabled="true"]) { background: var(--yk-surface-2); }
+}
+.yk-menu__separator { border: 0; border-top: 1px solid var(--yk-border); margin: 5px 0; }
+@keyframes yk-menu-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .yk-menu { animation: none; } }

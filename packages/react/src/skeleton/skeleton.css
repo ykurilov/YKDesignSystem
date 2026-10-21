@@ -1,0 +1,8 @@
+.yk-skeleton { display: flex; flex-direction: column; gap: 10px; }
+.yk-skeleton__line {
+  display: block; height: 12px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--yk-surface-2), var(--yk-surface-3), var(--yk-surface-2));
+  background-size: 200% 100%; animation: yk-shimmer 1.4s linear infinite;
+}
+@keyframes yk-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .yk-skeleton__line { animation: none; background: var(--yk-surface-2); } }
