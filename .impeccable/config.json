@@ -8,6 +8,15 @@
         "value": "cubic-bezier(.3, 1.6, .5, 1)",
         "createdAt": "2026-10-21T09:07:13.004Z",
         "reason": "agent decision: intentional spring overshoot for shape-morph demo of direction C (Material Expressive-style), sketch 01"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "sketches/06-accent-colors.html"
+        ],
+        "createdAt": "2026-10-21T10:22:45.903Z",
+        "reason": "agent decision: comparison sheet of accent colors, not product UI; type scale is defined later in the system"
       }
     ]
   }

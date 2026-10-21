@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 07 — акцентный цвет в интерфейсе</title>
+<style>
+  .base {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3;
+    --text: #141414; --muted: #6E6E6B; --border: #E9E9E6;
+    --ink: #141414; --on-ink: #FFFFFF;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  .theme-dark .base {
+    --bg: #0F0F0F; --surface: #181818; --surface-2: #222222;
+    --text: #F2F2F0; --muted: #9B9B97; --border: #2A2A2A;
+    --ink: #F2F2F0; --on-ink: #0F0F0F;
+  }
+  /* --accent и --accent-soft задаются у каждого телефона из скрипта */
+  .base { --primary: var(--accent); --on-primary: var(--on-accent); }
+  .ink-primary .base { --primary: var(--ink); --on-primary: var(--on-ink); }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 18px; font-weight: 600; margin-right: 8px; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .grid { display: grid; grid-template-columns: repeat(3, 390px); gap: 40px 36px; }
+  .label { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .label code { font-family: var(--mono); font-weight: 400; font-size: 11px; opacity: .55; margin-left: 6px; }
+
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden;
+    background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25); display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; }
+  .screen { flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 16px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: -10px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .title { font-weight: 600; letter-spacing: -0.025em; font-size: 32px; line-height: 1.1; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: 10px; }
+  .segmented button { flex: 1; border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 7px 0; border-radius: 8px; }
+  .segmented button.on { background: var(--surface); color: var(--accent-text); box-shadow: 0 1px 2px rgba(0,0,0,.08); font-weight: 600; }
+  .theme-dark .segmented button.on { background: #333; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px 3px 6px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-text); display: inline-flex; align-items: center; gap: 6px; }
+  .chip canvas { width: 14px; height: 14px; }
+  .steps { display: flex; gap: 4px; }
+  .steps i { flex: 1; height: 6px; border-radius: 2px; background: var(--surface-2); }
+  .steps i.done { background: var(--accent); }
+
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 11px 16px; font-size: 15px; }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .icon { width: 30px; height: 30px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; font-size: 14px; }
+  .row .grow { flex: 1; }
+  .row .num { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .row .chev { color: var(--muted); }
+  .new-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .switch { width: 44px; height: 26px; border-radius: 99px; background: var(--accent); position: relative; flex: none; }
+  .switch::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .check { width: 20px; height: 20px; border-radius: 5px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+
+  .field input { width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--surface); border: 1.5px solid var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 10px; padding: 11px 14px; outline: none; }
+  .field .hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .field .hint a { color: var(--accent-text); text-decoration: none; font-weight: 500; }
+
+  .buttons { display: flex; gap: 10px; }
+  .btn { flex: 1; border: 0; font: inherit; font-size: 15px; font-weight: 600; height: 46px; border-radius: 10px; }
+  .btn.primary { background: var(--primary); color: var(--on-primary); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+
+  .agent-line { margin-top: auto; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); padding-left: 2px; }
+  .agent-line canvas { width: 16px; height: 16px; }
+  .composer { margin-top: -6px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 8px 8px 16px; }
+  .composer span { flex: 1; color: var(--muted); font-size: 15px; }
+  .send { width: 36px; height: 36px; border: 0; border-radius: 9px; background: var(--primary); color: var(--on-primary); font-size: 18px; }
+
+  .tabbar { display: flex; justify-content: space-around; padding: 10px 12px 28px; border-top: 1px solid var(--border); background: var(--surface); margin-top: 12px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); position: relative; }
+  .tab b { font-size: 20px; font-weight: 400; line-height: 1; padding: 4px 18px; border-radius: 8px; font-family: system-ui; }
+  .tab.on { color: var(--accent-text); }
+  .tab.on b { background: var(--accent-soft); }
+  .tab .new-dot { position: absolute; top: 2px; right: 14px; }
+</style>
+</head>
+<body class="ink-primary">
+  <div class="page-head">
+    <h1>Набросок 07 — акцентный цвет в интерфейсе</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+    <button class="toggle" id="primaryToggle" onclick="togglePrimary()">Главная кнопка: чёрная</button>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <template id="phone">
+    <div class="phone">
+      <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="screen">
+        <div class="eyebrow">Рабочее пространство · 12</div>
+        <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+        <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+        <div class="card">
+          <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip"><canvas width="42" height="42"></canvas>В работе</span></div>
+          <div class="meta">Обновлено 2 ч назад · 3/5 задач</div>
+          <div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div>
+        </div>
+        <div class="list">
+          <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><i class="new-dot"></i><span class="num">08</span><div class="chev">›</div></div>
+          <div class="row"><div class="check">✓</div><div class="grow">Утвердить обложку</div><span class="num">14</span></div>
+          <div class="row"><div class="icon">◐</div><div class="grow">Напоминания агенту</div><span class="switch"></span></div>
+        </div>
+        <div class="field"><input value="Марафон по ИИ"><div class="hint">Название видно участникам · <a href="#">Шаблоны →</a></div></div>
+        <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+        <div class="agent-line"><canvas width="48" height="48"></canvas>собираю план рассылки, шаг 2/5</div>
+        <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+      </div>
+      <div class="tabbar"><div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат<i class="new-dot"></i></div><div class="tab"><b>☰</b>Ещё</div></div>
+    </div>
+  </template>
+
+  <script>
+    // [название, светлая: акцент, текст акцентом, мягкий фон; тёмная: то же]
+    const ACCENTS = [
+      ['Оранжевый',          ['#EE6A3C', '#C9502A', '#FCEBE3'], ['#F27D52', '#F7A07E', '#3A2219']],
+      ['Синий «чертёжный»',  ['#2F5BFF', '#2449D8', '#E6ECFF'], ['#6C8CFF', '#9AB0FF', '#1B2547']],
+      ['Сигнальный красный', ['#E5322D', '#C42722', '#FDE6E5'], ['#FF5A50', '#FF8C84', '#3D1A18']],
+      ['Янтарный',           ['#E89B00', '#A86F00', '#FFF2D6'], ['#FFB627', '#FFC95E', '#3A2C0E']],
+      ['Бирюзовый',          ['#00A0B8', '#007C8F', '#DDF5F8'], ['#2CC9DE', '#6ADBEA', '#0F3238']],
+      ['Фиолетовый',         ['#6E4BFF', '#5636E0', '#ECE7FF'], ['#9479FF', '#B3A1FF', '#251D47']],
+    ];
+
+    const SPHERE = (() => {
+      const n = 46, pts = [];
+      for (let i = 0; i < n; i++) {
+        const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+        pts.push([Math.cos(a) * r, y, Math.sin(a) * r]);
+      }
+      return pts;
+    })();
+    function drawSphere(canvas, t) {
+      const color = getComputedStyle(canvas).getPropertyValue('--accent').trim();
+      const ctx = canvas.getContext('2d'), s = canvas.width, c = s / 2, R = s * 0.375;
+      const ang = t / 1400, tilt = 0.45;
+      ctx.clearRect(0, 0, s, s);
+      const proj = SPHERE.map(([x, y, z]) => {
+        const x1 = x * Math.cos(ang) + z * Math.sin(ang), z1 = -x * Math.sin(ang) + z * Math.cos(ang);
+        return [x1, y * Math.cos(tilt) - z1 * Math.sin(tilt), y * Math.sin(tilt) + z1 * Math.cos(tilt)];
+      }).sort((a, b) => a[2] - b[2]);
+      for (const [x, y, z] of proj) {
+        const depth = (z + 1) / 2;
+        ctx.globalAlpha = 0.25 + depth * 0.75;
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(c + x * R, c + y * R, (s / 96) * (2 + depth * 3.2), 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Цвета задаём через <style>, чтобы тёмная тема переключала их вместе с остальным
+    const css = [];
+    const grid = document.getElementById('grid');
+    ACCENTS.forEach(([name, light, dark], i) => {
+      const cls = `accent-${i}`;
+      css.push(`.${cls} { --accent: ${light[0]}; --accent-text: ${light[1]}; --accent-soft: ${light[2]}; --on-accent: #fff; }`);
+      css.push(`.theme-dark .${cls} { --accent: ${dark[0]}; --accent-text: ${dark[1]}; --accent-soft: ${dark[2]}; --on-accent: #0F0F0F; }`);
+      const col = document.createElement('div');
+      col.className = `base ${cls}`;
+      col.innerHTML = `<div class="label">${name}<code>${light[0]}</code></div>`;
+      col.appendChild(document.getElementById('phone').content.cloneNode(true));
+      grid.appendChild(col);
+    });
+    const style = document.createElement('style');
+    style.textContent = css.join('\n');
+    document.head.appendChild(style);
+
+    const canvases = [...document.querySelectorAll('.phone canvas')];
+    const tick = (t) => { canvases.forEach((cv) => drawSphere(cv, t)); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+
+    function togglePrimary() {
+      const ink = document.body.classList.toggle('ink-primary');
+      document.getElementById('primaryToggle').textContent = `Главная кнопка: ${ink ? 'чёрная' : 'цветная'}`;
+    }
+  </script>
+</body>
+</html>
