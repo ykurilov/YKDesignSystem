@@ -47,3 +47,11 @@ body {
 @media (max-width: 760px) {
   .sc-swatches { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Поля и выбор */
+.sc-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.sc-fields__wide { grid-column: span 2; }
+@media (max-width: 760px) { .sc-fields { grid-template-columns: 1fr; } .sc-fields__wide { grid-column: auto; } }
+.sc-tabs-demo { min-width: 0; flex: 1; }
+/* Показывает состояние «в фокусе» без настоящего фокуса (для снимков и сравнения) */
+.sc-force-focus .yk-input { --yk-input-edge: var(--yk-accent); --yk-input-ring: var(--yk-accent-soft); }

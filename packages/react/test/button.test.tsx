@@ -1,5 +1,5 @@
 import { ArrowUpIcon } from "@phosphor-icons/react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -85,5 +85,81 @@ describe("Button", () => {
     const ref = createRef<HTMLButtonElement>();
     render(<Button ref={ref}>Кнопка</Button>);
     expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+  });
+});
+
+describe("Button как ссылка (href)", () => {
+  it("с href рендерится ссылкой a с тем же видом, без type", () => {
+    render(<Button href="/docs" variant="link">Документация</Button>);
+    const link = screen.getByRole("link", { name: "Документация" });
+    expect(link.tagName).toBe("A");
+    expect(link).toHaveAttribute("href", "/docs");
+    expect(link).not.toHaveAttribute("type");
+    expect(link).toHaveClass("yk-button", "yk-button--link", "yk-button--md");
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("любой вид и размер работают и на ссылке", () => {
+    render(<Button href="/x" variant="secondary" size="sm">Ссылка</Button>);
+    expect(screen.getByRole("link")).toHaveClass("yk-button--secondary", "yk-button--sm");
+  });
+
+  it("значок, подсказка клавиши и только-значок работают на ссылке", () => {
+    render(
+      <>
+        <Button href="/a" icon={ArrowUpIcon} kbd="G">Наверх</Button>
+        <Button href="/b" icon={ArrowUpIcon} aria-label="Вверх" />
+      </>,
+    );
+    expect(screen.getByRole("link", { name: /Наверх/ }).querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("link", { name: "Вверх" })).toHaveClass("yk-button--icon-only");
+  });
+
+  it("клик по ссылке доходит до onClick", async () => {
+    const onClick = vi.fn((e: { preventDefault(): void }) => e.preventDefault());
+    render(<Button href="/x" onClick={onClick}>Идём</Button>);
+    await userEvent.click(screen.getByRole("link"));
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("loading: aria-busy, клик отменяется, переход не происходит", async () => {
+    const onClick = vi.fn();
+    render(<Button href="/x" loading onClick={onClick}>Грузим</Button>);
+    const link = screen.getByRole("link", { name: "Грузим" });
+    expect(link).toHaveAttribute("aria-busy", "true");
+    const notPrevented = fireEvent.click(link);
+    expect(notPrevented).toBe(false);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("disabled: aria-disabled, нет в порядке табуляции, клик отменяется", async () => {
+    const onClick = vi.fn();
+    render(<Button href="/x" disabled onClick={onClick}>Нельзя</Button>);
+    const link = screen.getByRole("link", { name: "Нельзя" });
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link).toHaveAttribute("tabindex", "-1");
+    expect(link).not.toHaveAttribute("disabled");
+    expect(fireEvent.click(link)).toBe(false);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("внешняя ссылка: target и rel доходят до a", () => {
+    render(<Button href="https://example.com" target="_blank" rel="noreferrer">Сайт</Button>);
+    expect(screen.getByRole("link")).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link")).toHaveAttribute("rel", "noreferrer");
+  });
+
+  it("ref — на элемент a", () => {
+    const ref = createRef<HTMLAnchorElement>();
+    render(<Button href="/x" ref={ref}>Ссылка</Button>);
+    expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
+  });
+
+  it("ссылка-значок без aria-label — предупреждение в консоли", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    // @ts-expect-error ссылке-значку обязателен aria-label
+    render(<Button href="/x" icon={ArrowUpIcon} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("aria-label"));
+    warn.mockRestore();
   });
 });

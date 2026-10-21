@@ -7,3 +7,7 @@
 @import "./tag/tag.css";
 @import "./steps/steps.css";
 @import "./avatar/avatar.css";
+@import "./field/field.css";
+@import "./checkbox/choice.css";
+@import "./segmented/segmented.css";
+@import "./tabs/tabs.css";
