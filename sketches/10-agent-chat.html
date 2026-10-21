@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 10 — чат с агентом на телефоне</title>
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: var(--sans); background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .columns { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .label { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .label span { font-weight: 400; opacity: .6; }
+
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative;
+    background: var(--bg); color: var(--text); font-size: 15px;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25); display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; flex: none; }
+
+  /* ---------- Шапка чата ---------- */
+  .chat-head { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--border); flex: none; }
+  .chat-head .back { font-size: 22px; color: var(--text); width: 28px; }
+  .chat-head .who { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .chat-head .who b { font-size: 15px; font-weight: 600; }
+  .chat-head .who .mono-label { font-size: 9.5px; display: inline-flex; align-items: center; gap: 5px; }
+  .chat-head .more { width: 28px; text-align: right; color: var(--muted); font-size: 18px; }
+
+  .thread { flex: 1; overflow: hidden; padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---------- Сообщения ---------- */
+  .msg-user { align-self: flex-end; max-width: 82%; background: var(--surface-2); border-radius: 16px 16px 4px 16px; padding: 10px 13px; line-height: 1.45; }
+  .msg-user .att { margin-top: 8px; display: flex; align-items: center; gap: 8px; background: var(--surface); border-radius: 10px; padding: 7px 9px; font-size: 13px; }
+  .msg-user .att .mono-label { font-size: 9.5px; margin-left: auto; }
+  .msg-agent { display: flex; flex-direction: column; gap: 10px; line-height: 1.55; }
+  .msg-agent .who { display: flex; align-items: center; gap: 7px; font-size: 10.5px; }
+  .msg-agent ol { padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+  .msg-agent ol li::marker { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .msg-agent a { color: var(--accent-text); text-decoration: none; font-weight: 500; }
+  .msg-agent .day { align-self: center; font-size: 10px; }
+
+  .work { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .work header { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--sidebar); font-size: 13px; font-weight: 500; }
+  .work header .mono-label { margin-left: auto; font-size: 10px; }
+  .work .line { display: flex; align-items: center; gap: 9px; padding: 6px 12px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .work .line:first-of-type { padding-top: 9px; }
+  .work .line:last-child { padding-bottom: 10px; }
+  .work .line .ok { width: 14px; text-align: center; color: var(--text); }
+  .work .line.now { color: var(--text); }
+
+  .file { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+  .file .ic { width: 34px; height: 34px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; font-weight: 600; }
+  .file .grow { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 500; }
+  .file .grow .mono-label { font-size: 9.5px; font-weight: 400; }
+  .file .open { color: var(--muted); }
+
+  .actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { height: 32px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+  .reactions { display: flex; gap: 14px; color: var(--faint); font-size: 14px; padding-left: 2px; }
+
+  /* Карточка «нужно подтверждение» */
+  .confirm { border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); box-shadow: inset 2px 0 0 var(--accent); }
+  .confirm .mono-label { color: var(--accent-text); font-size: 10px; }
+  .confirm h4 { font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .confirm .facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+  .confirm .facts span:nth-child(odd) { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); align-self: center; }
+  .confirm .buttons { display: flex; gap: 8px; margin-top: 2px; }
+  .btn { height: 40px; flex: 1; border: 0; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; }
+  .btn.primary { background: var(--ink); color: var(--on-ink); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+
+  /* ---------- Поле ввода ---------- */
+  .composer-wrap { padding: 8px 12px 30px; flex: none; }
+  .composer { border: 1px solid var(--border-strong); border-radius: 16px; padding: 10px 10px 10px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); }
+  .composer .text { color: var(--faint); font-size: 15px; min-height: 20px; }
+  .composer .text.filled { color: var(--text); }
+  .composer .text.filled::after { content: ""; display: inline-block; width: 2px; height: 18px; background: var(--accent); vertical-align: -3px; margin-left: 1px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .composer .bar { display: flex; align-items: center; gap: 6px; }
+  .composer .tool { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); font-size: 16px; }
+  .composer .ctx { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; }
+  .send { margin-left: auto; width: 34px; height: 34px; border: 0; border-radius: 10px; background: var(--ink); color: var(--on-ink); font-size: 17px; }
+  .send.stop { background: var(--surface-2); color: var(--text); font-size: 11px; }
+
+  /* ---------- Пустой чат ---------- */
+  .hello { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 28px; text-align: center; }
+  .hello h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .hello p { color: var(--muted); line-height: 1.5; }
+  .suggest { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 6px; }
+  .suggest a { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 12px; padding: 11px 12px; color: var(--text); text-decoration: none; font-size: 14px; }
+  .suggest a .mono-label { font-size: 9.5px; width: 62px; flex: none; }
+  .suggest a .arr { margin-left: auto; color: var(--faint); }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Набросок 10 — чат с агентом на телефоне</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+
+  <div class="columns">
+
+    <!-- 1 · Новый чат -->
+    <div>
+      <div class="label">1 · Новый чат <span>— сфера крупно, подсказки</span></div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="chat-head"><span class="back">‹</span><div class="who"><b>Агент</b><span class="mono-label">Мастерская</span></div><span class="more">⋯</span></div>
+        <div class="hello">
+          <canvas class="sphere" data-size="96"></canvas>
+          <h2>Чем помочь?</h2>
+          <p>Я вижу ваши проекты, материалы курсов и прошлые рассылки.</p>
+        </div>
+        <div class="suggest">
+          <a href="#"><span class="mono-label">Написать</span>План рассылки к вебинару<span class="arr">↗</span></a>
+          <a href="#"><span class="mono-label">Разобрать</span>Что тормозит «Лендинг вебинара»<span class="arr">↗</span></a>
+          <a href="#"><span class="mono-label">Собрать</span>Квиз по уроку 7<span class="arr">↗</span></a>
+        </div>
+        <div class="composer-wrap"><div class="composer">
+          <div class="text">Спросить агента…</div>
+          <div class="bar"><span class="tool">+</span><span class="ctx">@ Мастерская</span><span class="tool">◉</span><button class="send">↑</button></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 2 · Агент работает -->
+    <div>
+      <div class="label">2 · Агент работает <span>— шаги, ответ, файл</span></div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="chat-head"><span class="back">‹</span><div class="who"><b>План рассылки</b><span class="mono-label"><canvas class="sphere" data-size="10"></canvas>Агент работает</span></div><span class="more">⋯</span></div>
+        <div class="thread">
+          <div class="msg-user">Собери план рассылки к вебинару: 5 писем, от анонса до дожима.
+            <div class="att">▤ Лендинг вебинара<span class="mono-label">Проект</span></div>
+          </div>
+          <div class="msg-agent">
+            <div class="work">
+              <header><canvas class="sphere" data-size="14"></canvas>Работаю над планом<span class="mono-label">Шаг 3/5</span></header>
+              <div class="line"><span class="ok">✓</span>прочитал лендинг вебинара</div>
+              <div class="line"><span class="ok">✓</span>нашёл 3 прошлые рассылки</div>
+              <div class="line now"><span class="ok"><canvas class="sphere" data-size="12"></canvas></span>пишу структуру писем…</div>
+            </div>
+            <div>Пока черновик такой:</div>
+            <ol><li>Анонс — за 7 дней</li><li>Польза — за 3 дня</li><li>Напоминание — в день эфира</li></ol>
+            <div>Тон беру из <a href="#">рассылки марафона →</a></div>
+            <div class="file"><span class="ic">MD</span><div class="grow">План рассылки.md<span class="mono-label">Черновик · 2 КБ</span></div><span class="open">↗</span></div>
+          </div>
+        </div>
+        <div class="composer-wrap"><div class="composer">
+          <div class="text">Уточнить по ходу…</div>
+          <div class="bar"><span class="tool">+</span><span class="ctx">@ Лендинг вебинара</span><button class="send stop">■</button></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 3 · Нужно подтверждение -->
+    <div>
+      <div class="label">3 · Нужно решение <span>— агент спрашивает разрешения</span></div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="chat-head"><span class="back">‹</span><div class="who"><b>План рассылки</b><span class="mono-label"><i class="new-dot" style="width:6px;height:6px"></i>Ждёт решения</span></div><span class="more">⋯</span></div>
+        <div class="thread">
+          <div class="msg-agent">
+            <span class="mono-label day">Сегодня · 14:20</span>
+            <div>Все 5 писем готовы. Прочитал их на ошибки и проверил ссылки — всё открывается.</div>
+            <div class="file"><span class="ic">5</span><div class="grow">Письма к вебинару<span class="mono-label">5 писем · проверено</span></div><span class="open">↗</span></div>
+            <div class="confirm">
+              <span class="mono-label">Нужно ваше решение</span>
+              <h4>Поставить письма в отправку?</h4>
+              <div class="facts"><span>Кому</span><span>Подписчики вебинара · 1 240</span><span>Первое</span><span>24 окт, 10:00</span><span>Последнее</span><span>31 окт, 18:30</span></div>
+              <div class="buttons"><button class="btn secondary">Изменить</button><button class="btn primary">Поставить</button></div>
+            </div>
+            <div class="reactions"><span>⧉</span><span>↻</span><span>▲</span><span>▼</span></div>
+          </div>
+        </div>
+        <div class="composer-wrap"><div class="composer">
+          <div class="text filled">Перенеси первое письмо на 9 утра</div>
+          <div class="bar"><span class="tool">+</span><span class="ctx">@ План рассылки</span><button class="send">↑</button></div>
+        </div></div>
+      </div>
+    </div>
+
+  </div>
+<script src="shared/sphere.js"></script>
+</body>
+</html>
