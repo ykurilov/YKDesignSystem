@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 06 — фирменный цвет</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  h1 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .lead { font-size: 13px; opacity: .65; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1240px; }
+
+  .swatch { border-radius: 18px; overflow: hidden; background: #fff; }
+  .swatch header { padding: 14px 18px 0; display: flex; justify-content: space-between; align-items: baseline; }
+  .swatch h3 { font-size: 15px; font-weight: 600; }
+  .swatch code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; opacity: .55; }
+  .swatch .note { padding: 4px 18px 0; font-size: 12px; color: #6E6E6B; line-height: 1.4; min-height: 38px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+
+  .theme { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .theme.light { --bg: #FFFFFF; --surface-2: #F4F4F3; --text: #141414; --muted: #6E6E6B; --border: #E9E9E6; background: var(--bg); }
+  .theme.dark  { --bg: #0F0F0F; --surface-2: #222222; --text: #F2F2F0; --muted: #9B9B97; --border: #2A2A2A; background: var(--bg); }
+  .theme { color: var(--text); }
+  .theme .big { display: grid; place-items: center; height: 84px; }
+  .theme canvas.big-c { width: 64px; height: 64px; }
+  .theme canvas.small-c { width: 16px; height: 16px; flex: none; }
+  .line { display: flex; align-items: center; gap: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .row span { flex: 1; }
+  .row i { width: 7px; height: 7px; border-radius: 50%; background: var(--spark); }
+  .row b { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; font-weight: 400; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>Набросок 06 — фирменный цвет</h1>
+  <p class="lead">Цвет живёт только в двух приметах: сфера «агент работает» и точка «есть новое». Всё остальное чёрно-белое.</p>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    // [название, светлая тема, тёмная тема, пояснение]
+    const ACCENTS = [
+      ['Оранжевый', '#EE6A3C', '#F27D52', 'Тёплый, дружелюбный. Близок к Claude и многим ИИ-продуктам.'],
+      ['Синий «чертёжный»', '#2F5BFF', '#6C8CFF', 'Цвет синьки — старых инженерных чертежей. Прямо продолжает «Чертёж».'],
+      ['Сигнальный красный', '#E5322D', '#FF5A50', 'Швейцарский плакат, дорожный знак. Строгий и уверенный, но может читаться как «ошибка».'],
+      ['Янтарный', '#E89B00', '#FFB627', 'Лампочка на приборной панели. Тёплый, но не «как у Claude».'],
+      ['Бирюзовый', '#00A0B8', '#2CC9DE', 'Свежий и технологичный. Спокойнее синего, но ближе к медицине и финансам.'],
+      ['Фиолетовый', '#6E4BFF', '#9479FF', 'Самый «ИИ-шный» цвет рынка. Узнаваем как жанр, не как бренд.'],
+    ];
+
+    // Сфера из точек: спираль Фибоначчи, вращение вокруг наклонной оси
+    const SPHERE = (() => {
+      const n = 46, pts = [];
+      for (let i = 0; i < n; i++) {
+        const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+        pts.push([Math.cos(a) * r, y, Math.sin(a) * r]);
+      }
+      return pts;
+    })();
+    const canvases = [];
+    function drawSphere(canvas, color, t) {
+      const ctx = canvas.getContext('2d'), s = canvas.width, c = s / 2, R = s * 0.375;
+      const ang = t / 1400, tilt = 0.45;
+      ctx.clearRect(0, 0, s, s);
+      const proj = SPHERE.map(([x, y, z]) => {
+        const x1 = x * Math.cos(ang) + z * Math.sin(ang), z1 = -x * Math.sin(ang) + z * Math.cos(ang);
+        return [x1, y * Math.cos(tilt) - z1 * Math.sin(tilt), y * Math.sin(tilt) + z1 * Math.cos(tilt)];
+      }).sort((a, b) => a[2] - b[2]);
+      for (const [x, y, z] of proj) {
+        const depth = (z + 1) / 2;
+        ctx.globalAlpha = 0.25 + depth * 0.75;
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(c + x * R, c + y * R, (s / 96) * (2 + depth * 3.2), 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    function sphereCanvas(cls, px, color) {
+      const cv = document.createElement('canvas');
+      cv.className = cls; cv.width = px; cv.height = px;
+      canvases.push([cv, color]);
+      return cv;
+    }
+
+    const grid = document.getElementById('grid');
+    for (const [name, light, dark, note] of ACCENTS) {
+      const el = document.createElement('div');
+      el.className = 'swatch';
+      el.innerHTML = `<header><h3>${name}</h3><code>${light}</code></header><p class="note">${note}</p><div class="pair"></div>`;
+      for (const [theme, color] of [['light', light], ['dark', dark]]) {
+        const pane = document.createElement('div');
+        pane.className = `theme ${theme}`;
+        pane.style.setProperty('--spark', color);
+        pane.innerHTML = `<div class="big"></div><div class="line"></div><div class="row"><span>Идеи для рассылки</span><i></i><b>08</b></div>`;
+        pane.querySelector('.big').appendChild(sphereCanvas('big-c', 128, color));
+        const line = pane.querySelector('.line');
+        line.appendChild(sphereCanvas('small-c', 48, color));
+        line.append('собираю план, шаг 2/5');
+        el.querySelector('.pair').appendChild(pane);
+      }
+      grid.appendChild(el);
+    }
+    const tick = (t) => { for (const [cv, color] of canvases) drawSphere(cv, color, t); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
