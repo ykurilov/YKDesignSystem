@@ -1,0 +1,43 @@
+.yk-button {
+  --yk-button-height: 40px;
+  --yk-button-pad-x: 16px;
+  --yk-button-icon: 16px;
+  --yk-button-ring: 0 0 0 0 transparent;
+  --yk-button-edge: 0 0 0 0 transparent;
+  height: var(--yk-button-height); padding: 0 var(--yk-button-pad-x); border: 0; border-radius: var(--yk-radius-md); margin: 0;
+  font-family: var(--yk-font-sans); font-size: 14px; font-weight: 600; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: none;
+  cursor: pointer; white-space: nowrap; text-decoration: none; -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--yk-button-edge), var(--yk-button-ring);
+  transition: background-color .15s, transform .2s var(--yk-ease-out), box-shadow .15s;
+}
+.yk-button:focus-visible { outline: none; --yk-button-ring: 0 0 0 2px var(--yk-bg), 0 0 0 4px var(--yk-accent); }
+.yk-button:active:not(:disabled):not([aria-disabled="true"]) { transform: scale(.97); }
+.yk-button:disabled { opacity: .4; cursor: not-allowed; }
+.yk-button[aria-busy="true"] { cursor: progress; }
+
+/* Виды */
+.yk-button--primary { background: var(--yk-ink); color: var(--yk-on-ink); }
+.yk-button--secondary { background: var(--yk-surface-2); color: var(--yk-text); }
+.yk-button--outline { background: transparent; color: var(--yk-text); --yk-button-edge: inset 0 0 0 1px var(--yk-border-strong); }
+.yk-button--ghost { background: transparent; color: var(--yk-text); }
+.yk-button--danger { background: var(--yk-danger); color: #fff; }
+.yk-button--link { background: transparent; color: var(--yk-accent-text); --yk-button-pad-x: 4px; font-weight: 500; }
+
+@media (hover: hover) {
+  .yk-button--primary:hover:enabled:not([aria-busy="true"]) { background: color-mix(in srgb, var(--yk-ink) 85%, var(--yk-bg)); }
+  .yk-button--secondary:hover:enabled:not([aria-busy="true"]) { background: var(--yk-surface-3); }
+  .yk-button--outline:hover:enabled:not([aria-busy="true"]),
+  .yk-button--ghost:hover:enabled:not([aria-busy="true"]) { background: var(--yk-surface-2); }
+  .yk-button--danger:hover:enabled:not([aria-busy="true"]) { background: color-mix(in srgb, var(--yk-danger) 88%, #000); }
+  .yk-button--link:hover:enabled { text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* Размеры */
+.yk-button--sm { --yk-button-height: 32px; --yk-button-pad-x: 12px; --yk-button-icon: 14px; font-size: 13px; border-radius: 8px; gap: 6px; }
+.yk-button--lg { --yk-button-height: 48px; --yk-button-pad-x: 22px; --yk-button-icon: 18px; font-size: 15px; }
+.yk-button--icon-only { width: var(--yk-button-height); padding: 0; }
+/* У значков Phosphor внутри рамки поле в 1/8 размера: без поправки рисунок отстоит от края дальше, чем текст справа */
+.yk-button--leading:not(.yk-button--icon-only) { padding-left: calc(var(--yk-button-pad-x) - var(--yk-button-icon) / 8); }
+
+.yk-button__kbd { font-family: var(--yk-font-mono); font-size: 10px; font-weight: 400; opacity: .6; }

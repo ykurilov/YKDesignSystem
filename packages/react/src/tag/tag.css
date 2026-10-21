@@ -1,0 +1,20 @@
+.yk-tag {
+  height: 26px; padding: 0 10px; border: 0; border-radius: 99px; margin: 0; box-sizing: border-box;
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  background: var(--yk-surface-2); color: var(--yk-text);
+  font-family: var(--yk-font-sans); font-size: 13px; line-height: 1; white-space: nowrap;
+}
+.yk-tag--removable { padding-right: 4px; }
+.yk-tag--action { cursor: pointer; }
+/* Поправка на поле внутри значка Phosphor (1/8 от 12px) */
+.yk-tag--with-icon { padding-left: 8.5px; }
+.yk-tag__remove {
+  width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; margin: 0;
+  display: inline-grid; place-items: center; background: transparent; color: var(--yk-faint); cursor: pointer;
+}
+.yk-tag__remove .yk-icon { vertical-align: 0; }
+@media (hover: hover) {
+  .yk-tag--action:hover { background: var(--yk-surface-3); }
+  .yk-tag__remove:hover { background: var(--yk-surface-3); color: var(--yk-text); }
+}
+.yk-tag--action:focus-visible, .yk-tag__remove:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--yk-bg), 0 0 0 4px var(--yk-accent); }
