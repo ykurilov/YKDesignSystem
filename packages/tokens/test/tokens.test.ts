@@ -8,7 +8,7 @@ describe("переменные", () => {
     const lightNames = Object.keys(tokens.color.light).sort();
     const darkNames = Object.keys(tokens.color.dark).sort();
     expect(darkNames).toEqual(lightNames);
-    expect(lightNames).toHaveLength(19);
+    expect(lightNames).toHaveLength(20);
   });
 
   it("все цвета — шестизначный hex", () => {
