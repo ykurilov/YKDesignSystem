@@ -61,6 +61,69 @@ public enum YKTokens {
         public static let label: CGFloat = 11
         public static let number: CGFloat = 24
     }
+
+    /// Роли шрифта. Разрядка — в долях кегля (em), высота строки — множитель кегля.
+    public enum Text {
+        public static let display = YKTextStyle(family: .sans, size: 30, weight: 600, letterSpacing: -0.025, lineHeight: 1.1, uppercase: false)
+        public static let title = YKTextStyle(family: .sans, size: 22, weight: 600, letterSpacing: -0.02, lineHeight: nil, uppercase: false)
+        public static let heading = YKTextStyle(family: .sans, size: 17, weight: 600, letterSpacing: -0.01, lineHeight: nil, uppercase: false)
+        public static let body = YKTextStyle(family: .sans, size: 15, weight: 400, letterSpacing: 0, lineHeight: 1.5, uppercase: false)
+        public static let small = YKTextStyle(family: .sans, size: 13, weight: 400, letterSpacing: 0, lineHeight: nil, uppercase: false)
+        public static let label = YKTextStyle(family: .mono, size: 11, weight: 400, letterSpacing: 0.08, lineHeight: nil, uppercase: true)
+        public static let number = YKTextStyle(family: .mono, size: 24, weight: 500, letterSpacing: -0.02, lineHeight: nil, uppercase: false)
+    }
+
+    /// Тени: слои для светлой и тёмной темы.
+    public enum Shadow {
+        public static let pop = YKShadow(light: [YKShadowLayer(x: 0, y: 12, blur: 32, spread: 0, color: YKRGBA(red: 0, green: 0, blue: 0, alpha: 0.12)), YKShadowLayer(x: 0, y: 2, blur: 6, spread: 0, color: YKRGBA(red: 0, green: 0, blue: 0, alpha: 0.06))], dark: [YKShadowLayer(x: 0, y: 12, blur: 32, spread: 0, color: YKRGBA(red: 0, green: 0, blue: 0, alpha: 0.5)), YKShadowLayer(x: 0, y: 0, blur: 0, spread: 1, color: YKRGBA(red: 42, green: 42, blue: 42, alpha: 1))])
+    }
+
+    /// Кривые плавности анимаций.
+    public enum Easing {
+        public static let out = YKCubicBezier(x1: 0.22, y1: 1, x2: 0.36, y2: 1)
+    }
+}
+
+/// Стиль текста: системный или моноширинный шрифт, кегль, вес (100–900), разрядка в em.
+public struct YKTextStyle: Sendable, Equatable {
+    public enum Family: Sendable { case sans, mono }
+    public let family: Family
+    public let size: CGFloat
+    public let weight: Int
+    public let letterSpacing: CGFloat
+    public let lineHeight: CGFloat?
+    public let uppercase: Bool
+}
+
+/// Цвет каналами 0–255 и прозрачностью 0–1.
+public struct YKRGBA: Sendable, Equatable {
+    public let red: Int
+    public let green: Int
+    public let blue: Int
+    public let alpha: Double
+}
+
+/// Один слой тени: смещение, размытие и растяжение в точках.
+public struct YKShadowLayer: Sendable, Equatable {
+    public let x: CGFloat
+    public let y: CGFloat
+    public let blur: CGFloat
+    public let spread: CGFloat
+    public let color: YKRGBA
+}
+
+/// Тень для двух тем.
+public struct YKShadow: Sendable, Equatable {
+    public let light: [YKShadowLayer]
+    public let dark: [YKShadowLayer]
+}
+
+/// Кривая плавности как в CSS cubic-bezier().
+public struct YKCubicBezier: Sendable, Equatable {
+    public let x1: Double
+    public let y1: Double
+    public let x2: Double
+    public let y2: Double
 }
 
 /// Цвет, который сам меняется при смене светлой и тёмной темы.
