@@ -30,8 +30,11 @@ public struct YKFieldState: Equatable, Sendable {
     }
 
     public var backgroundRole: YKColorRole { isEnabled ? .surface : .surface2 }
-    public var textRole: YKColorRole { isEnabled ? .text : .faint }
+    /// Отключённое поле узнаётся по серому фону; текст остаётся читаемым — muted, не faint.
+    public var textRole: YKColorRole { isEnabled ? .text : .muted }
     public var hintRole: YKColorRole { hasError ? .danger : .muted }
+    /// Плейсхолдер — текст, поэтому muted: faint только для декора.
+    public var placeholderRole: YKColorRole { .muted }
 }
 
 /// Рамка поля: рисует состояние вокруг любого содержимого (строка ввода, выбор из списка, поиск).
@@ -85,7 +88,7 @@ public struct YKTextField: View {
     public var body: some View {
         let state = YKFieldState(isFocused: isFocused, hasError: error != nil, isEnabled: isEnabled)
         YKField(label: label, hint: error ?? hint, state: state) {
-            TextField(text: $text, prompt: Text(placeholder).foregroundStyle(YKColorRole.faint.color)) {
+            TextField(text: $text, prompt: Text(placeholder).foregroundStyle(state.placeholderRole.color)) {
                 Text(label ?? placeholder)
             }
             .focused($isFocused)

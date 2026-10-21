@@ -1,12 +1,20 @@
 import SwiftUI
 
 /// Витрина компонентов — разделы как в наброске 09.
-/// `initialSection` (1…9) сразу прокручивает к разделу: так снимаются снимки экрана.
+/// `initialSection` (1…9) сразу прокручивает к разделу, `presenting` сразу открывает окно или шторку:
+/// так снимаются снимки экрана.
 public struct YKShowcaseView: View {
-    let initialSection: Int?
+    /// Что открыть поверх витрины при запуске.
+    public enum Presentation: String, Sendable {
+        case sheet, alert, dialog
+    }
 
-    public init(initialSection: Int? = nil) {
+    let initialSection: Int?
+    let presenting: Presentation?
+
+    public init(initialSection: Int? = nil, presenting: Presentation? = nil) {
         self.initialSection = initialSection
+        self.presenting = presenting
     }
 
     public var body: some View {
@@ -26,8 +34,10 @@ public struct YKShowcaseView: View {
                     ShowcaseSection(5, "Выбор", "Включённое — оранжевым.") { ChoiceDemo() }
                     ShowcaseSection(6, "Метки и приметы", "Сфера — «агент работает». Точка — «есть новое».") { MarksDemo() }
                     ShowcaseSection(7, "Карточки и списки", nil) { CardsDemo() }
-                    ShowcaseSection(8, "Уведомления", "Плашки в потоке экрана и всплывающее уведомление.") { NoticesDemo() }
-                    ShowcaseSection(9, "Пусто", nil) { EmptyDemo() }
+                    ShowcaseSection(8, "Всплывающее", "Окно, меню, шторка снизу, уведомления. Окна и меню — системные, в нашем цвете.") {
+                        OverlaysDemo(presenting: presenting)
+                    }
+                    ShowcaseSection(9, "Пусто и загрузка", nil) { EmptyDemo() }
                 }
                 .padding(.horizontal, YKTokens.Space.s5)
                 .padding(.top, YKTokens.Space.s4)
@@ -183,7 +193,7 @@ private struct TypeDemo: View {
 
     private func row(_ label: String, @ViewBuilder sample: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(label).ykMonoLabel(color: .faint)
+            Text(label).ykMonoLabel()
             sample()
         }
     }
@@ -219,6 +229,14 @@ private struct ButtonsDemo: View {
                 }
                 .buttonStyle(.yk(.primary, size: .lg))
             }
+            DemoLine("Значки") {
+                YKIconButton(.arrowUp, label: "Отправить", variant: .primary) {}
+                YKIconButton(.plus, label: "Добавить") {}
+                YKIconButton(.pencilSimple, label: "Переименовать", variant: .outline) {}
+                YKIconButton(.copy, label: "Скопировать", variant: .ghost) {}
+                YKIconButton(.trash, label: "Удалить", variant: .danger, size: .sm) {}
+                YKIconButton(.stop, label: "Остановить", variant: .secondary, size: .lg, iconWeight: .fill) {}
+            }
             Button {} label: { Text("Создать · на всю ширину").frame(maxWidth: .infinity) }
                 .buttonStyle(.yk(.primary, size: .lg))
         }
@@ -248,7 +266,7 @@ private struct FieldsDemo: View {
                     YKIcon(.magnifyingGlass)
                     Text("Найти проект")
                 }
-                .foregroundStyle(YKColorRole.faint.color)
+                .foregroundStyle(YKColorRole.muted.color)
             }
             YKTextField("Отключено", text: $readOnly).disabled(true)
         }
@@ -263,6 +281,8 @@ private struct ChoiceDemo: View {
     @State private var agentSends = true
     @State private var darkTheme = false
     @State private var filter = "all"
+    @State private var period = "daily"
+    @State private var tab = "overview"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -275,8 +295,19 @@ private struct ChoiceDemo: View {
                 Toggle("Агент может отправлять письма", isOn: $agentSends).toggleStyle(.ykSwitch)
                 Toggle("Тёмная тема", isOn: $darkTheme).toggleStyle(.ykSwitch)
             }
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Радио").ykMonoLabel()
+                YKRadioGroup(selection: $period, options: [("daily", "Каждый день"), ("weekly", "Раз в неделю"), ("never", "Не напоминать")])
+            }
             DemoLine("Сегменты") {
                 YKSegmented(selection: $filter, options: [("all", "Все"), ("mine", "Мои"), ("archive", "Архив")])
+            }
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Вкладки").ykMonoLabel()
+                YKTabs(selection: $tab, tabs: [
+                    YKTab("overview", "Обзор"), YKTab("tasks", "Задачи", count: 27),
+                    YKTab("files", "Файлы", count: 8), YKTab("history", "История"),
+                ])
             }
         }
         .ykText(.body, size: 14)
@@ -327,6 +358,7 @@ private struct MarksDemo: View {
 
 private struct CardsDemo: View {
     @State private var reminders = true
+    private let recentFiles = ["План рассылки.md", "Квиз по уроку 7.md", "Обложка вебинара.png"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -342,36 +374,118 @@ private struct CardsDemo: View {
             YKStat("Задач открыто", value: "27", total: "/ 64", delta: "12% за неделю")
             YKListGroup {
                 YKListRow("Идеи для рассылки", subtitle: "8 заметок", icon: .sparkle, accessory: .newDotAndChevron, isSelected: true)
+                YKListDivider()
                 YKListRow("Обложки курса", subtitle: "14 файлов", icon: .image, accessory: .chevron)
+                YKListDivider()
                 YKListRow("Напоминания агенту", icon: .bell) {
                     Toggle(isOn: $reminders) { EmptyView() }.toggleStyle(.ykSwitch)
                 }
+                YKListDivider()
                 YKListRow("Задачи", icon: .listChecks, accessory: .value("27"))
+            }
+            YKListGroup(recentFiles, id: \.self) { name in
+                YKListRow(name, icon: .fileText, accessory: .chevron)
             }
         }
     }
 }
 
-// MARK: - 08 Уведомления
+// MARK: - 08 Всплывающее
 
-private struct NoticesDemo: View {
+private struct OverlaysDemo: View {
+    @State private var showsSheet = false
+    @State private var showsAlert = false
+    @State private var showsDialog = false
+    @State private var projectName = "Марафон по ИИ"
+    let presenting: YKShowcaseView.Presentation?
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 18) {
+            DemoLine("Открыть") {
+                Button("Окно") { showsAlert = true }.buttonStyle(.yk(.outline))
+                Button("Выбор действия") { showsDialog = true }.buttonStyle(.yk(.outline))
+                Button("Шторка") { showsSheet = true }.buttonStyle(.yk(.outline))
+            }
+            DemoLine("Меню") {
+                YKMenuButton {
+                    projectMenuItems
+                } label: {
+                    HStack(spacing: 6) { Text("Действия"); YKIcon(.caretDown, size: 14) }
+                }
+                YKMenuButton(label: "Ещё действия", variant: .ghost) { projectMenuItems }
+            }
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Шторка · вид").ykMonoLabel()
+                sheetBody
+                    .background(YKSheetMetrics.backgroundRole.color, in: UnevenRoundedRectangle(
+                        topLeadingRadius: YKSheetMetrics.cornerRadius, topTrailingRadius: YKSheetMetrics.cornerRadius
+                    ))
+                    .ykPopShadow(cornerRadius: YKSheetMetrics.cornerRadius)
+                    .padding(YKTokens.Space.s4)
+                    .padding(.bottom, -YKTokens.Space.s4)
+                    .background(YKColorRole.surface2.color, in: RoundedRectangle(cornerRadius: YKTokens.Radius.xl))
+                    .clipShape(RoundedRectangle(cornerRadius: YKTokens.Radius.xl))
+            }
             YKToast("Проект удалён", actionTitle: "Вернуть") {}
             YKBanner("Агент собирает план рассылки.", message: "Можно закрыть окно — пришлём уведомление, когда будет готово.", kind: .agent)
             YKBanner("Письмо не отправлено.", message: "Почтовый сервис не отвечает. Агент повторит через 5 минут.", kind: .danger)
             YKBanner("Черновик сохранён.", message: "Его видите только вы, пока не нажмёте «Опубликовать».")
         }
+        .ykSystemDialogs()
+        .alert("Удалить «Квиз по уроку 7»?", isPresented: $showsAlert) {
+            Button("Отмена", role: .cancel) {}
+            Button("Удалить", role: .destructive) {}
+        } message: {
+            Text("Проект и 5 задач исчезнут. Вернуть их можно в течение 30 дней из архива.")
+        }
+        .confirmationDialog("Квиз по уроку 7", isPresented: $showsDialog, titleVisibility: .visible) {
+            projectMenuItems
+            Button("Отмена", role: .cancel) {}
+        }
+        .ykSheet(isPresented: $showsSheet, title: "Новый проект", detents: [.height(240), .medium]) {
+            sheetFields
+        }
+        .onAppear {
+            switch presenting {
+            case .sheet: showsSheet = true
+            case .alert: showsAlert = true
+            case .dialog: showsDialog = true
+            case nil: break
+            }
+        }
+    }
+
+    @ViewBuilder private var projectMenuItems: some View {
+        // Пункты системного меню — без значков: SF Symbols не наши, а Phosphor-картинки система не уменьшает
+        Button("Переименовать") {}
+        Button("Дублировать") {}
+        Button("Спросить агента") {}
+        Button("Удалить", role: .destructive) {}
+    }
+
+    private var sheetBody: some View {
+        YKSheetContent(title: "Новый проект") { sheetFields }
+    }
+
+    private var sheetFields: some View {
+        VStack(spacing: 12) {
+            YKTextField(text: $projectName)
+            Button {} label: { Text("Создать").frame(maxWidth: .infinity) }
+                .buttonStyle(.yk(.primary, size: .lg))
+        }
     }
 }
 
-// MARK: - 09 Пусто
+// MARK: - 09 Пусто и загрузка
 
 private struct EmptyDemo: View {
     var body: some View {
-        YKEmptyState(label: "Проектов · 0", title: "Здесь пока пусто", message: "Создайте проект сами или опишите задачу агенту — он соберёт черновик.") {
-            Button("Спросить агента") {}.buttonStyle(.yk(.secondary))
-            Button("Создать проект") {}.buttonStyle(.yk(.primary))
+        VStack(alignment: .leading, spacing: 16) {
+            YKEmptyState(label: "Проектов · 0", title: "Здесь пока пусто", message: "Создайте проект сами или опишите задачу агенту — он соберёт черновик.") {
+                Button("Спросить агента") {}.buttonStyle(.yk(.secondary))
+                Button("Создать проект") {}.buttonStyle(.yk(.primary))
+            }
+            YKCard { YKSkeleton() }
         }
     }
 }

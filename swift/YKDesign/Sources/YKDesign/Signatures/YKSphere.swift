@@ -1,16 +1,31 @@
 import SwiftUI
 
+/// Как сферу видит VoiceOver: с подписью — элемент-статус, без подписи — скрыта (рядом и так есть текст).
+public struct YKSphereAccessibility: Equatable, Sendable {
+    public let label: String?
+
+    public init(label: String?) {
+        self.label = label?.isEmpty == true ? nil : label
+    }
+
+    public var isHidden: Bool { label == nil }
+}
+
 /// Сфера из точек — «агент работает». Одна и та же в крупном и мелком размере.
 /// При включённом «Уменьшении движения» стоит на месте.
 public struct YKSphere: View {
     let size: CGFloat
     let color: Color?
+    let accessibility: YKSphereAccessibility
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// - Parameter color: по умолчанию — акцент.
-    public init(size: CGFloat = 16, color: Color? = nil) {
+    /// - Parameters:
+    ///   - color: по умолчанию — акцент.
+    ///   - label: подпись для VoiceOver, когда сфера одна сообщает о работе агента («Агент пишет ответ»).
+    public init(size: CGFloat = 16, color: Color? = nil, label: String? = nil) {
         self.size = size
         self.color = color
+        self.accessibility = YKSphereAccessibility(label: label)
     }
 
     public var body: some View {
@@ -33,7 +48,19 @@ public struct YKSphere: View {
             }
         }
         .frame(width: size, height: size)
-        .accessibilityHidden(true)
+        .ykSphereAccessibility(accessibility)
+    }
+}
+
+private extension View {
+    @ViewBuilder func ykSphereAccessibility(_ accessibility: YKSphereAccessibility) -> some View {
+        if let label = accessibility.label {
+            accessibilityElement()
+                .accessibilityLabel(Text(label))
+                .accessibilityAddTraits(.updatesFrequently)
+        } else {
+            accessibilityHidden(true)
+        }
     }
 }
 

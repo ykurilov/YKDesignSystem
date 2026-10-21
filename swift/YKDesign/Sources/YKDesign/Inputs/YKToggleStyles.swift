@@ -7,9 +7,12 @@ public enum YKSwitchAppearance {
 
     public static func trackRole(isOn: Bool) -> YKColorRole { isOn ? .accent : .surface3 }
 
-    /// Отступ кружка от левого края дорожки.
-    public static func knobOffset(isOn: Bool) -> CGFloat {
-        isOn ? trackSize.width - knobDiameter - 3 : 3
+    /// Зазор между кружком и краем дорожки.
+    public static let knobInset: CGFloat = 3
+
+    /// Включённый кружок — у конечного края (справа, а при письме справа налево — слева).
+    public static func knobAlignment(isOn: Bool) -> HorizontalAlignment {
+        isOn ? .trailing : .leading
     }
 }
 
@@ -27,13 +30,13 @@ public struct YKSwitchToggleStyle: ToggleStyle {
             configuration.isOn.toggle()
         } label: {
             HStack(spacing: 10) {
-                ZStack(alignment: .leading) {
+                ZStack(alignment: Alignment(horizontal: YKSwitchAppearance.knobAlignment(isOn: configuration.isOn), vertical: .center)) {
                     Capsule().fill(YKSwitchAppearance.trackRole(isOn: configuration.isOn).color)
                     Circle()
                         .fill(Color.white)
                         .shadow(color: .black.opacity(0.2), radius: 1.5, y: 1)
                         .frame(width: YKSwitchAppearance.knobDiameter, height: YKSwitchAppearance.knobDiameter)
-                        .offset(x: YKSwitchAppearance.knobOffset(isOn: configuration.isOn))
+                        .padding(.horizontal, YKSwitchAppearance.knobInset)
                 }
                 .frame(width: YKSwitchAppearance.trackSize.width, height: YKSwitchAppearance.trackSize.height)
                 .animation(.ykOut(), value: configuration.isOn)
