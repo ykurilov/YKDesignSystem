@@ -7,6 +7,18 @@ public enum YKSkeletonAppearance {
 
     public static func isShimmering(reduceMotion: Bool) -> Bool { !reduceMotion }
 
+    /// Чем залиты полосы.
+    public enum Fill: Equatable, Sendable {
+        /// Ровная плашка — при «Уменьшении движения».
+        case flat(YKColorRole)
+        /// Основа с бегущим бликом.
+        case shimmer(base: YKColorRole, highlight: YKColorRole)
+    }
+
+    public static func fill(reduceMotion: Bool) -> Fill {
+        isShimmering(reduceMotion: reduceMotion) ? .shimmer(base: .surface2, highlight: .surface3) : .flat(.surface2)
+    }
+
     /// Положение блика 0…1 через `elapsed` секунд.
     public static func phase(elapsed: TimeInterval, reduceMotion: Bool = false) -> Double {
         guard isShimmering(reduceMotion: reduceMotion) else { return 0 }
@@ -46,11 +58,15 @@ public struct YKSkeleton: View {
     }
 
     private func fill(phase: Double) -> AnyShapeStyle {
-        guard !reduceMotion else { return AnyShapeStyle(YKColorRole.surface2.color) }
-        // Блик проходит слева направо: градиент вдвое шире полосы и сдвигается по фазе
-        let start = UnitPoint(x: 1 - phase * 2, y: 0.5)
-        let end = UnitPoint(x: 3 - phase * 2, y: 0.5)
-        let gradient = Gradient(colors: [YKColorRole.surface2.color, YKColorRole.surface3.color, YKColorRole.surface2.color])
-        return AnyShapeStyle(LinearGradient(gradient: gradient, startPoint: start, endPoint: end))
+        switch YKSkeletonAppearance.fill(reduceMotion: reduceMotion) {
+        case .flat(let role):
+            return AnyShapeStyle(role.color)
+        case .shimmer(let base, let highlight):
+            // Блик проходит слева направо: градиент вдвое шире полосы и сдвигается по фазе
+            let start = UnitPoint(x: 1 - phase * 2, y: 0.5)
+            let end = UnitPoint(x: 3 - phase * 2, y: 0.5)
+            let gradient = Gradient(colors: [base.color, highlight.color, base.color])
+            return AnyShapeStyle(LinearGradient(gradient: gradient, startPoint: start, endPoint: end))
+        }
     }
 }

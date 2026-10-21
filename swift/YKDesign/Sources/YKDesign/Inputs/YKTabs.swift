@@ -10,6 +10,17 @@ public enum YKTabsAppearance {
     public static let countRole: YKColorRole = .muted
 }
 
+/// Что VoiceOver говорит о вкладках.
+public enum YKTabsAccessibility {
+    /// «Задачи, 27» — название и счётчик одной фразой.
+    public static func label(title: String, count: Int?) -> String {
+        count.map { "\(title), \($0)" } ?? title
+    }
+
+    /// Ряд вкладок для VoiceOver — панель вкладок: он объявляет «вкладка 2 из 4».
+    public static let rowTraits: AccessibilityTraits = .isTabBar
+}
+
 /// Вкладка: название и необязательный счётчик моноширинными цифрами.
 public struct YKTab<Value: Hashable>: Hashable {
     public let value: Value
@@ -40,6 +51,8 @@ public struct YKTabs<Value: Hashable>: View {
                     tabButton(tab)
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(YKTabsAccessibility.rowTraits)
         }
         .scrollIndicators(.hidden)
         .overlay(alignment: .bottom) { YKColorRole.border.color.frame(height: 1) }
@@ -71,6 +84,7 @@ public struct YKTabs<Value: Hashable>: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(Text(YKTabsAccessibility.label(title: tab.title, count: tab.count)))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
