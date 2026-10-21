@@ -116,7 +116,7 @@ public struct YKField<Content: View>: View {
             YKFieldBox(state: state) { content }
             if let hint {
                 Text(hint)
-                    .modifier(YKTextStyleModifier(style: YKTokens.Text.small, size: 12.5, relativeTo: .footnote))
+                    .ykText(.small, size: 12.5)
                     .foregroundStyle(state.hintRole.color)
             }
         }

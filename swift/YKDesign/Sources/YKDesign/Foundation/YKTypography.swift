@@ -96,9 +96,10 @@ struct YKTextStyleModifier: ViewModifier {
 }
 
 public extension View {
-    /// Роль текста: `.ykText(.heading)`.
-    func ykText(_ role: YKTextRole) -> some View {
-        modifier(YKTextStyleModifier(style: role.style, relativeTo: role.dynamicTypeStyle))
+    /// Роль текста: `.ykText(.heading)`. `size` и `weight` — для плотных мест (строка списка 14, плашка 14);
+    /// кегль всё равно растёт вместе с крупным шрифтом системы.
+    func ykText(_ role: YKTextRole, size: CGFloat? = nil, weight: Int? = nil) -> some View {
+        modifier(YKTextStyleModifier(style: role.style, size: size, weight: weight, relativeTo: role.dynamicTypeStyle))
     }
 
     /// Метка «Чертежа»: моноширинный капс с разрядкой, приглушённым цветом. Только для меток, не для текста.

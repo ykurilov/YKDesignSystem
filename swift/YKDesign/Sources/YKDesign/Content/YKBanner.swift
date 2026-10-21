@@ -41,8 +41,7 @@ public struct YKBanner: View {
                 EmptyView()
             }
             Text("\(Text(title).fontWeight(.semibold)) \(message)")
-                .font(.system(size: 14))
-                .lineSpacing(14 * 0.25)
+                .ykText(.body, size: 14)
                 .foregroundStyle(YKColorRole.text.color)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -72,7 +71,7 @@ public struct YKToast: View {
     public var body: some View {
         HStack(spacing: YKTokens.Space.s3) {
             Text(message)
-                .font(.system(size: 14))
+                .ykText(.body, size: 14)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let actionTitle, let action {
                 Button(actionTitle, action: action)
@@ -93,7 +92,8 @@ private struct YKToastActionStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
         configuration.label
-            .font(.system(size: 13, weight: .semibold))
+            .ykText(.small, weight: 600)
+            .fixedSize()
             .padding(.horizontal, 10)
             .frame(minHeight: 30)
             .overlay { shape.strokeBorder(YKColorRole.onInk.color.opacity(0.3), lineWidth: 1) }

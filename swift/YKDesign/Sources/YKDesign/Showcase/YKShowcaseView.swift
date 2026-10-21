@@ -34,6 +34,10 @@ public struct YKShowcaseView: View {
                 .padding(.bottom, YKTokens.Space.s10)
             }
             .background(YKColorRole.bg.color)
+            // Полоса цвета фона под строкой состояния: прокрученный текст не лезет под часы
+            .safeAreaInset(edge: .top, spacing: 0) {
+                Color.clear.frame(height: 0).background(YKColorRole.bg.color)
+            }
             .foregroundStyle(YKColorRole.text.color)
             .onAppear {
                 if let initialSection { proxy.scrollTo(initialSection, anchor: .top) }
@@ -275,7 +279,7 @@ private struct ChoiceDemo: View {
                 YKSegmented(selection: $filter, options: [("all", "Все"), ("mine", "Мои"), ("archive", "Архив")])
             }
         }
-        .font(.system(size: 14))
+        .ykText(.body, size: 14)
     }
 }
 
@@ -328,7 +332,7 @@ private struct CardsDemo: View {
         VStack(alignment: .leading, spacing: 16) {
             YKCard {
                 HStack {
-                    Text("Лендинг вебинара").font(.system(size: 16, weight: .semibold)).tracking(-0.16)
+                    Text("Лендинг вебинара").ykText(.heading, size: 16)
                     Spacer(minLength: 8)
                     YKChip("В работе", kind: .live)
                 }

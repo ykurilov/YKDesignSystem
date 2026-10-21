@@ -40,10 +40,10 @@ public struct YKListRow<Trailing: View>: View {
                     .background(YKColorRole.surface2.color, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 14))
+                Text(title).ykText(.body, size: 14)
                 if let subtitle {
                     Text(subtitle)
-                        .modifier(YKTextStyleModifier(style: YKTokens.Text.small, size: 12.5, relativeTo: .footnote))
+                        .ykText(.small, size: 12.5)
                         .foregroundStyle(YKColorRole.muted.color)
                 }
             }

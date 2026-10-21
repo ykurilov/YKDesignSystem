@@ -19,12 +19,15 @@ public struct YKEmptyState<Actions: View>: View {
             if let label { Text(label).ykMonoLabel() }
             Text(title).ykText(.heading).foregroundStyle(YKColorRole.text.color)
             Text(message)
-                .font(.system(size: 14))
-                .lineSpacing(14 * 0.3)
+                .ykText(.body, size: 14)
                 .foregroundStyle(YKColorRole.muted.color)
                 .frame(maxWidth: 320)
-            HStack(spacing: YKTokens.Space.s3) { actions }
-                .padding(.top, 6)
+            // Кнопки в ряд, а если не помещаются (узкий экран, крупный шрифт) — столбиком
+            ViewThatFits {
+                HStack(spacing: YKTokens.Space.s3) { actions }
+                VStack(spacing: YKTokens.Space.s2) { actions }
+            }
+            .padding(.top, 6)
         }
         .multilineTextAlignment(.center)
         .padding(36)

@@ -4,7 +4,8 @@
 # Запуск с основного Mac: imac-run --no-setup --fetch swift/screenshots -- 'bash swift/run-showcase.sh'
 set -euo pipefail
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-export PATH=$HOME/.local/bin:$PATH
+# XcodeGen ищет свои наборы настроек рядом с настоящим файлом, а не со ссылкой в ~/.local/bin
+XCODEGEN=$(readlink -f "$(command -v xcodegen || echo "$HOME/.local/bin/xcodegen")")
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEVICE=$(xcrun simctl list devices available | awk '/-- iOS 18.5 --/{f=1;next} /^--/{f=0} f && /iPhone 16 \(/{gsub(/[()]/,"",$3); print $3; exit}')
 BUNDLE=cloud.kurilov.YKShowcaseApp
@@ -14,9 +15,9 @@ LARGE_SECTIONS="${LARGE_SECTIONS:-2 3 4 7 8}"
 mkdir -p "$OUT"
 
 cd "$ROOT/YKShowcaseApp"
-xcodegen generate --quiet
+"$XCODEGEN" generate --quiet
 xcodebuild build -project YKShowcaseApp.xcodeproj -scheme YKShowcaseApp \
-  -destination "id=$DEVICE" -derivedDataPath ~/work/yk-app-dd -quiet 2>&1 | grep -vE "^\s*$|DVTDeviceOperation" || true
+  -destination "id=$DEVICE,arch=arm64" -derivedDataPath ~/work/yk-app-dd -quiet 2>&1 | grep -vE "^\s*$|DVTDeviceOperation" || true
 APP=$(ls -d ~/work/yk-app-dd/Build/Products/Debug-iphonesimulator/YKShowcaseApp.app)
 
 xcrun simctl boot "$DEVICE" 2>/dev/null || true
