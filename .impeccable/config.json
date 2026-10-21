@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.3, 1.6, .5, 1)",
+        "createdAt": "2026-10-21T09:07:13.004Z",
+        "reason": "agent decision: intentional spring overshoot for shape-morph demo of direction C (Material Expressive-style), sketch 01"
+      }
+    ]
+  }
+}
