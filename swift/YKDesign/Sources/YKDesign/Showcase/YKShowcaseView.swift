@@ -90,19 +90,30 @@ private struct ShowcaseSection<Content: View>: View {
 }
 
 /// Подпись слева от примеров в строке, как `.line > .mono-label` в наброске.
+/// `stacksWhenCrowded` — для рядов кнопок: не помещаются в строку (крупный шрифт) — встают столбиком,
+/// а не переносятся вразнобой.
 private struct DemoLine<Content: View>: View {
     let label: String
+    let stacksWhenCrowded: Bool
     let content: Content
 
-    init(_ label: String, @ViewBuilder content: () -> Content) {
+    init(_ label: String, stacksWhenCrowded: Bool = false, @ViewBuilder content: () -> Content) {
         self.label = label
+        self.stacksWhenCrowded = stacksWhenCrowded
         self.content = content()
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(label).ykMonoLabel()
-            FlowLayout(spacing: 10) { content }
+            if stacksWhenCrowded {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) { content }
+                    VStack(alignment: .leading, spacing: 10) { content }
+                }
+            } else {
+                FlowLayout(spacing: 10) { content }
+            }
         }
     }
 }
@@ -123,7 +134,11 @@ private struct FlowLayout: Layout {
         for row in arrange(width: bounds.width, subviews: subviews) {
             var x = bounds.minX
             for index in row.indices {
-                let size = subviews[index].sizeThatFits(.unspecified)
+                // Элемент шире строки получает ширину строки, а не вылезает за край
+                let ideal = subviews[index].sizeThatFits(.unspecified)
+                let size = ideal.width > bounds.width
+                    ? subviews[index].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil))
+                    : ideal
                 subviews[index].place(at: CGPoint(x: x, y: y + (row.height - size.height) / 2), proposal: ProposedViewSize(size))
                 x += size.width + spacing
             }
@@ -204,7 +219,7 @@ private struct TypeDemo: View {
 private struct ButtonsDemo: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            DemoLine("Виды") {
+            DemoLine("Виды", stacksWhenCrowded: true) {
                 Button("Создать проект") {}.buttonStyle(.yk(.primary))
                 Button("Импорт") {}.buttonStyle(.yk(.secondary))
                 Button("Настроить") {}.buttonStyle(.yk(.outline))
@@ -215,13 +230,13 @@ private struct ButtonsDemo: View {
                 }
                 .buttonStyle(.yk(.link))
             }
-            DemoLine("Состояния") {
+            DemoLine("Состояния", stacksWhenCrowded: true) {
                 Button("Обычная") {}.buttonStyle(.yk(.primary))
                 Button("Отключена") {}.buttonStyle(.yk(.primary)).disabled(true)
                 Button("Агент пишет…") {}.buttonStyle(.yk(.primary, isLoading: true))
                 Button("Думаю…") {}.buttonStyle(.yk(.secondary, isLoading: true))
             }
-            DemoLine("Размеры") {
+            DemoLine("Размеры", stacksWhenCrowded: true) {
                 Button("Маленькая") {}.buttonStyle(.yk(.primary, size: .sm))
                 Button("Средняя") {}.buttonStyle(.yk(.primary, size: .md))
                 Button {} label: {
@@ -297,7 +312,7 @@ private struct ChoiceDemo: View {
             }
             VStack(alignment: .leading, spacing: 10) {
                 Text("Радио").ykMonoLabel()
-                YKRadioGroup(selection: $period, options: [("daily", "Каждый день"), ("weekly", "Раз в неделю"), ("never", "Не напоминать")])
+                YKRadioGroup("Напоминания", selection: $period, options: [("daily", "Каждый день"), ("weekly", "Раз в неделю"), ("never", "Не напоминать")])
             }
             DemoLine("Сегменты") {
                 YKSegmented(selection: $filter, options: [("all", "Все"), ("mine", "Мои"), ("archive", "Архив")])
@@ -401,18 +416,18 @@ private struct OverlaysDemo: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            DemoLine("Открыть") {
+            DemoLine("Открыть", stacksWhenCrowded: true) {
                 Button("Окно") { showsAlert = true }.buttonStyle(.yk(.outline))
                 Button("Выбор действия") { showsDialog = true }.buttonStyle(.yk(.outline))
                 Button("Шторка") { showsSheet = true }.buttonStyle(.yk(.outline))
             }
-            DemoLine("Меню") {
+            DemoLine("Меню", stacksWhenCrowded: true) {
                 YKMenuButton {
                     projectMenuItems
                 } label: {
                     HStack(spacing: 6) { Text("Действия"); YKIcon(.caretDown, size: 14) }
                 }
-                YKMenuButton(label: "Ещё действия", variant: .ghost) { projectMenuItems }
+                YKMenuButton(label: "Ещё действия") { projectMenuItems }
             }
             VStack(alignment: .leading, spacing: 10) {
                 Text("Шторка · вид").ykMonoLabel()
@@ -442,8 +457,23 @@ private struct OverlaysDemo: View {
             projectMenuItems
             Button("Отмена", role: .cancel) {}
         }
-        .ykSheet(isPresented: $showsSheet, title: "Новый проект", detents: [.height(240), .medium]) {
-            sheetFields
+        .ykSheet(isPresented: $showsSheet, detents: [.height(260), .medium]) {
+            // Панель инструментов внутри шторки: кнопки берут цвет текста из .ykSheet
+            NavigationStack {
+                sheetFields
+                    .padding(.top, 4)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .background(YKSheetMetrics.backgroundRole.color)
+                    .navigationTitle("Новый проект")
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(YKSheetMetrics.backgroundRole.color, for: .navigationBar)
+                    #endif
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) { Button("Отмена") { showsSheet = false } }
+                        ToolbarItem(placement: .confirmationAction) { Button("Готово") { showsSheet = false } }
+                    }
+            }
         }
         .onAppear {
             switch presenting {
@@ -479,13 +509,18 @@ private struct OverlaysDemo: View {
 // MARK: - 09 Пусто и загрузка
 
 private struct EmptyDemo: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             YKEmptyState(label: "Проектов · 0", title: "Здесь пока пусто", message: "Создайте проект сами или опишите задачу агенту — он соберёт черновик.") {
                 Button("Спросить агента") {}.buttonStyle(.yk(.secondary))
                 Button("Создать проект") {}.buttonStyle(.yk(.primary))
             }
-            YKCard { YKSkeleton() }
+            YKCard {
+                Text(reduceMotion ? "Уменьшение движения · вкл" : "Уменьшение движения · выкл").ykMonoLabel(size: 10.5)
+                YKSkeleton()
+            }
         }
     }
 }

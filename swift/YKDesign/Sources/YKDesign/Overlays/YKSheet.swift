@@ -6,6 +6,8 @@ public enum YKSheetMetrics {
     public static let gripSize = CGSize(width: 36, height: 5)
     public static let backgroundRole: YKColorRole = .surface
     public static let gripRole: YKColorRole = .surface3
+    /// Кнопки внутри шторки (в том числе на панели инструментов) — цветом текста, не системным синим.
+    public static let tintRole: YKColorRole = .text
 }
 
 /// Содержимое шторки: ручка сверху и поля как в наброске. Можно показать и без `.sheet` — в витрине.
@@ -51,7 +53,7 @@ public extension View {
                 .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(YKSheetMetrics.cornerRadius)
                 .presentationBackground(YKSheetMetrics.backgroundRole.color)
-                .tint(YKColorRole.accent.color)
+                .tint(YKSheetMetrics.tintRole.color)
         }
     }
 }

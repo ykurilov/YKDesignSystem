@@ -40,11 +40,17 @@ public struct YKMenuButton<Items: View, Label: View>: View {
     }
 }
 
+/// Триггер меню со значком.
+public enum YKMenuTrigger {
+    /// Квадрат с заливкой: «···» без формы почти не виден. Прозрачный `.ghost` — только по явному выбору.
+    public static let defaultIconVariant: YKButtonVariant = .secondary
+}
+
 public extension YKMenuButton where Label == YKIcon {
     /// Квадратный триггер со значком, по умолчанию «три точки». Подпись — для VoiceOver.
     init(
         icon: YKIconName = .dotsThree, label accessibilityTitle: String,
-        variant: YKButtonVariant = .ghost, size: YKButtonSize = .md,
+        variant: YKButtonVariant = YKMenuTrigger.defaultIconVariant, size: YKButtonSize = .md,
         @ViewBuilder items: () -> Items
     ) {
         self.variant = variant

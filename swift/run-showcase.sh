@@ -47,6 +47,10 @@ for s in $LARGE_SECTIONS; do shoot light accessibility-medium "$s" "$(printf '%0
 for theme in ${PRESENT_THEMES:-light dark}; do
   for what in ${PRESENTATIONS:-sheet alert dialog}; do shoot "$theme" large 8 "08-$what-$theme" "$what"; done
 done
-for s in ${RTL_SECTIONS:-5}; do shoot light large "$s" "$(printf '%02d' "$s")-light-rtl" rtl; done
+for s in ${RTL_SECTIONS:-5}; do shoot light large "$s" "$(printf '%02d' "$s")-light-right-to-left" rtl; done
+# «Уменьшение движения»: сфера и скелет должны стоять, у скелета — ровные плашки без блика
+xcrun simctl spawn "$DEVICE" defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
+for s in ${REDUCE_MOTION_SECTIONS:-9}; do shoot light large "$s" "$(printf '%02d' "$s")-light-reduce-motion"; done
+xcrun simctl spawn "$DEVICE" defaults write com.apple.Accessibility ReduceMotionEnabled -bool false
 xcrun simctl ui "$DEVICE" content_size large
 xcrun simctl ui "$DEVICE" appearance light
