@@ -13,7 +13,8 @@
 }
 .yk-button:focus-visible { outline: none; --yk-button-ring: 0 0 0 2px var(--yk-bg), 0 0 0 4px var(--yk-accent); }
 .yk-button:active:not(:disabled):not([aria-disabled="true"]) { transform: scale(.97); }
-.yk-button:disabled { opacity: .4; cursor: not-allowed; }
+.yk-button:disabled,
+.yk-button[aria-disabled="true"]:not([aria-busy="true"]) { opacity: .4; cursor: not-allowed; }
 .yk-button[aria-busy="true"] { cursor: progress; }
 
 /* Виды */
@@ -25,12 +26,12 @@
 .yk-button--link { background: transparent; color: var(--yk-accent-text); --yk-button-pad-x: 4px; font-weight: 500; }
 
 @media (hover: hover) {
-  .yk-button--primary:hover:enabled:not([aria-busy="true"]) { background: color-mix(in srgb, var(--yk-ink) 85%, var(--yk-bg)); }
-  .yk-button--secondary:hover:enabled:not([aria-busy="true"]) { background: var(--yk-surface-3); }
-  .yk-button--outline:hover:enabled:not([aria-busy="true"]),
-  .yk-button--ghost:hover:enabled:not([aria-busy="true"]) { background: var(--yk-surface-2); }
-  .yk-button--danger:hover:enabled:not([aria-busy="true"]) { background: color-mix(in srgb, var(--yk-danger) 88%, #000); }
-  .yk-button--link:hover:enabled { text-decoration: underline; text-underline-offset: 3px; }
+  .yk-button--primary:hover:not(:disabled):not([aria-disabled="true"]) { background: color-mix(in srgb, var(--yk-ink) 85%, var(--yk-bg)); }
+  .yk-button--secondary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--yk-surface-3); }
+  .yk-button--outline:hover:not(:disabled):not([aria-disabled="true"]),
+  .yk-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--yk-surface-2); }
+  .yk-button--danger:hover:not(:disabled):not([aria-disabled="true"]) { background: color-mix(in srgb, var(--yk-danger) 88%, #000); }
+  .yk-button--link:hover:not(:disabled):not([aria-disabled="true"]) { text-decoration: underline; text-underline-offset: 3px; }
 }
 
 /* Размеры */
