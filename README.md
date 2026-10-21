@@ -23,20 +23,15 @@ sketches/          наброски — история, не править
 
 ## Подключение в React-приложении
 
-Пакеты пока не опубликованы, поэтому подключаем с диска. Проверено на пустом приложении Vite + React: собирается, стили и компоненты работают.
+Пакеты опубликованы в npm:
 
 ```bash
-# один раз, в репозитории дизайн-системы: собрать пакеты (без этого в них нет dist/)
-cd /путь/к/YKDesignSystem && pnpm install && pnpm -r build
-
-# в вашем приложении
-pnpm add link:/путь/к/YKDesignSystem/packages/tokens link:/путь/к/YKDesignSystem/packages/react @phosphor-icons/react
+pnpm add @ykurilov/ds-tokens @ykurilov/ds-react @phosphor-icons/react
 ```
 
-- `link:` — живая ссылка: поправили дизайн-систему, пересобрали (`pnpm -r build`) — приложение видит новое сразу.
-- `file:` вместо `link:` — копия на момент установки; после пересборки команду `pnpm add file:…` нужно повторить.
-- Путь в `package.json` приложения абсолютный: на другом компьютере и в CI он не сработает, пока пакеты не опубликованы.
-- Когда пакеты опубликуют, останется `pnpm add @ykurilov/ds-tokens @ykurilov/ds-react @phosphor-icons/react`.
+Чтобы проверить неопубликованную правку дизайн-системы в приложении до выпуска — живая ссылка с диска: `pnpm -r build` в репозитории системы, затем в приложении `pnpm add link:/путь/к/YKDesignSystem/packages/tokens link:/путь/к/YKDesignSystem/packages/react`. Перед коммитом приложения вернуть зависимость из npm.
+
+Выпуск новой версии: поднять `version` в `packages/tokens/package.json` и `packages/react/package.json`, `pnpm -r build`, затем `pnpm publish --access public` в каждом пакете (ключ — `~/.codex/secrets/npm-ykurilov-publish-token.txt`, через временный `NPM_CONFIG_USERCONFIG`, в файлы проекта не класть).
 
 ```tsx
 // один раз, в корне приложения: сначала переменные, потом стили компонентов
