@@ -9,7 +9,7 @@
 .yk-tab:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--yk-bg), 0 0 0 4px var(--yk-accent); }
 .yk-tab:disabled { opacity: .4; cursor: not-allowed; }
 @media (hover: hover) { .yk-tab[aria-selected="false"]:hover:not(:disabled) { color: var(--yk-text); } }
-.yk-tab__count { font-size: 11px; color: var(--yk-faint); }
+.yk-tab__count { font-size: 11px; color: var(--yk-muted); }
 .yk-tab-panel { padding-top: 16px; }
 .yk-tab-panel:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--yk-bg), 0 0 0 4px var(--yk-accent); border-radius: 4px; }
 .yk-tab-panel[hidden] { display: none; }

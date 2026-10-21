@@ -25,7 +25,12 @@ export function Sphere({ size = 16, color, label, className, style }: SphereProp
     if (!canvas || !ctx) return;
     const pixelSize = size * pixelRatio();
     canvas.width = canvas.height = pixelSize;
-    return attachSphere((time) => drawSphereFrame(ctx, pixelSize, resolveColor(canvas, color), time));
+    // Цвет читаем при появлении и при смене темы, а не в каждом кадре: getComputedStyle в цикле дорог
+    let dotColor = resolveColor(canvas, color);
+    return attachSphere(
+      (time) => drawSphereFrame(ctx, pixelSize, dotColor, time),
+      () => { dotColor = resolveColor(canvas, color); },
+    );
   }, [size, color]);
 
   const rootClass = className ? `yk-sphere ${className}` : "yk-sphere";

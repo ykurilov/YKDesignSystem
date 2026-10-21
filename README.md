@@ -23,9 +23,20 @@ sketches/          наброски — история, не править
 
 ## Подключение в React-приложении
 
+Пакеты пока не опубликованы, поэтому подключаем с диска. Проверено на пустом приложении Vite + React: собирается, стили и компоненты работают.
+
 ```bash
-pnpm add @ykurilov/ds-tokens @ykurilov/ds-react @phosphor-icons/react
+# один раз, в репозитории дизайн-системы: собрать пакеты (без этого в них нет dist/)
+cd /путь/к/YKDesignSystem && pnpm install && pnpm -r build
+
+# в вашем приложении
+pnpm add link:/путь/к/YKDesignSystem/packages/tokens link:/путь/к/YKDesignSystem/packages/react @phosphor-icons/react
 ```
+
+- `link:` — живая ссылка: поправили дизайн-систему, пересобрали (`pnpm -r build`) — приложение видит новое сразу.
+- `file:` вместо `link:` — копия на момент установки; после пересборки команду `pnpm add file:…` нужно повторить.
+- Путь в `package.json` приложения абсолютный: на другом компьютере и в CI он не сработает, пока пакеты не опубликованы.
+- Когда пакеты опубликуют, останется `pnpm add @ykurilov/ds-tokens @ykurilov/ds-react @phosphor-icons/react`.
 
 ```tsx
 // один раз, в корне приложения: сначала переменные, потом стили компонентов
@@ -49,7 +60,16 @@ export function Composer({ busy }: { busy: boolean }) {
 
 Тема: светлая по умолчанию, тёмная — сама по системной настройке. Задать вручную: `<html data-theme="dark">` или `data-theme="light"`.
 
-Компоненты: `Icon`, `Sphere`, `NewDot`, `MonoLabel`, `MonoNum`, `Button`, `Chip`, `Tag`, `Steps`, `Avatar`, `Card`, `Stat`, `StatGroup`, `List`, `ListRow`, `Table*`, `Dialog`, `Sheet`, `Menu`, `Toast` (`ToastProvider` + `useToast`), `Banner`, `EmptyState`, `Skeleton`. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
+Компоненты:
+- Основа: `Icon`, `Sphere`, `NewDot`, `MonoLabel`, `MonoNum`.
+- Кнопки и метки: `Button`, `Chip`, `Tag`, `Steps`, `Avatar`.
+- Поля: `TextField`, `Textarea`, `SearchField`, `Select`.
+- Выбор: `Checkbox`, `Radio` + `RadioGroup`, `Switch`, `SegmentedControl`, `Tabs` (`TabList`, `Tab`, `TabPanel`).
+- Карточки и списки: `Card`, `Stat`, `StatGroup`, `List`, `ListRow`, `Table*` (`Table`, `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell`, `TableCell`).
+- Всплывающее: `Dialog`, `Sheet`, `Menu`, `Toast` (`ToastProvider` + `useToast`).
+- Сообщения и пустота: `Banner`, `EmptyState`, `Skeleton`.
+
+`ToastProvider` ставится один раз в корне приложения: он держит живую область, которую читает экранный диктор. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
 
 ## Витрина
 
@@ -72,7 +92,12 @@ pnpm -r test
 
 ## Swift (iPhone)
 
-Подключение: Swift Package `swift/YKDesign`, продукт `YKDesign`. Значки — официальный пакет Phosphor для SwiftUI.
+Подключение (пакет с диска, проверено сборкой пустого проекта):
+- В Xcode: File → Add Package Dependencies… → Add Local… → папка `swift/YKDesign`, продукт `YKDesign`.
+- Или в `Package.swift` приложения: `.package(path: "/путь/к/YKDesignSystem/swift/YKDesign")` и `.product(name: "YKDesign", package: "YKDesign")` в зависимостях цели.
+- Собирать через Xcode или `xcodebuild`, не через `swift build`: значки Phosphor лежат в каталоге ресурсов, консольный `swift build` его не собирает.
+
+Значки — официальный пакет Phosphor для SwiftUI, подтянется сам.
 
 ```swift
 import YKDesign

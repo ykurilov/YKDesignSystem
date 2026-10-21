@@ -1,5 +1,5 @@
 import { CheckIcon, MinusIcon } from "@phosphor-icons/react";
-import { forwardRef, useEffect, useRef, type InputHTMLAttributes, type ReactNode } from "react";
+import { forwardRef, useEffect, useMemo, useRef, type InputHTMLAttributes, type ReactNode } from "react";
 import { classNames } from "../classNames.js";
 import { Icon } from "../icon/Icon.js";
 import { mergeRefs } from "../mergeRefs.js";
@@ -17,6 +17,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   ref,
 ) {
   const inner = useRef<HTMLInputElement>(null);
+  const mergedRef = useMemo(() => mergeRefs(inner, ref), [ref]);
   useEffect(() => {
     if (inner.current) inner.current.indeterminate = indeterminate;
   }, [indeterminate]);
@@ -29,7 +30,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   return (
     <label className={classNames("yk-choice", disabled && "yk-choice--disabled", className)}>
       <span className="yk-check">
-        <input ref={mergeRefs(inner, ref)} type="checkbox" className="yk-check__input" disabled={disabled} {...rest} />
+        <input ref={mergedRef} type="checkbox" className="yk-check__input" disabled={disabled} {...rest} />
         <Icon icon={CheckIcon} size={14} className="yk-check__mark yk-check__mark--checked" />
         <Icon icon={MinusIcon} size={14} className="yk-check__mark yk-check__mark--mixed" />
       </span>

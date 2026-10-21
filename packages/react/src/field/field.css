@@ -26,21 +26,21 @@
 .yk-input:has(.yk-input__control:focus) { --yk-input-edge: var(--yk-accent); --yk-input-ring: var(--yk-accent-soft); }
 .yk-input--invalid,
 .yk-input--invalid:has(.yk-input__control:focus) { --yk-input-edge: var(--yk-danger); --yk-input-ring: var(--yk-danger-soft); }
-.yk-input--disabled { background: var(--yk-surface-2); color: var(--yk-faint); --yk-input-edge: var(--yk-border-strong); }
+.yk-input--disabled { background: var(--yk-surface-2); color: var(--yk-muted); --yk-input-edge: var(--yk-border-strong); }
 
 .yk-input__control {
   flex: 1; min-width: 0; height: 100%; margin: 0; padding: 0; border: 0; outline: none; background: transparent;
   font: inherit; color: inherit; appearance: none; -webkit-appearance: none;
 }
-.yk-input__control::placeholder { color: var(--yk-faint); opacity: 1; }
-.yk-input__control:disabled { cursor: not-allowed; -webkit-text-fill-color: var(--yk-faint); opacity: 1; }
+.yk-input__control::placeholder { color: var(--yk-muted); opacity: 1; }
+.yk-input__control:disabled { cursor: not-allowed; -webkit-text-fill-color: var(--yk-muted); opacity: 1; }
 .yk-input__control[type="search"]::-webkit-search-cancel-button,
 .yk-input__control[type="search"]::-webkit-search-decoration { -webkit-appearance: none; display: none; }
 
 textarea.yk-input__control { height: auto; padding: 10px 12px; resize: none; line-height: 1.45; }
 .yk-input--sm textarea.yk-input__control { padding: 7px 10px; }
 
-.yk-input__icon { color: var(--yk-faint); }
+.yk-input__icon { color: var(--yk-muted); }
 .yk-input:has(.yk-input__control:focus) .yk-input__icon { color: var(--yk-muted); }
 
 .yk-input__kbd {

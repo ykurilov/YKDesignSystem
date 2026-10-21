@@ -40,17 +40,17 @@ export type TextStyleName = "display" | "title" | "heading" | "body" | "small" |
 
 const light: ColorPalette = {
   bg: "#FFFFFF", surface: "#FFFFFF", surface2: "#F4F4F3", surface3: "#EBEBE9", sidebar: "#FAFAF9",
-  text: "#141414", muted: "#6E6E6B", faint: "#A3A3A0", border: "#E9E9E6", borderStrong: "#D6D6D2",
+  text: "#141414", muted: "#6E6E6B", faint: "#929290", border: "#E9E9E6", borderStrong: "#D6D6D2",
   ink: "#141414", onInk: "#FFFFFF",
-  accent: "#EE6A3C", accentText: "#BE4824", accentSoft: "#FCEBE3",
+  accent: "#EE6A3C", accentText: "#B64523", accentSoft: "#FCEBE3",
   // Ошибка — холоднее и темнее акцента, чтобы не путать «важно» и «сломалось»
   danger: "#C8283A", onDanger: "#FFFFFF", dangerSoft: "#FBE7E9",
-  success: "#1E8A55", successSoft: "#E3F4EA",
+  success: "#1A7A4B", successSoft: "#E3F4EA",
 };
 
 const dark: ColorPalette = {
   bg: "#0F0F0F", surface: "#161616", surface2: "#222222", surface3: "#2C2C2C", sidebar: "#121212",
-  text: "#F2F2F0", muted: "#9B9B97", faint: "#5E5E5B", border: "#262626", borderStrong: "#3A3A3A",
+  text: "#F2F2F0", muted: "#9B9B97", faint: "#666662", border: "#262626", borderStrong: "#3A3A3A",
   ink: "#F2F2F0", onInk: "#0F0F0F",
   accent: "#F27D52", accentText: "#F7A07E", accentSoft: "#3A2219",
   danger: "#FF5C6C", onDanger: "#0F0F0F", dangerSoft: "#3D1A1E",

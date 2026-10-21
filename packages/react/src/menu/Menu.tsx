@@ -37,7 +37,8 @@ interface TriggerProps {
   "aria-controls"?: string;
 }
 
-const ITEM_SELECTOR = "[role=menuitem]:not([aria-disabled=true])";
+// Недоступные пункты тоже в списке: до них доходят стрелками, диктор их читает как недоступные
+const ITEM_SELECTOR = "[role=menuitem]";
 
 /** Выпадающее меню у кнопки: стрелки, Enter, Esc, подсказки клавиш. */
 export function Menu({ label, trigger, entries, align }: MenuProps) {
@@ -90,7 +91,26 @@ export function Menu({ label, trigger, entries, align }: MenuProps) {
     list[next]!.focus();
   };
 
+  /** Поиск по первой букве: следующий за текущим пункт, начинающийся с неё, по кругу. */
+  const focusByLetter = (letter: string) => {
+    const list = items();
+    const current = list.indexOf(document.activeElement as HTMLElement);
+    const wanted = letter.toLocaleLowerCase();
+    for (let step = 1; step <= list.length; step++) {
+      const candidate = list[(current + step) % list.length]!;
+      if (candidate.textContent?.trim().toLocaleLowerCase().startsWith(wanted)) {
+        candidate.focus();
+        return;
+      }
+    }
+  };
+
   const handleMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      focusByLetter(event.key);
+      return;
+    }
     switch (event.key) {
       case "ArrowDown": event.preventDefault(); moveFocus(1); break;
       case "ArrowUp": event.preventDefault(); moveFocus(-1); break;
