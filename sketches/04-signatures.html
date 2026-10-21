@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 04 — четыре фишки на одной основе</title>
+<style>
+  /* ---------- Общая нейтральная основа ---------- */
+  .base {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3; --canvas: #F2F2F0;
+    --text: #141414; --muted: #6E6E6B; --border: #E9E9E6;
+    --primary: #141414; --on-primary: #FFFFFF;
+    --spark: #EE6A3C; --marker: #FFD3BD;
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  .theme-dark .base {
+    --bg: #0F0F0F; --surface: #181818; --surface-2: #222222; --canvas: #0A0A0A;
+    --text: #F2F2F0; --muted: #9B9B97; --border: #2A2A2A;
+    --primary: #F2F2F0; --on-primary: #0F0F0F;
+    --spark: #F27D52; --marker: #6A3420;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .columns { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .column-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .column-note { font-size: 12px; opacity: .65; margin-bottom: 12px; width: 390px; line-height: 1.4; }
+
+  /* ---------- Каркас экрана ---------- */
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative;
+    background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; }
+  .screen { flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 18px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .title { font-weight: 600; letter-spacing: -0.025em; font-size: 32px; line-height: 1.1; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: 999px; }
+  .segmented button { flex: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 500; padding: 7px 0; border-radius: 999px; }
+  .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .theme-dark .segmented button.on { background: #333; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-size: 13px; color: var(--muted); }
+  .chip { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); display: inline-flex; align-items: center; gap: 6px; }
+  .progress { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 62%; background: var(--text); border-radius: 99px; }
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .icon { width: 32px; height: 32px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; font-size: 15px; }
+  .row .grow { flex: 1; font-size: 15px; }
+  .row .chev { color: var(--muted); }
+  .btn { flex: 1; border: 0; font: inherit; font-size: 15px; font-weight: 600; height: 46px; border-radius: 999px; cursor: pointer; transition: border-radius .35s var(--ease-out), transform .2s var(--ease-out); }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--primary); color: var(--on-primary); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+  .buttons { display: flex; gap: 10px; }
+  .composer { margin-top: auto; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 8px 8px 8px 16px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+  .composer span { flex: 1; color: var(--muted); font-size: 15px; }
+  .send { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-size: 18px; }
+  .agent-status { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); margin-top: auto; padding-left: 4px; }
+  .agent-status + .composer { margin-top: -8px; }
+  .tabbar { display: flex; justify-content: space-around; padding: 10px 12px 28px; border-top: 1px solid var(--border); background: var(--surface); margin-top: 14px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); position: relative; }
+  .tab b { font-size: 20px; font-weight: 400; line-height: 1; padding: 4px 18px; border-radius: 99px; }
+  .tab.on { color: var(--text); }
+  .tab.on b { background: var(--surface-2); }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--spark); flex: none; display: inline-block; }
+  .dot.live { animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--spark) 45%, transparent); }
+    50% { transform: scale(.8); box-shadow: 0 0 0 6px transparent; }
+  }
+
+  /* =========================================================
+     1 · Угол и точка (из наброска 03, угол справа снизу, усилен)
+     ========================================================= */
+  .sig-corner .card, .sig-corner .list { border-radius: 24px 24px 4px 24px; }
+  .sig-corner .btn.primary { border-radius: 23px 23px 4px 23px; }
+  .sig-corner .btn.primary:active { border-radius: 14px; }
+  .sig-corner .composer { border-radius: 28px 28px 4px 28px; }
+  .sig-corner .send { border-radius: 18px 18px 4px 18px; }
+  .sig-corner .chip .dot { width: 6px; height: 6px; }
+  .sig-corner .tab .dot { position: absolute; top: 2px; right: 14px; width: 7px; height: 7px; }
+
+  /* =========================================================
+     2 · Остров: всё парит над серым полотном, внизу живая чёрная капсула
+     ========================================================= */
+  .sig-island .phone { background: var(--canvas); }
+  .sig-island .card, .sig-island .list { border: 0; border-radius: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .sig-island .segmented { background: #E6E6E3; }
+  .sig-island .btn.secondary { background: var(--surface); }
+  .theme-dark .sig-island .segmented { background: #1C1C1C; }
+  .sig-island .island-wrap { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .theme-dark .sig-island .island, .theme-dark .sig-island .island-agent { background: #F2F2F0; color: #0F0F0F; }
+  .island-agent {
+    background: #141414; color: #fff; border-radius: 999px; height: 40px; padding: 0 16px;
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; overflow: hidden; white-space: nowrap;
+    animation: island-grow 4s var(--ease-out) infinite;
+  }
+  .island-agent .count { opacity: .55; font-variant-numeric: tabular-nums; }
+  @keyframes island-grow {
+    0%, 12% { width: 40px; padding: 0 16px; }
+    30%, 80% { width: 290px; }
+    95%, 100% { width: 40px; }
+  }
+  .island {
+    background: #141414; color: #fff; border-radius: 999px; height: 60px; width: 300px; padding: 0 8px 0 22px;
+    display: flex; align-items: center; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,.22);
+  }
+  .island .item { font-size: 20px; opacity: .5; width: 44px; text-align: center; }
+  .island .item.on { opacity: 1; }
+  .island .ask { width: 96px; height: 44px; border-radius: 999px; background: var(--spark); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+
+  /* =========================================================
+     3 · Чертёж: моноширинные подписи, счётчики, шкала-шаги
+     ========================================================= */
+  .sig-mono .card, .sig-mono .list, .sig-mono .composer { border-radius: 12px; }
+  .sig-mono .btn, .sig-mono .segmented, .sig-mono .segmented button { border-radius: 10px; }
+  .sig-mono .segmented button { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .sig-mono .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: -12px; }
+  .sig-mono .meta, .sig-mono .chip { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+  .sig-mono .chip { border-radius: 6px; background: transparent; border: 1px solid var(--border); }
+  .sig-mono .row .icon { border-radius: 8px; }
+  .sig-mono .row .num { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .sig-mono .steps { display: flex; gap: 4px; }
+  .sig-mono .steps i { flex: 1; height: 6px; border-radius: 2px; background: var(--surface-2); }
+  .sig-mono .steps i.done { background: var(--text); }
+  .sig-mono .send { border-radius: 9px; }
+  .sig-mono .typed { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: auto; padding-left: 4px; white-space: nowrap; overflow: hidden; }
+  .sig-mono .typed span { display: inline-block; overflow: hidden; vertical-align: bottom; animation: type 5s steps(32) infinite; }
+  .sig-mono .typed b { display: inline-block; width: 7px; height: 13px; background: var(--spark); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
+  .sig-mono .typed + .composer { margin-top: -8px; }
+  @keyframes type { 0% { width: 0; } 60%, 100% { width: 32ch; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  .sig-mono .tab { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .sig-mono .tab b { border-radius: 8px; }
+
+  /* =========================================================
+     4 · Маркер: важное выделено тёплым «маркером», который прорисовывается
+     ========================================================= */
+  .hl {
+    background-image: linear-gradient(var(--marker), var(--marker));
+    background-repeat: no-repeat; background-position: 0 88%; background-size: 100% 38%;
+    animation: swipe 3.5s var(--ease-out) infinite;
+    padding: 0 2px; margin: 0 -2px;
+  }
+  @keyframes swipe { 0%, 8% { background-size: 0 38%; } 30%, 100% { background-size: 100% 38%; } }
+  .sig-marker .chip { background: transparent; padding: 0; font-weight: 600; }
+  .sig-marker .chip .hl { background-size: 100% 100%; background-position: 0 50%; animation: none; padding: 2px 6px; border-radius: 3px; }
+  .sig-marker .progress i { background: var(--text); }
+  .sig-marker .tab.on b { background: transparent; }
+  .sig-marker .tab.on span { background: linear-gradient(var(--marker), var(--marker)) no-repeat 0 85% / 100% 45%; padding: 0 3px; }
+  .sig-marker .row.new .grow span { background: linear-gradient(var(--marker), var(--marker)) no-repeat 0 88% / 100% 38%; }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Набросок 04 — четыре фишки на одной основе</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+
+  <div class="columns">
+
+    <!-- 1 · Угол и точка -->
+    <div class="base sig-corner">
+      <div class="column-label">1 · Угол и точка</div>
+      <div class="column-note">Видно: у карточек и кнопок острый правый нижний угол, как у реплики в чате. Чувствуется: оранжевая точка дышит, пока агент работает.</div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="screen">
+          <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+          <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+          <div class="card">
+            <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip"><i class="dot live"></i>В работе</span></div>
+            <div class="meta">Обновлено 2 часа назад · 5 задач</div>
+            <div class="progress"><i></i></div>
+          </div>
+          <div class="list">
+            <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><i class="dot"></i><div class="chev">›</div></div>
+            <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><div class="chev">›</div></div>
+          </div>
+          <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+          <div class="agent-status"><i class="dot live"></i>Агент собирает план рассылки…</div>
+          <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+        </div>
+        <div class="tabbar"><div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат<i class="dot"></i></div><div class="tab"><b>☰</b>Ещё</div></div>
+      </div>
+    </div>
+
+    <!-- 2 · Остров -->
+    <div class="base sig-island">
+      <div class="column-label">2 · Остров</div>
+      <div class="column-note">Видно: всё парит над серым полотном, внизу чёрная капсула с навигацией и кнопкой агента. Чувствуется: капсула вырастает и рассказывает, что делает агент, потом сжимается.</div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="screen">
+          <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+          <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+          <div class="card">
+            <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip">В работе</span></div>
+            <div class="meta">Обновлено 2 часа назад · 5 задач</div>
+            <div class="progress"><i></i></div>
+          </div>
+          <div class="list">
+            <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><div class="chev">›</div></div>
+            <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><div class="chev">›</div></div>
+          </div>
+          <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+        </div>
+        <div class="island-wrap">
+          <div class="island-agent"><i class="dot live"></i>Собираю план рассылки<span class="count">2 / 5</span></div>
+          <div class="island"><span class="item on">◇</span><span class="item">◯</span><span class="item">☰</span><span class="ask">Агент</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · Чертёж -->
+    <div class="base sig-mono">
+      <div class="column-label">3 · Чертёж</div>
+      <div class="column-note">Видно: служебные подписи и цифры моноширинным шрифтом, как в инженерном блокноте; прогресс — шагами. Чувствуется: агент «печатает» свой статус, мигает оранжевый курсор.</div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="screen">
+          <div class="eyebrow">Рабочее пространство · 12</div>
+          <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+          <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+          <div class="card">
+            <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip">В работе</span></div>
+            <div class="meta">Обновлено 2 ч назад · 3/5 задач</div>
+            <div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div>
+          </div>
+          <div class="list">
+            <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><span class="num">08</span><div class="chev">›</div></div>
+            <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><span class="num">14</span><div class="chev">›</div></div>
+          </div>
+          <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+          <div class="typed"><span>&gt; собираю план рассылки, шаг 2/5</span><b></b></div>
+          <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+        </div>
+        <div class="tabbar"><div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат</div><div class="tab"><b>☰</b>Ещё</div></div>
+      </div>
+    </div>
+
+    <!-- 4 · Маркер -->
+    <div class="base sig-marker">
+      <div class="column-label">4 · Маркер</div>
+      <div class="column-note">Видно: важное подчёркнуто тёплым маркером, как в бумажном блокноте. Чувствуется: маркер прорисовывается слева направо, когда что-то выбрано или появилось новое.</div>
+      <div class="phone">
+        <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="screen">
+          <div class="top"><div class="title"><span class="hl">Проекты</span></div><div class="avatar">ЮК</div></div>
+          <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+          <div class="card">
+            <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip"><span class="hl">В работе</span></span></div>
+            <div class="meta">Обновлено 2 часа назад · 5 задач</div>
+            <div class="progress"><i></i></div>
+          </div>
+          <div class="list">
+            <div class="row new"><div class="icon">✦</div><div class="grow"><span>Идеи для рассылки</span></div><div class="chev">›</div></div>
+            <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><div class="chev">›</div></div>
+          </div>
+          <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+          <div class="agent-status"><span>Агент собирает <span class="hl">план рассылки</span>…</span></div>
+          <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+        </div>
+        <div class="tabbar"><div class="tab on"><b>◇</b><span>Проекты</span></div><div class="tab"><b>◯</b>Чат</div><div class="tab"><b>☰</b>Ещё</div></div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
