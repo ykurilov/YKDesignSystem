@@ -2,6 +2,7 @@
   "name": "@ykurilov/ds-react",
   "version": "0.1.0",
   "description": "React-компоненты YKDesignSystem на переменных @ykurilov/ds-tokens",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -44,5 +45,8 @@
     "tsup": "^9.0.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
