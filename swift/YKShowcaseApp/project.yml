@@ -1,0 +1,27 @@
+# Проект Xcode собирается командой `xcodegen generate` (см. swift/run-showcase.sh), .xcodeproj не коммитится.
+name: YKShowcaseApp
+options:
+  bundleIdPrefix: cloud.kurilov
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  YKDesign:
+    path: ../YKDesign
+targets:
+  YKShowcaseApp:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    dependencies:
+      - package: YKDesign
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: cloud.kurilov.YKShowcaseApp
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDisplayName: YKDesign
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        SWIFT_VERSION: "6.0"
+        CODE_SIGNING_ALLOWED: NO
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
