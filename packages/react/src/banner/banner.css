@@ -5,7 +5,7 @@
 }
 .yk-banner__mark { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: var(--yk-muted); }
 /* Поле внутри значка Phosphor (1/8 от 20px): без поправки рисунок отстоит от края дальше, чем рамка баннера диктует */
-.yk-banner__mark > .yk-icon { margin: 0 -2.5px; }
+.yk-banner__mark > .yk-icon { margin-left: -1.9px; justify-self: start; }
 .yk-banner__title { font-weight: 600; }
 .yk-banner--danger { border-color: color-mix(in srgb, var(--yk-danger) 35%, transparent); background: var(--yk-danger-soft); }
 .yk-banner--danger .yk-banner__mark { color: var(--yk-danger); }

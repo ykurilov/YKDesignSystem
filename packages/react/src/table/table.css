@@ -10,7 +10,7 @@
 .yk-table tbody tr:last-child > .yk-table__cell { border-bottom: 0; }
 .yk-table__cell--strong { font-weight: 500; }
 .yk-table__cell--numeric {
-  font-family: var(--yk-font-mono); font-size: 12px; color: var(--yk-muted); font-variant-numeric: tabular-nums;
+  font-family: var(--yk-font-mono); font-size: 12px; color: var(--yk-muted); font-variant-numeric: tabular-nums; text-align: right;
 }
 .yk-table tr[data-selected] > .yk-table__cell { background: color-mix(in srgb, var(--yk-accent-soft) 55%, transparent); }
 .yk-table tr[data-selected] > .yk-table__cell:first-child { box-shadow: inset 2px 0 0 var(--yk-accent); }

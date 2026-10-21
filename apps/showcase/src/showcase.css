@@ -47,3 +47,22 @@ body {
 @media (max-width: 760px) {
   .sc-swatches { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Карточки, списки, таблица */
+.sc-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+.sc-cols--2-1 { grid-template-columns: 2fr 1fr; align-items: start; }
+.sc-wide { flex: 1; min-width: 0; }
+@media (max-width: 760px) { .sc-cols, .sc-cols--2-1 { grid-template-columns: 1fr; } }
+
+/* Всплывающее: статичный показ как в наброске */
+.sc-stage { background: var(--yk-surface-2); border-radius: var(--yk-radius-xl); padding: 24px; display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.sc-static { position: static; animation: none; }
+.sc-static--menu { width: 220px; }
+.sc-static--sheet { width: 300px; }
+.sc-hover { background: var(--yk-surface-2); }
+.sc-banners { flex: 1; min-width: 0; max-width: 820px; display: flex; flex-direction: column; gap: 12px; }
+.sc-input {
+  height: 40px; width: 100%; box-sizing: border-box; padding: 0 12px; font: inherit; font-size: 15px;
+  color: var(--yk-text); background: var(--yk-surface); border: 1px solid var(--yk-border-strong); border-radius: var(--yk-radius-md);
+}
+.sc-input:focus { outline: none; border-color: var(--yk-accent); box-shadow: 0 0 0 3px var(--yk-accent-soft); }
