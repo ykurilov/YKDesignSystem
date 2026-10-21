@@ -89,7 +89,17 @@ public extension YKListRow where Trailing == EmptyView {
     }
 }
 
-/// Группа строк в рамке с линиями между строками.
+/// Где в группе строк нужна линия.
+public enum YKListGroupLayout {
+    /// Линия — только между соседними строками, не после последней.
+    public static func showsDivider(after index: Int, count: Int) -> Bool {
+        index < count - 1
+    }
+}
+
+/// Группа строк в рамке.
+/// Из данных линии между строками ставятся сами: `YKListGroup(projects, id: \.id) { YKListRow($0.title) }`.
+/// Для постоянного набора строк линии ставятся явно: `YKListRow(…); YKListDivider(); YKListRow(…)`.
 public struct YKListGroup<Content: View>: View {
     let content: Content
 
@@ -98,21 +108,50 @@ public struct YKListGroup<Content: View>: View {
     }
 
     public var body: some View {
-        _VariadicView.Tree(YKListDividedLayout()) { content }
+        VStack(spacing: 0) { content }
             .ykSurface(cornerRadius: YKTokens.Radius.lg)
     }
 }
 
-/// Раскладка строк с линией между соседними: так строки не знают о своих соседях.
-private struct YKListDividedLayout: _VariadicView_MultiViewRoot {
-    func body(children: _VariadicView.Children) -> some View {
-        VStack(spacing: 0) {
-            ForEach(children) { child in
-                child
-                if child.id != children.last?.id {
-                    YKColorRole.border.color.frame(height: 1)
-                }
+public extension YKListGroup {
+    init<Data: RandomAccessCollection, ID: Hashable, Row: View>(
+        _ data: Data, id: KeyPath<Data.Element, ID>, @ViewBuilder row: @escaping (Data.Element) -> Row
+    ) where Content == YKListRows<Data.Element, ID, Row> {
+        self.init { YKListRows(Array(data), id: id, row: row) }
+    }
+}
+
+/// Строки из данных с линией между соседними.
+public struct YKListRows<Element, ID: Hashable, Row: View>: View {
+    private struct Item: Identifiable {
+        let id: ID
+        let index: Int
+        let element: Element
+    }
+
+    private let items: [Item]
+    private let row: (Element) -> Row
+
+    init(_ elements: [Element], id: KeyPath<Element, ID>, row: @escaping (Element) -> Row) {
+        self.items = elements.enumerated().map { Item(id: $0.element[keyPath: id], index: $0.offset, element: $0.element) }
+        self.row = row
+    }
+
+    public var body: some View {
+        ForEach(items) { item in
+            row(item.element)
+            if YKListGroupLayout.showsDivider(after: item.index, count: items.count) {
+                YKListDivider()
             }
         }
+    }
+}
+
+/// Линия между строками группы.
+public struct YKListDivider: View {
+    public init() {}
+
+    public var body: some View {
+        YKColorRole.border.color.frame(height: 1).accessibilityHidden(true)
     }
 }

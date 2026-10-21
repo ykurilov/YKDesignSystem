@@ -72,21 +72,51 @@ public enum YKTextMetrics {
     }
 
     static let systemLineHeight: CGFloat = 1.2
+
+    /// Во сколько раз крупнее обычного может стать моноширинная метка.
+    public static let monoLabelMaxGrowth: CGFloat = 1.5
+
+    /// Кегль моноширинной метки при крупном шрифте: растёт вдвое медленнее основного текста
+    /// и не больше чем в полтора раза — так метка всегда мельче текста рядом.
+    /// - Parameter bodyScale: во сколько раз система увеличила основной текст (1 — обычный размер).
+    public static func monoLabelSize(base: CGFloat, bodyScale: CGFloat) -> CGFloat {
+        min(base * (1 + (bodyScale - 1) * 0.5), base * monoLabelMaxGrowth)
+    }
 }
 
-/// Применяет стиль текста: шрифт, разрядку, высоту строки и капс. Кегль растёт с Dynamic Type.
+/// Как кегль подстраивается под крупный шрифт системы.
+enum YKTextScaling {
+    /// Как системный стиль (Dynamic Type).
+    case relativeTo(Font.TextStyle)
+    /// Медленно и с потолком — моноширинные метки и мелкие цифры.
+    case monoLabel
+}
+
+/// Применяет стиль текста: шрифт, разрядку, высоту строки и капс. Кегль растёт с крупным шрифтом системы.
 struct YKTextStyleModifier: ViewModifier {
     let style: YKTextStyle
     let weight: Int
-    @ScaledMetric private var size: CGFloat
+    let baseSize: CGFloat
+    let isMonoLabel: Bool
+    @ScaledMetric private var scaledSize: CGFloat
+    @ScaledMetric(relativeTo: .body) private var bodyScale: CGFloat = 1
 
-    init(style: YKTextStyle, size: CGFloat? = nil, weight: Int? = nil, relativeTo textStyle: Font.TextStyle) {
+    init(style: YKTextStyle, size: CGFloat? = nil, weight: Int? = nil, scaling: YKTextScaling) {
         self.style = style
         self.weight = weight ?? style.weight
-        _size = ScaledMetric(wrappedValue: size ?? style.size, relativeTo: textStyle)
+        self.baseSize = size ?? style.size
+        switch scaling {
+        case .relativeTo(let textStyle):
+            isMonoLabel = false
+            _scaledSize = ScaledMetric(wrappedValue: baseSize, relativeTo: textStyle)
+        case .monoLabel:
+            isMonoLabel = true
+            _scaledSize = ScaledMetric(wrappedValue: baseSize, relativeTo: .body)
+        }
     }
 
     func body(content: Content) -> some View {
+        let size = isMonoLabel ? YKTextMetrics.monoLabelSize(base: baseSize, bodyScale: bodyScale) : scaledSize
         content
             .font(.system(size: size, weight: YKTextMetrics.weight(weight), design: style.family == .mono ? .monospaced : .default))
             .tracking(YKTextMetrics.tracking(style, size: size))
@@ -97,12 +127,14 @@ struct YKTextStyleModifier: ViewModifier {
 
 public extension View {
     /// Роль текста: `.ykText(.heading)`. `size` и `weight` — для плотных мест (строка списка 14, плашка 14);
-    /// кегль всё равно растёт вместе с крупным шрифтом системы.
+    /// кегль всё равно растёт вместе с крупным шрифтом системы. Метка (`.label`) растёт медленно, как `ykMonoLabel`.
     func ykText(_ role: YKTextRole, size: CGFloat? = nil, weight: Int? = nil) -> some View {
-        modifier(YKTextStyleModifier(style: role.style, size: size, weight: weight, relativeTo: role.dynamicTypeStyle))
+        let scaling: YKTextScaling = role == .label ? .monoLabel : .relativeTo(role.dynamicTypeStyle)
+        return modifier(YKTextStyleModifier(style: role.style, size: size, weight: weight, scaling: scaling))
     }
 
     /// Метка «Чертежа»: моноширинный капс с разрядкой, приглушённым цветом. Только для меток, не для текста.
+    /// При крупном шрифте растёт медленнее текста и с потолком.
     /// - Parameter tracking: разрядка в em; в плотных метках (статусы, сегменты) — 0.05.
     func ykMonoLabel(
         size: CGFloat = YKTokens.Text.label.size,
@@ -115,17 +147,18 @@ public extension View {
             family: label.family, size: size, weight: weight,
             letterSpacing: tracking, lineHeight: label.lineHeight, uppercase: label.uppercase
         )
-        return modifier(YKTextStyleModifier(style: style, relativeTo: .caption2))
+        return modifier(YKTextStyleModifier(style: style, scaling: .monoLabel))
             .foregroundStyle(color.color)
     }
 
-    /// Моноширинные цифры. Без размера — роль «Число · 24».
+    /// Моноширинные цифры. Без размера — роль «Число · 24». Мелкие (до 13) — счётчики, растут как метки.
     func ykMonoNum(size: CGFloat? = nil, weight: Int? = nil) -> some View {
-        modifier(YKTextStyleModifier(
+        let isCounter = (size ?? YKTokens.Text.number.size) <= 13
+        return modifier(YKTextStyleModifier(
             style: YKTokens.Text.number,
             size: size,
             weight: weight ?? (size == nil ? YKTokens.Text.number.weight : 400),
-            relativeTo: size == nil ? .title : .caption
+            scaling: isCounter ? .monoLabel : .relativeTo(.title)
         ))
     }
 }

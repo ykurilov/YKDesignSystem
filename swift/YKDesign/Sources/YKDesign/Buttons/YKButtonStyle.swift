@@ -66,10 +66,17 @@ public struct YKButtonState: Equatable, Sendable {
     public var showsSphere: Bool { isLoading }
     /// Во время загрузки повторное нажатие не принимается.
     public var acceptsTaps: Bool { isEnabled && !isLoading }
+    /// Срабатывает ли действие — и от пальца, и от VoiceOver.
+    public var shouldTriggerAction: Bool { acceptsTaps }
+    /// Для VoiceOver кнопка в загрузке недоступна («недоступно»), хотя выглядит обычной.
+    public var isAccessibilityDisabled: Bool { !acceptsTaps }
+    /// Что VoiceOver скажет после названия кнопки.
+    public var accessibilityValue: String? { isLoading ? "Загрузка" : nil }
 }
 
 /// Кнопка YKDesign: `.buttonStyle(.yk(.primary, size: .lg, isLoading: sending))`.
-public struct YKButtonStyle: ButtonStyle {
+/// Стиль сам решает, вызывать ли действие: во время загрузки оно не срабатывает ни от касания, ни от VoiceOver.
+public struct YKButtonStyle: PrimitiveButtonStyle {
     let variant: YKButtonVariant
     let size: YKButtonSize
     let isLoading: Bool
@@ -85,7 +92,7 @@ public struct YKButtonStyle: ButtonStyle {
     }
 }
 
-public extension ButtonStyle where Self == YKButtonStyle {
+public extension PrimitiveButtonStyle where Self == YKButtonStyle {
     static func yk(_ variant: YKButtonVariant = .primary, size: YKButtonSize = .md, isLoading: Bool = false) -> YKButtonStyle {
         YKButtonStyle(variant, size: size, isLoading: isLoading)
     }
@@ -95,37 +102,74 @@ private struct YKButtonBody: View {
     let variant: YKButtonVariant
     let size: YKButtonSize
     let isLoading: Bool
-    let configuration: ButtonStyleConfiguration
-
+    let configuration: PrimitiveButtonStyleConfiguration
     @Environment(\.isEnabled) private var isEnabled
-    @ScaledMetric private var height: CGFloat
-    @ScaledMetric private var fontSize: CGFloat
-
-    init(variant: YKButtonVariant, size: YKButtonSize, isLoading: Bool, configuration: ButtonStyleConfiguration) {
-        self.variant = variant
-        self.size = size
-        self.isLoading = isLoading
-        self.configuration = configuration
-        _height = ScaledMetric(wrappedValue: size.metrics.height, relativeTo: .body)
-        _fontSize = ScaledMetric(wrappedValue: size.metrics.fontSize, relativeTo: .body)
-    }
 
     var body: some View {
-        let state = YKButtonState(isEnabled: isEnabled, isPressed: configuration.isPressed, isLoading: isLoading)
+        let state = YKButtonState(isEnabled: isEnabled, isPressed: false, isLoading: isLoading)
+        Button {
+            if state.shouldTriggerAction { configuration.trigger() }
+        } label: {
+            configuration.label
+        }
+        .buttonStyle(YKPressableChromeStyle(variant: variant, size: size, isEnabled: isEnabled, isLoading: isLoading))
+        // Отключаем только внутреннюю кнопку: вид задаёт isEnabled снаружи, VoiceOver слышит «недоступно»
+        .disabled(state.isAccessibilityDisabled)
+        .ykAccessibilityValue(state.accessibilityValue)
+    }
+}
+
+/// Нажатие и вид; доступность и действие решает YKButtonBody.
+private struct YKPressableChromeStyle: ButtonStyle {
+    let variant: YKButtonVariant
+    let size: YKButtonSize
+    let isEnabled: Bool
+    let isLoading: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        YKButtonChrome(
+            variant: variant, size: size,
+            state: YKButtonState(isEnabled: isEnabled, isPressed: configuration.isPressed, isLoading: isLoading)
+        ) {
+            configuration.label
+        }
+        .animation(.ykOut(duration: 0.2), value: configuration.isPressed)
+    }
+}
+
+extension View {
+    @ViewBuilder func ykAccessibilityValue(_ value: String?) -> some View {
+        if let value { accessibilityValue(Text(value)) } else { self }
+    }
+}
+
+/// Внешний вид кнопки без поведения — общий для `YKButtonStyle`, кнопки-значка и кнопки меню.
+struct YKButtonChrome<Label: View>: View {
+    let variant: YKButtonVariant
+    let size: YKButtonSize
+    let state: YKButtonState
+    /// Ширина квадратной кнопки-значка; `nil` — по содержимому.
+    var squareSide: CGFloat? = nil
+    @ViewBuilder let label: Label
+
+    @ScaledMetric private var scale: CGFloat = 1
+
+    var body: some View {
         let palette = variant.palette
-        let shape = RoundedRectangle(cornerRadius: size.metrics.cornerRadius, style: .continuous)
+        let metrics = size.metrics
+        let shape = RoundedRectangle(cornerRadius: metrics.cornerRadius, style: .continuous)
 
         HStack(spacing: YKTokens.Space.s2) {
             if state.showsSphere {
                 YKSphere(size: 16, color: palette.foreground.color)
             }
-            configuration.label
+            label
         }
-        .font(.system(size: fontSize, weight: variant.fontWeight))
+        .font(.system(size: metrics.fontSize * scale, weight: variant.fontWeight))
         .lineLimit(1)
         .foregroundStyle(palette.foreground.color)
-        .padding(.horizontal, variant.horizontalPadding(for: size))
-        .frame(minHeight: height)
+        .padding(.horizontal, squareSide == nil ? variant.horizontalPadding(for: size) : 0)
+        .frame(minWidth: squareSide.map { $0 * scale }, minHeight: metrics.height * scale)
         .background(palette.background.color, in: shape)
         .overlay {
             if let border = palette.border {
@@ -135,7 +179,5 @@ private struct YKButtonBody: View {
         .contentShape(shape)
         .scaleEffect(state.scale)
         .opacity(state.opacity)
-        .allowsHitTesting(state.acceptsTaps)
-        .animation(.ykOut(duration: 0.2), value: configuration.isPressed)
     }
 }

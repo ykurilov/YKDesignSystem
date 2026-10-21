@@ -110,7 +110,7 @@ YKChip("В работе", kind: .live)
 YKIcon(.caretRight, size: 14)
 ```
 
-Компоненты: `YKSphere`, `YKNewDot`, `YKButtonStyle`, `YKChip`, `YKSteps`, `YKAvatar`, `YKTag`, `YKTextField` / `YKField`, `.ykSwitch` / `.ykCheckbox`, `YKSegmented`, `YKCard`, `YKStat`, `YKListGroup` + `YKListRow`, `YKBanner`, `YKToast`, `YKEmptyState`. Все разом — `YKShowcaseView`.
+Компоненты: `YKSphere`, `YKNewDot`, `YKButtonStyle`, `YKIconButton`, `YKMenuButton`, `YKChip`, `YKSteps`, `YKAvatar`, `YKTag`, `YKTextField` / `YKField`, `.ykSwitch` / `.ykCheckbox`, `YKRadioGroup`, `YKSegmented`, `YKTabs`, `YKCard`, `YKStat`, `YKListGroup` + `YKListRow` / `YKListDivider`, `YKBanner`, `YKToast`, `YKEmptyState`, `YKSkeleton`, `.ykSheet`, `.ykSystemDialogs()`. Все разом — `YKShowcaseView`.
 
 Тесты и снимки — на iMac:
 

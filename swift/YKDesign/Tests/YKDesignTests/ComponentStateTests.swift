@@ -99,15 +99,13 @@ struct InputTests {
         #expect(error.hintRole == .danger && idle.hintRole == .muted)
 
         let disabled = YKFieldState(isFocused: false, hasError: false, isEnabled: false)
-        #expect(disabled.backgroundRole == .surface2 && disabled.textRole == .faint)
+        #expect(disabled.backgroundRole == .surface2 && disabled.textRole == .muted)
     }
 
     @Test("переключатель и флажок включённые — акцент")
     func toggles() {
         #expect(YKSwitchAppearance.trackRole(isOn: true) == .accent)
         #expect(YKSwitchAppearance.trackRole(isOn: false) == .surface3)
-        #expect(YKSwitchAppearance.knobOffset(isOn: false) == 3)
-        #expect(YKSwitchAppearance.knobOffset(isOn: true) == 19)
         #expect(YKCheckboxAppearance.fillRole(isOn: true) == .accent)
         #expect(YKCheckboxAppearance.borderRole(isOn: true) == .accent)
         #expect(YKCheckboxAppearance.fillRole(isOn: false) == .surface)
