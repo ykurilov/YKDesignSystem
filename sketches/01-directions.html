@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 01 — три направления</title>
+<style>
+  /* ---------- Направление A: «Бумага» — тёплое, умеренные углы, заголовки с засечками ---------- */
+  .dir-a {
+    --bg: #F6F3EC; --surface: #FFFFFF; --surface-2: #EFEBE2;
+    --text: #1F1D1A; --muted: #6F6A61; --border: #E4DED2;
+    --accent: #C0613A; --on-accent: #FFFFFF; --accent-soft: #F5E3D9;
+    --r-control: 10px; --r-card: 14px; --r-chip: 8px; --r-avatar: 50%; --r-fab: 14px;
+    --font-head: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+    --head-weight: 500; --head-track: -0.01em;
+  }
+  .theme-dark .dir-a {
+    --bg: #1C1A17; --surface: #262320; --surface-2: #2F2B27;
+    --text: #EFEAE1; --muted: #A39C90; --border: #3A3530;
+    --accent: #E07C52; --on-accent: #1C1A17; --accent-soft: #3D2A20;
+  }
+
+  /* ---------- Направление B: «Графит» — нейтральный каркас, таблетки, одна тёплая искра ---------- */
+  .dir-b {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F2;
+    --text: #121212; --muted: #6B6B68; --border: #E8E8E5;
+    --accent: #121212; --on-accent: #FFFFFF; --accent-soft: #F4F4F2;
+    --spark: #FF6A3D;
+    --r-control: 999px; --r-card: 18px; --r-chip: 999px; --r-avatar: 50%; --r-fab: 999px;
+    --font-head: system-ui, -apple-system, "SF Pro Display", "Inter", sans-serif;
+    --head-weight: 600; --head-track: -0.025em;
+  }
+  .theme-dark .dir-b {
+    --bg: #0E0E0E; --surface: #171717; --surface-2: #212121;
+    --text: #F2F2F0; --muted: #9A9A96; --border: #2A2A2A;
+    --accent: #F2F2F0; --on-accent: #0E0E0E; --accent-soft: #212121;
+  }
+
+  /* ---------- Направление C: «Живой» — смешанные формы, которые меняются при нажатии ---------- */
+  .dir-c {
+    --bg: #F4F6F5; --surface: #FFFFFF; --surface-2: #E6EEEA;
+    --text: #17201C; --muted: #5E6B65; --border: #DCE4E0;
+    --accent: #12795F; --on-accent: #FFFFFF; --accent-soft: #CFEBDF;
+    --r-control: 999px; --r-card: 26px; --r-chip: 10px; --r-avatar: 38%; --r-fab: 18px;
+    --font-head: system-ui, -apple-system, "SF Pro Rounded", "Inter", sans-serif;
+    --head-weight: 650; --head-track: -0.02em;
+  }
+  .theme-dark .dir-c {
+    --bg: #0F1513; --surface: #18201D; --surface-2: #1F2B27;
+    --text: #E6EFEB; --muted: #93A49C; --border: #2A3632;
+    --accent: #6DD3AE; --on-accent: #0F1513; --accent-soft: #1E3A30;
+  }
+
+  /* ---------- Общая разметка страницы ---------- */
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+    background: #D9D9D6; color: #222; padding: 32px;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .columns { display: flex; gap: 32px; flex-wrap: wrap; }
+  .column-label { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .column-label span { font-weight: 400; opacity: .6; }
+
+  /* ---------- Экран телефона ---------- */
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden;
+    background: var(--bg); color: var(--text); position: relative;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; }
+  .screen { flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 18px; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .title { font-family: var(--font-head); font-weight: var(--head-weight); letter-spacing: var(--head-track); font-size: 32px; line-height: 1.1; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: var(--r-avatar);
+    background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-weight: 600; font-size: 15px;
+  }
+
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: var(--r-control); }
+  .segmented button {
+    flex: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 500;
+    padding: 7px 0; border-radius: var(--r-control); cursor: pointer;
+  }
+  .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card);
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-size: 13px; color: var(--muted); }
+  .chip {
+    font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: var(--r-chip);
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .dir-b .chip { background: var(--surface-2); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .dir-b .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--spark); }
+  .progress { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 62%; background: var(--accent); border-radius: 99px; }
+  .dir-b .progress i { background: var(--spark); }
+
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .icon { width: 32px; height: 32px; border-radius: calc(var(--r-chip) + 2px); background: var(--surface-2); display: grid; place-items: center; font-size: 15px; }
+  .dir-b .row .icon { border-radius: 10px; }
+  .row .grow { flex: 1; font-size: 15px; }
+  .row .chev { color: var(--muted); }
+
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field input {
+    width: 100%; font: inherit; font-size: 16px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-control);
+    padding: 12px 16px; outline: none;
+  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .buttons { display: flex; gap: 10px; }
+  .btn {
+    flex: 1; border: 0; font: inherit; font-size: 15px; font-weight: 600; padding: 13px 0;
+    border-radius: var(--r-control); cursor: pointer;
+    transition: transform .12s ease, border-radius .25s cubic-bezier(.3,1.6,.5,1);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--accent); color: var(--on-accent); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+  /* C: при нажатии кнопка меняет форму — таблетка становится квадратнее */
+  .dir-c .btn:active { border-radius: 14px; transform: scale(.98); }
+
+  .composer {
+    margin-top: auto; display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: calc(var(--r-card) + 6px);
+    padding: 8px 8px 8px 16px; box-shadow: 0 4px 16px rgba(0,0,0,.05);
+  }
+  .composer span { flex: 1; color: var(--muted); font-size: 15px; }
+  .send {
+    width: 36px; height: 36px; border: 0; border-radius: var(--r-fab);
+    background: var(--accent); color: var(--on-accent); font-size: 18px; cursor: pointer;
+    transition: border-radius .3s cubic-bezier(.3,1.6,.5,1), transform .12s ease;
+  }
+  .dir-a .send { border-radius: 10px; }
+  .dir-c .send { border-radius: 12px; }
+  .dir-c .send:active { border-radius: 50%; transform: rotate(-12deg); }
+
+  .tabbar {
+    display: flex; justify-content: space-around; padding: 10px 12px 28px;
+    border-top: 1px solid var(--border); background: var(--surface); margin-top: 14px;
+  }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
+  .tab b { font-size: 20px; font-weight: 400; line-height: 1; }
+  .tab.on { color: var(--accent); }
+  .dir-b .tab.on { color: var(--text); }
+  /* C: активная вкладка в «пилюле», как в новом Material */
+  .dir-c .tab b { padding: 4px 18px; border-radius: 99px; }
+  .dir-c .tab.on b { background: var(--accent-soft); }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Набросок 01 — три направления</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+
+  <div class="columns" id="columns"></div>
+
+  <template id="phone">
+    <div class="phone">
+      <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="screen">
+        <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+        <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+        <div class="card">
+          <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip">В работе</span></div>
+          <div class="meta">Обновлено 2 часа назад · 5 задач</div>
+          <div class="progress"><i></i></div>
+        </div>
+        <div class="list">
+          <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><div class="chev">›</div></div>
+          <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><div class="chev">›</div></div>
+        </div>
+        <div class="field"><label>Название проекта</label><input placeholder="Например, «Марафон»"></div>
+        <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+        <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат</div><div class="tab"><b>☰</b>Ещё</div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    const directions = [
+      ['dir-a', 'A · Бумага', 'тёплый фон, засечки в заголовках, умеренные углы'],
+      ['dir-b', 'B · Графит', 'чёрно-белый каркас, таблетки, одна оранжевая искра'],
+      ['dir-c', 'C · Живой', 'смешанные формы, кнопки меняют форму при нажатии'],
+    ];
+    const template = document.getElementById('phone');
+    for (const [cls, name, note] of directions) {
+      const col = document.createElement('div');
+      col.className = cls;
+      col.innerHTML = `<div class="column-label">${name} <span>— ${note}</span></div>`;
+      col.appendChild(template.content.cloneNode(true));
+      document.getElementById('columns').appendChild(col);
+    }
+  </script>
+</body>
+</html>
