@@ -15,6 +15,7 @@ const READABLE_PAIRS: Array<[ColorName, ColorName]> = [
   ["muted", "bg"],
   ["onInk", "ink"],
   ["accentText", "bg"],
+  ["onDanger", "danger"],
 ];
 const THEMES: ThemeName[] = ["light", "dark"];
 

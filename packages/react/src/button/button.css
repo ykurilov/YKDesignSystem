@@ -21,7 +21,7 @@
 .yk-button--secondary { background: var(--yk-surface-2); color: var(--yk-text); }
 .yk-button--outline { background: transparent; color: var(--yk-text); --yk-button-edge: inset 0 0 0 1px var(--yk-border-strong); }
 .yk-button--ghost { background: transparent; color: var(--yk-text); }
-.yk-button--danger { background: var(--yk-danger); color: #fff; }
+.yk-button--danger { background: var(--yk-danger); color: var(--yk-on-danger); }
 .yk-button--link { background: transparent; color: var(--yk-accent-text); --yk-button-pad-x: 4px; font-weight: 500; }
 
 @media (hover: hover) {

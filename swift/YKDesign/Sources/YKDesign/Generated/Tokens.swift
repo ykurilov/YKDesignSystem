@@ -25,6 +25,7 @@ public enum YKTokens {
         public static let accentText = adaptive(light: 0xBE4824, dark: 0xF7A07E)
         public static let accentSoft = adaptive(light: 0xFCEBE3, dark: 0x3A2219)
         public static let danger = adaptive(light: 0xC8283A, dark: 0xFF5C6C)
+        public static let onDanger = adaptive(light: 0xFFFFFF, dark: 0x0F0F0F)
         public static let dangerSoft = adaptive(light: 0xFBE7E9, dark: 0x3D1A1E)
         public static let success = adaptive(light: 0x1E8A55, dark: 0x4CC88A)
         public static let successSoft = adaptive(light: 0xE3F4EA, dark: 0x16301F)
