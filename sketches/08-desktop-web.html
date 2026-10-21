@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 08 — веб-версия на компьютере</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3; --sidebar: #FAFAF9;
+    --text: #141414; --muted: #6E6E6B; --faint: #A3A3A0; --border: #E9E9E6;
+    --ink: #141414; --on-ink: #FFFFFF;
+    --accent: #EE6A3C; --accent-text: #C9502A; --accent-soft: #FCEBE3;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --sans: system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+  }
+  .theme-dark {
+    --bg: #0F0F0F; --surface: #151515; --surface-2: #222222; --sidebar: #121212;
+    --text: #F2F2F0; --muted: #9B9B97; --faint: #5E5E5B; --border: #262626;
+    --ink: #F2F2F0; --on-ink: #0F0F0F;
+    --accent: #F27D52; --accent-text: #F7A07E; --accent-soft: #3A2219;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; font-size: 14px; }
+  .mono-label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  .app { display: grid; grid-template-columns: 248px 1fr 360px; height: 100vh; }
+
+  /* ---------- Боковая панель ---------- */
+  .sidebar { background: var(--sidebar); border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 22px; }
+  .workspace { display: flex; align-items: center; gap: 10px; padding: 6px 8px; }
+  .workspace .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .workspace b { font-weight: 600; font-size: 14px; flex: 1; }
+  .workspace span { color: var(--muted); }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav .mono-label { padding: 0 8px 6px; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: 14px; }
+  .nav a .ic { width: 18px; text-align: center; color: var(--muted); }
+  .nav a .count { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .nav a.on { background: var(--surface-2); font-weight: 500; }
+  .nav a.on .ic { color: var(--accent); }
+  .nav a .new-dot { margin-left: auto; }
+  .new-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .sidebar .agent-card { margin-top: auto; border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
+  .agent-card .row { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .agent-card .steps { display: flex; gap: 3px; }
+  .agent-card .steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--surface-2); }
+  .agent-card .steps i.done { background: var(--accent); }
+
+  /* ---------- Основная область ---------- */
+  .main { overflow: hidden; display: flex; flex-direction: column; }
+  .topbar { height: 52px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 8px; color: var(--muted); }
+  .topbar .crumb b { color: var(--text); font-weight: 500; }
+  .topbar .search { margin-left: auto; width: 260px; height: 32px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; padding: 0 10px; gap: 8px; color: var(--faint); background: var(--surface); }
+  .topbar .search kbd { margin-left: auto; font-family: var(--mono); font-size: 10px; border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; color: var(--muted); }
+  .topbar .theme-btn { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; }
+
+  .content { padding: 28px 28px 0; display: flex; flex-direction: column; gap: 20px; overflow: hidden; }
+  .heading { display: flex; align-items: flex-end; gap: 16px; }
+  .heading h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; margin-top: 6px; }
+  .heading .actions { margin-left: auto; display: flex; gap: 8px; }
+  .btn { height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn.primary { background: var(--ink); color: var(--on-ink); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+  .btn kbd { font-family: var(--mono); font-size: 10px; font-weight: 400; opacity: .6; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); border-radius: 12px; }
+  .stat { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .stat + .stat { border-left: 1px solid var(--border); }
+  .stat .value { font-family: var(--mono); font-size: 24px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat .value small { font-size: 12px; color: var(--muted); margin-left: 4px; }
+  .stat .value.accent { color: var(--accent-text); }
+
+  .toolbar { display: flex; align-items: center; gap: 12px; }
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: 10px; }
+  .segmented button { border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
+  .segmented button.on { background: var(--surface); color: var(--accent-text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .theme-dark .segmented button.on { background: #333; }
+  .filter { height: 30px; padding: 0 10px; border: 1px dashed var(--border); border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+
+  table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 10px 16px; background: var(--sidebar); border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  tr.selected td { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+  tr.selected td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+  td.name { font-weight: 500; }
+  td.name span { display: flex; align-items: center; gap: 8px; }
+  td.num { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .chip { font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+  .chip.live { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
+  .chip.done { color: var(--text); }
+  .steps { display: flex; gap: 3px; width: 110px; }
+  .steps i { flex: 1; height: 5px; border-radius: 2px; background: var(--surface-2); }
+  .steps i.done { background: var(--text); }
+  tr.selected .steps i.done, .steps.live i.done { background: var(--accent); }
+  .owner { width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); display: inline-grid; place-items: center; font-size: 10px; font-weight: 600; }
+
+  /* ---------- Панель агента ---------- */
+  .agent { border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+  .agent header { height: 52px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; padding: 0 18px; }
+  .agent header b { font-weight: 600; }
+  .agent header .mono-label { margin-left: auto; }
+  .thread { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+  .msg-user { align-self: flex-end; max-width: 85%; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; line-height: 1.45; }
+  .msg-agent { line-height: 1.55; display: flex; flex-direction: column; gap: 10px; }
+  .msg-agent .who { display: flex; align-items: center; gap: 8px; }
+  .msg-agent ol { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+  .msg-agent a { color: var(--accent-text); text-decoration: none; font-weight: 500; }
+  .tool { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .tool .line { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .tool .line .ok { color: var(--text); }
+  .composer { margin: 0 18px 18px; border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .composer .placeholder { color: var(--faint); }
+  .composer .bar { display: flex; align-items: center; gap: 8px; }
+  .composer .bar .mono-label { font-size: 10px; }
+  .send { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 9px; background: var(--ink); color: var(--on-ink); font-size: 16px; }
+
+  canvas.sphere { flex: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="workspace"><div class="logo">ЮК</div><b>Мастерская</b><span>⌄</span></div>
+    <nav class="nav">
+      <div class="mono-label">Работа</div>
+      <a class="on" href="#"><span class="ic">◇</span>Проекты<span class="count">12</span></a>
+      <a href="#"><span class="ic">◯</span>Чат с агентом<i class="new-dot"></i></a>
+      <a href="#"><span class="ic">▤</span>Материалы<span class="count">48</span></a>
+      <a href="#"><span class="ic">◷</span>Расписание</a>
+    </nav>
+    <nav class="nav">
+      <div class="mono-label">Курсы</div>
+      <a href="#"><span class="ic">·</span>Марафон по ИИ</a>
+      <a href="#"><span class="ic">·</span>Вайб-кодинг</a>
+      <a href="#"><span class="ic">·</span>Мастерская</a>
+    </nav>
+    <div class="agent-card">
+      <div class="row"><canvas class="sphere" data-size="16"></canvas>Агент работает</div>
+      <div style="font-size:13px">План рассылки для вебинара</div>
+      <div class="steps"><i class="done"></i><i class="done"></i><i></i><i></i><i></i></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="crumb">Мастерская / <b>Проекты</b></span>
+      <div class="search">⌕ Поиск по проектам<kbd>⌘K</kbd></div>
+      <button class="theme-btn" onclick="document.body.classList.toggle('theme-dark')">◐ Тема</button>
+    </div>
+
+    <div class="content">
+      <div class="heading">
+        <div><div class="mono-label">Рабочее пространство · 12 проектов</div><h1>Проекты</h1></div>
+        <div class="actions"><button class="btn secondary">Импорт</button><button class="btn primary">Создать проект <kbd>N</kbd></button></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="mono-label">В работе</span><span class="value accent">04</span></div>
+        <div class="stat"><span class="mono-label">Задач открыто</span><span class="value">27<small>/ 64</small></span></div>
+        <div class="stat"><span class="mono-label">Сделано за неделю</span><span class="value">18</span></div>
+        <div class="stat"><span class="mono-label">Агент сэкономил</span><span class="value">6,5<small>ч</small></span></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+        <span class="filter">+ Статус</span><span class="filter">+ Курс</span>
+      </div>
+
+      <table>
+        <thead><tr><th>Проект</th><th>Статус</th><th>Прогресс</th><th>Задачи</th><th>Обновлён</th><th></th></tr></thead>
+        <tbody>
+          <tr class="selected"><td class="name"><span>Лендинг вебинара</span></td><td><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span></td><td><div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div></td><td class="num">3/5</td><td class="num">2 ч назад</td><td><span class="owner">ЮК</span></td></tr>
+          <tr><td class="name"><span>Идеи для рассылки<i class="new-dot"></i></span></td><td><span class="chip">Черновик</span></td><td><div class="steps"><i class="done"></i><i></i><i></i><i></i><i></i></div></td><td class="num">1/5</td><td class="num">вчера</td><td><span class="owner">АИ</span></td></tr>
+          <tr><td class="name"><span>Обложки курса</span></td><td><span class="chip live"><canvas class="sphere" data-size="12"></canvas>В работе</span></td><td><div class="steps live"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i></i></div></td><td class="num">4/5</td><td class="num">вчера</td><td><span class="owner">ЮК</span></td></tr>
+          <tr><td class="name"><span>Марафон по ИИ — неделя 2</span></td><td><span class="chip done">✓ Готово</span></td><td><div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></div></td><td class="num">5/5</td><td class="num">12 окт</td><td><span class="owner">МК</span></td></tr>
+          <tr><td class="name"><span>Квиз по уроку 7</span></td><td><span class="chip">Черновик</span></td><td><div class="steps"><i></i><i></i><i></i><i></i><i></i></div></td><td class="num">0/5</td><td class="num">10 окт</td><td><span class="owner">ЮК</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <aside class="agent">
+    <header><b>Агент</b><span class="mono-label">Лендинг вебинара</span></header>
+    <div class="thread">
+      <div class="msg-user">Собери план рассылки к вебинару: 5 писем, от анонса до дожима.</div>
+      <div class="msg-agent">
+        <div class="who mono-label"><canvas class="sphere" data-size="16"></canvas>Агент · шаг 2/5</div>
+        <div class="tool">
+          <div class="line"><span class="ok">✓</span>прочитал лендинг вебинара</div>
+          <div class="line"><span class="ok">✓</span>нашёл 3 прошлые рассылки</div>
+          <div class="line"><canvas class="sphere" data-size="12"></canvas>пишу структуру писем…</div>
+        </div>
+        <div>Предварительно так:</div>
+        <ol><li>Анонс — за 7 дней</li><li>Польза — за 3 дня</li><li>Напоминание — в день эфира</li></ol>
+        <div>Опираюсь на <a href="#">рассылку марафона →</a></div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="placeholder">Спросить агента…</div>
+      <div class="bar"><span class="mono-label">+ файл</span><span class="mono-label">@ проект</span><button class="send">↑</button></div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+  const SPHERE = (() => {
+    const n = 46, pts = [];
+    for (let i = 0; i < n; i++) {
+      const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+      pts.push([Math.cos(a) * r, y, Math.sin(a) * r]);
+    }
+    return pts;
+  })();
+  const spheres = [...document.querySelectorAll('canvas.sphere')].map((cv) => {
+    const size = +cv.dataset.size, dpr = 3;
+    cv.width = cv.height = size * dpr; cv.style.width = cv.style.height = size + 'px';
+    return cv;
+  });
+  function drawSphere(canvas, t) {
+    const color = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+    const ctx = canvas.getContext('2d'), s = canvas.width, c = s / 2, R = s * 0.375;
+    const ang = t / 1400, tilt = 0.45;
+    ctx.clearRect(0, 0, s, s);
+    const proj = SPHERE.map(([x, y, z]) => {
+      const x1 = x * Math.cos(ang) + z * Math.sin(ang), z1 = -x * Math.sin(ang) + z * Math.cos(ang);
+      return [x1, y * Math.cos(tilt) - z1 * Math.sin(tilt), y * Math.sin(tilt) + z1 * Math.cos(tilt)];
+    }).sort((a, b) => a[2] - b[2]);
+    for (const [x, y, z] of proj) {
+      const depth = (z + 1) / 2;
+      ctx.globalAlpha = 0.25 + depth * 0.75;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(c + x * R, c + y * R, (s / 96) * (2 + depth * 3.2), 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  const tick = (t) => { spheres.forEach((cv) => drawSphere(cv, t)); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
