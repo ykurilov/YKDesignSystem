@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 05 — живой индикатор агента</title>
+<style>
+  .base {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3;
+    --text: #141414; --muted: #6E6E6B; --border: #E9E9E6;
+    --primary: #141414; --on-primary: #FFFFFF;
+    --spark: #EE6A3C; --spark-deep: #B9431C;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  .theme-dark .base {
+    --bg: #0F0F0F; --surface: #181818; --surface-2: #222222;
+    --text: #F2F2F0; --muted: #9B9B97; --border: #2A2A2A;
+    --primary: #F2F2F0; --on-primary: #0F0F0F;
+    --spark: #F27D52; --spark-deep: #A8441F;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .layout { display: flex; gap: 40px; align-items: flex-start; }
+
+  /* ---------- Витрина индикаторов ---------- */
+  .gallery { display: grid; grid-template-columns: repeat(3, 230px); gap: 16px; }
+  .tile {
+    background: var(--bg); color: var(--text); border-radius: 16px; padding: 18px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 14px; border: 2px solid transparent;
+  }
+  .tile.on { border-color: var(--text); }
+  .tile .stage { height: 96px; display: grid; place-items: center; }
+  .tile h4 { font-size: 14px; font-weight: 600; }
+  .tile p { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: -8px; }
+  .tile .inline { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; }
+
+  /* Каждый индикатор строится в квадрате 48px и масштабируется обёрткой */
+  .slot { display: inline-flex; }
+  .ind { display: inline-block; vertical-align: middle; width: calc(48px * var(--k)); height: calc(48px * var(--k)); position: relative; flex: none; }
+  .ind > .core { position: absolute; left: 0; top: 0; width: 48px; height: 48px; transform: scale(var(--k)); transform-origin: 0 0; perspective: 160px; }
+  .ind.big { --k: 1.6; }
+  .ind.small { --k: .33; }
+  .p3d { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+  /* 0 · Точка — для сравнения */
+  .i-dot .d { position: absolute; left: 14px; top: 14px; width: 20px; height: 20px; border-radius: 50%; background: var(--spark); animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--spark) 45%, transparent); } 50% { transform: scale(.78); box-shadow: 0 0 0 12px transparent; } }
+
+  /* 1 · Искра: три лепестка вращаются в объёме и «раскрываются» */
+  .i-spark .p3d { animation: spark-turn 3.2s cubic-bezier(.45,0,.55,1) infinite; }
+  .i-spark .ray { position: absolute; left: 20px; top: 2px; width: 8px; height: 44px; border-radius: 4px; background: var(--spark); }
+  .i-spark .ray:nth-child(1) { transform: rotateZ(0deg); }
+  .i-spark .ray:nth-child(2) { transform: rotateZ(60deg); background: color-mix(in srgb, var(--spark) 85%, var(--spark-deep)); }
+  .i-spark .ray:nth-child(3) { transform: rotateZ(120deg); background: var(--spark-deep); }
+  @keyframes spark-turn {
+    0% { transform: rotateX(0) rotateY(0) rotateZ(0) scale(1); }
+    50% { transform: rotateX(55deg) rotateY(180deg) rotateZ(90deg) scale(.72); }
+    100% { transform: rotateX(0) rotateY(360deg) rotateZ(180deg) scale(1); }
+  }
+
+  /* 2 · Кубик: маленький куб перекатывается с грани на грань */
+  .i-cube .p3d { left: 12px; top: 12px; width: 24px; height: 24px; animation: cube-roll 2.6s cubic-bezier(.65,0,.35,1) infinite; }
+  .i-cube .f { position: absolute; width: 24px; height: 24px; border: 2px solid var(--spark); background: color-mix(in srgb, var(--spark) 18%, transparent); border-radius: 3px; }
+  .i-cube .f:nth-child(1) { transform: translateZ(12px); background: var(--spark); }
+  .i-cube .f:nth-child(2) { transform: rotateY(180deg) translateZ(12px); }
+  .i-cube .f:nth-child(3) { transform: rotateY(90deg) translateZ(12px); }
+  .i-cube .f:nth-child(4) { transform: rotateY(-90deg) translateZ(12px); }
+  .i-cube .f:nth-child(5) { transform: rotateX(90deg) translateZ(12px); }
+  .i-cube .f:nth-child(6) { transform: rotateX(-90deg) translateZ(12px); }
+  @keyframes cube-roll {
+    0% { transform: rotateX(-25deg) rotateY(35deg); }
+    50% { transform: rotateX(-25deg) rotateY(125deg); }
+    100% { transform: rotateX(-25deg) rotateY(215deg); }
+  }
+
+  /* 3 · Гироскоп: два кольца вращаются в разных плоскостях вокруг точки */
+  .i-gyro .ring { position: absolute; inset: 4px; border-radius: 50%; border: 2.5px solid var(--spark); }
+  .i-gyro .ring.a { animation: gyro-a 2.4s linear infinite; }
+  .i-gyro .ring.b { border-color: var(--text); opacity: .85; animation: gyro-b 3.6s linear infinite; }
+  .i-gyro .c { position: absolute; left: 19px; top: 19px; width: 10px; height: 10px; border-radius: 50%; background: var(--spark); }
+  @keyframes gyro-a { from { transform: rotateX(70deg) rotateZ(0); } to { transform: rotateX(70deg) rotateZ(360deg); } }
+  @keyframes gyro-b { from { transform: rotateY(70deg) rotateX(0) rotateZ(0); } to { transform: rotateY(70deg) rotateX(360deg) rotateZ(180deg); } }
+
+  /* 4 · Монета: диск переворачивается, оранжевая и тёмная стороны */
+  .i-coin .p3d { left: 8px; top: 8px; width: 32px; height: 32px; animation: coin-flip 2s cubic-bezier(.65,0,.35,1) infinite; }
+  .i-coin .side { position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; }
+  .i-coin .side.front { background: var(--spark); }
+  .i-coin .side.back { background: var(--text); transform: rotateY(180deg); }
+  @keyframes coin-flip { 0%,15% { transform: rotateY(0); } 50%,65% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
+
+  /* 5 · Сфера из точек — рисуется на canvas */
+  .i-sphere canvas { width: 48px; height: 48px; display: block; }
+
+  @media (prefers-reduced-motion: reduce) { .ind * { animation: none !important; } }
+
+  /* ---------- Телефон в стиле «Чертёж» ---------- */
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden; flex: none;
+    background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25); display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; }
+  .screen { flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 18px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: -12px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .title { font-weight: 600; letter-spacing: -0.025em; font-size: 32px; line-height: 1.1; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: 10px; }
+  .segmented button { flex: 1; border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 7px 0; border-radius: 8px; }
+  .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .theme-dark .segmented button.on { background: #333; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 6px; }
+  .steps { display: flex; gap: 4px; }
+  .steps i { flex: 1; height: 6px; border-radius: 2px; background: var(--surface-2); }
+  .steps i.done { background: var(--text); }
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; font-size: 15px; }
+  .row .grow { flex: 1; font-size: 15px; }
+  .row .num { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .row .chev { color: var(--muted); }
+  .new-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--spark); }
+  .buttons { display: flex; gap: 10px; }
+  .btn { flex: 1; border: 0; font: inherit; font-size: 15px; font-weight: 600; height: 46px; border-radius: 10px; }
+  .btn.primary { background: var(--primary); color: var(--on-primary); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); }
+  .agent-line { margin-top: auto; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); padding-left: 2px; }
+  .composer { margin-top: -8px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 8px 8px 16px; }
+  .composer span { flex: 1; color: var(--muted); font-size: 15px; }
+  .send { width: 36px; height: 36px; border: 0; border-radius: 9px; background: var(--primary); color: var(--on-primary); font-size: 18px; }
+  .tabbar { display: flex; justify-content: space-around; padding: 10px 12px 28px; border-top: 1px solid var(--border); background: var(--surface); margin-top: 14px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); position: relative; }
+  .tab b { font-size: 20px; font-weight: 400; line-height: 1; padding: 4px 18px; border-radius: 8px; font-family: system-ui; }
+  .tab.on { color: var(--text); }
+  .tab.on b { background: var(--surface-2); }
+  .tab .new-dot { position: absolute; top: 2px; right: 14px; }
+</style>
+</head>
+<body class="base-host">
+  <div class="page-head">
+    <h1>Набросок 05 — живой индикатор агента в «Чертеже»</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+
+  <div class="layout base">
+    <div class="gallery" id="gallery"></div>
+
+    <div class="phone">
+      <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="screen">
+        <div class="eyebrow">Рабочее пространство · 12</div>
+        <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+        <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+        <div class="card">
+          <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip"><span class="slot" data-size="small"></span>В работе</span></div>
+          <div class="meta">Обновлено 2 ч назад · 3/5 задач</div>
+          <div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div>
+        </div>
+        <div class="list">
+          <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><i class="new-dot"></i><span class="num">08</span><div class="chev">›</div></div>
+          <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><span class="num">14</span><div class="chev">›</div></div>
+        </div>
+        <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+        <div class="agent-line"><span class="slot" data-size="line"></span>собираю план рассылки, шаг 2/5</div>
+        <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+      </div>
+      <div class="tabbar"><div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат<i class="new-dot"></i></div><div class="tab"><b>☰</b>Ещё</div></div>
+    </div>
+  </div>
+
+  <script>
+    const INDICATORS = [
+      ['dot', 'Точка', 'Для сравнения: дышит на месте.', '<i class="d"></i>'],
+      ['spark', 'Искра', 'Три лепестка вращаются в объёме, складываются и раскрываются.', '<div class="p3d"><i class="ray"></i><i class="ray"></i><i class="ray"></i></div>'],
+      ['cube', 'Кубик', 'Маленький куб перекатывается с грани на грань — «идёт работа».', '<div class="p3d">' + '<i class="f"></i>'.repeat(6) + '</div>'],
+      ['gyro', 'Гироскоп', 'Два кольца крутятся в разных плоскостях вокруг точки.', '<i class="ring a"></i><i class="ring b"></i><i class="c"></i>'],
+      ['coin', 'Монета', 'Диск переворачивается: оранжевая сторона, тёмная сторона.', '<div class="p3d"><i class="side front"></i><i class="side back"></i></div>'],
+      ['sphere', 'Сфера', 'Шар из точек медленно вращается, ближние точки крупнее.', '<canvas width="96" height="96"></canvas>'],
+    ];
+
+    function makeIndicator(type, sizeClass) {
+      const [, , , inner] = INDICATORS.find(([key]) => key === type);
+      const el = document.createElement('span');
+      el.className = `ind ${sizeClass} i-${type}`;
+      el.innerHTML = `<span class="core">${inner}</span>`;
+      if (type === 'sphere') startSphere(el.querySelector('canvas'));
+      return el;
+    }
+
+    // Точки на сфере по спирали Фибоначчи, вращение вокруг наклонной оси
+    function startSphere(canvas) {
+      const ctx = canvas.getContext('2d');
+      const n = 46, pts = [];
+      for (let i = 0; i < n; i++) {
+        const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+        pts.push([Math.cos(a) * r, y, Math.sin(a) * r]);
+      }
+      const tick = (t) => {
+        if (!canvas.isConnected) return;
+        const color = getComputedStyle(canvas).getPropertyValue('--spark').trim() || '#EE6A3C';
+        const ang = t / 1400, tilt = 0.45;
+        ctx.clearRect(0, 0, 96, 96);
+        const proj = pts.map(([x, y, z]) => {
+          const x1 = x * Math.cos(ang) + z * Math.sin(ang), z1 = -x * Math.sin(ang) + z * Math.cos(ang);
+          const y2 = y * Math.cos(tilt) - z1 * Math.sin(tilt), z2 = y * Math.sin(tilt) + z1 * Math.cos(tilt);
+          return [x1, y2, z2];
+        }).sort((a, b) => a[2] - b[2]);
+        for (const [x, y, z] of proj) {
+          const depth = (z + 1) / 2;
+          ctx.globalAlpha = 0.25 + depth * 0.75;
+          ctx.fillStyle = color;
+          ctx.beginPath(); ctx.arc(48 + x * 36, 48 + y * 36, 2 + depth * 3.2, 0, Math.PI * 2); ctx.fill();
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    function applyToPhone(type) {
+      document.querySelectorAll('.phone .slot').forEach((slot) => {
+        slot.replaceChildren(makeIndicator(type, slot.dataset.size === 'line' ? 'line' : 'small'));
+      });
+      document.querySelectorAll('.tile').forEach((t) => t.classList.toggle('on', t.dataset.type === type));
+    }
+
+    const gallery = document.getElementById('gallery');
+    for (const [type, name, note] of INDICATORS) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.dataset.type = type;
+      tile.innerHTML = `<div class="stage"></div><h4>${name}</h4><p>${note}</p><div class="inline"></div>`;
+      tile.querySelector('.stage').appendChild(makeIndicator(type, 'big'));
+      const inline = tile.querySelector('.inline');
+      inline.appendChild(makeIndicator(type, 'small'));
+      inline.append('собираю план, шаг 2/5');
+      tile.onclick = () => applyToPhone(type);
+      gallery.appendChild(tile);
+    }
+    applyToPhone(new URLSearchParams(location.search).get('i') || 'spark');
+  </script>
+  <style>.ind.line { --k: .42; }</style>
+</body>
+</html>
