@@ -7,6 +7,7 @@ function Probe() {
   api = useToast();
   return null;
 }
+const toastOf = (text: string) => screen.getByText(text).closest(".yk-toast") as HTMLElement;
 function setup() {
   render(<ToastProvider><Probe /></ToastProvider>);
 }
@@ -19,6 +20,22 @@ describe("Toast", () => {
     setup();
     act(() => { api.show({ message: "Проект удалён" }); });
     expect(screen.getByRole("status")).toHaveTextContent("Проект удалён");
+  });
+
+  it("живая область есть с самого начала, и сообщения появляются внутри неё", () => {
+    setup();
+    const region = screen.getByRole("status");
+    expect(region).toHaveAttribute("aria-live", "polite");
+    expect(region).toBeEmptyDOMElement();
+    act(() => { api.show({ message: "Готово" }); });
+    expect(screen.getByRole("status")).toBe(region);
+    expect(region).toContainElement(screen.getByText("Готово"));
+  });
+
+  it("каждая плашка внутри области не объявляет себя второй раз", () => {
+    setup();
+    act(() => { api.show({ message: "Готово" }); });
+    expect(screen.getAllByRole("status")).toHaveLength(1);
   });
 
   it("кнопка действия вызывает onAction и убирает плашку", () => {
@@ -52,10 +69,10 @@ describe("Toast", () => {
     setup();
     act(() => { api.show({ message: "Готово", duration: 4000 }); });
     act(() => { vi.advanceTimersByTime(3000); });
-    fireEvent.mouseEnter(screen.getByRole("status"));
+    fireEvent.mouseEnter(toastOf("Готово"));
     act(() => { vi.advanceTimersByTime(60_000); });
     expect(screen.getByText("Готово")).toBeInTheDocument();
-    fireEvent.mouseLeave(screen.getByRole("status"));
+    fireEvent.mouseLeave(toastOf("Готово"));
     act(() => { vi.advanceTimersByTime(999); });
     expect(screen.getByText("Готово")).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(1); });
@@ -82,7 +99,7 @@ describe("Toast", () => {
     let first = "";
     act(() => { first = api.show({ message: "Первая" }); });
     act(() => { api.show({ message: "Вторая" }); });
-    expect(screen.getAllByRole("status")).toHaveLength(2);
+    expect(document.querySelectorAll(".yk-toast")).toHaveLength(2);
     act(() => { api.dismiss(first); });
     expect(screen.queryByText("Первая")).toBeNull();
     expect(screen.getByText("Вторая")).toBeInTheDocument();

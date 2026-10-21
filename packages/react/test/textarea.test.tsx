@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Textarea } from "../src/index.js";
 
 describe("Textarea", () => {
@@ -22,6 +22,15 @@ describe("Textarea", () => {
     const ref = createRef<HTMLTextAreaElement>();
     render(<Textarea label="A" ref={ref} />);
     expect(ref.current).toBeInstanceOf(HTMLTextAreaElement);
+  });
+
+  it("внешний ref-колбэк зовётся один раз и не дёргается на каждый рендер", () => {
+    const ref = vi.fn();
+    const { rerender } = render(<Textarea label="A" ref={ref} />);
+    rerender(<Textarea label="A" ref={ref} value="текст" onChange={() => {}} />);
+    rerender(<Textarea label="A" ref={ref} value="текст ещё" onChange={() => {}} />);
+    expect(ref).toHaveBeenCalledTimes(1);
+    expect(ref).toHaveBeenCalledWith(expect.any(HTMLTextAreaElement));
   });
 
   describe("autoGrow", () => {

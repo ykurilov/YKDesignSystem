@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useLayoutEffect, useRef, type TextareaHTMLAttributes } from "react";
+import { forwardRef, useCallback, useLayoutEffect, useMemo, useRef, type TextareaHTMLAttributes } from "react";
 import { FieldFrame } from "../field/FieldFrame.js";
 import { useField, type FieldBaseProps } from "../field/useField.js";
 import { mergeRefs } from "../mergeRefs.js";
@@ -15,6 +15,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 ) {
   const { controlProps, frameProps } = useField({ id, label, hint, error, "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"], "aria-describedby": rest["aria-describedby"] });
   const inner = useRef<HTMLTextAreaElement>(null);
+  const mergedRef = useMemo(() => mergeRefs(inner, ref), [ref]);
 
   const fit = useCallback(() => {
     const el = inner.current;
@@ -33,7 +34,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   return (
     <FieldFrame {...frameProps} size={size} disabled={disabled} multiline className={className}>
       <textarea
-        ref={mergeRefs(inner, ref)}
+        ref={mergedRef}
         className="yk-input__control"
         rows={rows}
         disabled={disabled}

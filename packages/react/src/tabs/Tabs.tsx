@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useId, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
 import { classNames } from "../classNames.js";
 
 interface TabsContext {
@@ -27,15 +27,24 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, "default
 /** Вкладки: Tabs → TabList → Tab, и TabPanel на каждую вкладку. */
 export function Tabs({ value, defaultValue, onValueChange, className, ...rest }: TabsProps) {
   const baseId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
   const [inner, setInner] = useState(defaultValue);
   const current = value !== undefined ? value : inner;
+
+  // Ничего не выбрано снаружи — открываем первую доступную вкладку, иначе в список вкладок не попасть клавишей Tab
+  useLayoutEffect(() => {
+    if (current !== undefined) return;
+    const first = rootRef.current?.querySelector<HTMLElement>('[role="tab"]:not(:disabled)');
+    if (first?.dataset.value !== undefined) setInner(first.dataset.value);
+  }, [current]);
+
   const select = (next: string) => {
     if (value === undefined) setInner(next);
     if (next !== current) onValueChange?.(next);
   };
   return (
     <Context.Provider value={{ baseId, value: current, select }}>
-      <div className={classNames("yk-tabs", className)} {...rest} />
+      <div ref={rootRef} className={classNames("yk-tabs", className)} {...rest} />
     </Context.Provider>
   );
 }
@@ -79,6 +88,7 @@ export function Tab({ value, count, className, children, onClick, ...rest }: Tab
       type="button"
       role="tab"
       id={`${ctx.baseId}-tab-${idPart(value)}`}
+      data-value={value}
       aria-selected={selected}
       aria-controls={`${ctx.baseId}-panel-${idPart(value)}`}
       tabIndex={selected ? 0 : -1}

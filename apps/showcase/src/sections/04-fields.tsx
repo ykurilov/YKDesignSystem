@@ -28,7 +28,7 @@ function FieldsDemo() {
       <DemoLine label="Со значком">
         <TextField aria-label="Почта" icon={EnvelopeIcon} placeholder="Почта" kbd="⌘M" />
         <SearchField aria-label="Поиск с текстом" defaultValue="марафон" />
-        <SearchField aria-label="Поиск без подсказки" kbd={null} placeholder="Без подсказки клавиши" />
+        <SearchField aria-label="Поиск без подсказки" kbd={null} placeholder="Без подсказки" />
       </DemoLine>
       <DemoLine label="Маленькие">
         <TextField size="sm" aria-label="Маленькое поле" placeholder="Маленькое · 32px" />

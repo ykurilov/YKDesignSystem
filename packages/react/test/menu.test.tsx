@@ -120,7 +120,7 @@ describe("Menu", () => {
     expect(screen.getByRole("menuitem", { name: /Переименовать/ })).not.toHaveClass("yk-menu__item--danger");
   });
 
-  it("отключённый пункт пропускается стрелками и не срабатывает", async () => {
+  it("отключённый пункт достижим стрелками, озвучивается как недоступный и не срабатывает", async () => {
     const user = userEvent.setup();
     const onSkipped = vi.fn();
     const { trigger } = setup({
@@ -132,8 +132,61 @@ describe("Menu", () => {
     });
     await user.click(trigger);
     await user.keyboard("{ArrowDown}");
-    expect(screen.getByRole("menuitem", { name: "Третий" })).toHaveFocus();
-    await user.click(screen.getByRole("menuitem", { name: "Недоступный" }));
+    const disabled = screen.getByRole("menuitem", { name: "Недоступный" });
+    expect(disabled).toHaveFocus();
+    expect(disabled).toHaveAttribute("aria-disabled", "true");
+    await user.keyboard("{Enter}");
     expect(onSkipped).not.toHaveBeenCalled();
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    await user.click(disabled);
+    expect(onSkipped).not.toHaveBeenCalled();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("menuitem", { name: "Третий" })).toHaveFocus();
+  });
+
+  describe("поиск по первой букве", () => {
+    const entries = (): MenuEntry[] => [
+      { label: "Переименовать", onSelect: () => {} },
+      { label: "Дублировать", onSelect: () => {} },
+      { label: "Делиться", onSelect: () => {} },
+      { label: "Удалить", onSelect: () => {} },
+    ];
+
+    it("буква переводит фокус на пункт с такой первой буквой", async () => {
+      const user = userEvent.setup();
+      const { trigger } = setup({ entries: entries() });
+      await user.click(trigger);
+      await user.keyboard("у");
+      expect(screen.getByRole("menuitem", { name: "Удалить" })).toHaveFocus();
+    });
+
+    it("регистр не важен, повторное нажатие идёт к следующему пункту и по кругу", async () => {
+      const user = userEvent.setup();
+      const { trigger } = setup({ entries: entries() });
+      await user.click(trigger);
+      await user.keyboard("Д");
+      expect(screen.getByRole("menuitem", { name: "Дублировать" })).toHaveFocus();
+      await user.keyboard("д");
+      expect(screen.getByRole("menuitem", { name: "Делиться" })).toHaveFocus();
+      await user.keyboard("д");
+      expect(screen.getByRole("menuitem", { name: "Дублировать" })).toHaveFocus();
+    });
+
+    it("нет такой буквы — фокус остаётся, меню не закрывается", async () => {
+      const user = userEvent.setup();
+      const { trigger } = setup({ entries: entries() });
+      await user.click(trigger);
+      await user.keyboard("я");
+      expect(screen.getByRole("menuitem", { name: "Переименовать" })).toHaveFocus();
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
+
+    it("отключённый пункт тоже находится по букве", async () => {
+      const user = userEvent.setup();
+      const { trigger } = setup({ entries: [{ label: "Первый", onSelect: () => {} }, { label: "Блок", disabled: true, onSelect: () => {} }] });
+      await user.click(trigger);
+      await user.keyboard("б");
+      expect(screen.getByRole("menuitem", { name: "Блок" })).toHaveFocus();
+    });
   });
 });

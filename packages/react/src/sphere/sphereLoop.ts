@@ -1,61 +1,85 @@
 // Один общий цикл анимации на все сферы страницы.
 // При «уменьшить движение» сферы рисуются одним кадром и перерисовываются только при смене темы.
+// Настройку движения и тему страницы отслеживаем на лету, пока на странице есть хоть одна сфера.
 
 type DrawFrame = (time: number) => void;
 
-const animated = new Set<DrawFrame>();
-const still = new Set<DrawFrame>();
+interface SphereHandle {
+  draw: DrawFrame;
+  /** Перечитать цвет: тема страницы сменилась. */
+  refreshColor: () => void;
+}
+
+const spheres = new Set<SphereHandle>();
+let reducedMotion = false;
 let frameId: number | null = null;
-let stopThemeWatch: (() => void) | null = null;
+let stopWatching: (() => void) | null = null;
 
 export function prefersReducedMotion(): boolean {
   return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** Подключает сферу к общему циклу. Возвращает отключение. */
-export function attachSphere(draw: DrawFrame): () => void {
-  if (prefersReducedMotion()) {
-    draw(0);
-    still.add(draw);
-    watchTheme();
-    return () => {
-      still.delete(draw);
-      if (still.size === 0) unwatchTheme();
-    };
+export function attachSphere(draw: DrawFrame, refreshColor: () => void = () => {}): () => void {
+  const handle: SphereHandle = { draw, refreshColor };
+  if (spheres.size === 0) {
+    reducedMotion = prefersReducedMotion();
+    stopWatching = watchPage();
   }
-  animated.add(draw);
-  if (frameId === null) frameId = requestAnimationFrame(tick);
+  spheres.add(handle);
+  syncMode(handle);
   return () => {
-    animated.delete(draw);
-    if (animated.size === 0 && frameId !== null) {
-      cancelAnimationFrame(frameId);
-      frameId = null;
-    }
+    spheres.delete(handle);
+    if (spheres.size > 0) return;
+    stopFrames();
+    stopWatching?.();
+    stopWatching = null;
   };
+}
+
+/** Новая сфера: при «уменьшить движение» рисует один кадр, иначе запускает цикл, если он стоит. */
+function syncMode(fresh?: SphereHandle) {
+  if (reducedMotion) {
+    stopFrames();
+    (fresh ? [fresh] : [...spheres]).forEach(({ draw }) => draw(0));
+  } else if (frameId === null && spheres.size > 0) {
+    frameId = requestAnimationFrame(tick);
+  }
+}
+
+function stopFrames() {
+  if (frameId === null) return;
+  cancelAnimationFrame(frameId);
+  frameId = null;
 }
 
 function tick(time: number) {
-  animated.forEach((draw) => draw(time));
-  frameId = animated.size > 0 ? requestAnimationFrame(tick) : null;
+  spheres.forEach(({ draw }) => draw(time));
+  frameId = spheres.size > 0 ? requestAnimationFrame(tick) : null;
 }
 
-function redrawStill() {
-  still.forEach((draw) => draw(0));
+function handleThemeChange() {
+  spheres.forEach(({ refreshColor }) => refreshColor());
+  if (reducedMotion) spheres.forEach(({ draw }) => draw(0));
 }
 
-function watchTheme() {
-  if (stopThemeWatch || typeof document === "undefined") return;
-  const observer = typeof MutationObserver === "function" ? new MutationObserver(redrawStill) : null;
+function handleMotionChange(event: { matches: boolean }) {
+  reducedMotion = event.matches;
+  syncMode();
+}
+
+/** Следит за темой страницы (атрибут data-theme, системная тема) и настройкой движения. */
+function watchPage(): () => void {
+  if (typeof document === "undefined" || typeof matchMedia !== "function") return () => {};
+  const observer = typeof MutationObserver === "function" ? new MutationObserver(handleThemeChange) : null;
   observer?.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
   const scheme = matchMedia("(prefers-color-scheme: dark)");
-  scheme.addEventListener?.("change", redrawStill);
-  stopThemeWatch = () => {
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  scheme.addEventListener?.("change", handleThemeChange);
+  motion.addEventListener?.("change", handleMotionChange);
+  return () => {
     observer?.disconnect();
-    scheme.removeEventListener?.("change", redrawStill);
+    scheme.removeEventListener?.("change", handleThemeChange);
+    motion.removeEventListener?.("change", handleMotionChange);
   };
-}
-
-function unwatchTheme() {
-  stopThemeWatch?.();
-  stopThemeWatch = null;
 }

@@ -11,10 +11,10 @@ export interface ToastProps {
   onBlur?: FocusEventHandler<HTMLDivElement>;
 }
 
-/** Тёмная плашка с сообщением и необязательной кнопкой. Показывать — через `useToast`. */
+/** Тёмная плашка с сообщением и необязательной кнопкой. Показывать — через `useToast`: зачитывает её живая область провайдера. */
 export function Toast({ message, actionLabel, onAction, ...handlers }: ToastProps) {
   return (
-    <div role="status" className="yk-toast" {...handlers}>
+    <div className="yk-toast" {...handlers}>
       <span className="yk-toast__message">{message}</span>
       {actionLabel && (
         <button type="button" className="yk-toast__action" onClick={onAction}>

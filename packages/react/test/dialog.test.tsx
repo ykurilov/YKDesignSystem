@@ -127,6 +127,86 @@ describe("Dialog", () => {
   });
 });
 
+function Nested({ onCloseOuter, onCloseInner }: { onCloseOuter: () => void; onCloseInner: () => void }) {
+  const [outer, setOuter] = useState(true);
+  const [inner, setInner] = useState(false);
+  return (
+    <>
+      <main>Страница</main>
+      <Dialog open={outer} onClose={() => { setOuter(false); onCloseOuter(); }} title="Внешнее">
+        <button onClick={() => setInner(true)}>Подробнее</button>
+        <Dialog open={inner} onClose={() => { setInner(false); onCloseInner(); }} title="Внутреннее">
+          <button>Понятно</button>
+        </Dialog>
+      </Dialog>
+    </>
+  );
+}
+
+describe("вложенные окна и фон", () => {
+  it("Esc закрывает только верхнее окно", async () => {
+    const user = userEvent.setup();
+    const onCloseOuter = vi.fn();
+    const onCloseInner = vi.fn();
+    render(<Nested onCloseOuter={onCloseOuter} onCloseInner={onCloseInner} />);
+    await user.click(screen.getByRole("button", { name: "Подробнее" }));
+    expect(screen.getAllByRole("dialog", { hidden: true })).toHaveLength(2);
+    await user.keyboard("{Escape}");
+    expect(onCloseInner).toHaveBeenCalledTimes(1);
+    expect(onCloseOuter).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog", { name: "Внешнее" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(onCloseOuter).toHaveBeenCalledTimes(1);
+  });
+
+  it("Tab в верхнем окне не уходит в нижнее", async () => {
+    const user = userEvent.setup();
+    render(<Nested onCloseOuter={() => {}} onCloseInner={() => {}} />);
+    await user.click(screen.getByRole("button", { name: "Подробнее" }));
+    expect(screen.getByRole("button", { name: "Понятно" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Понятно" })).toHaveFocus();
+  });
+
+  it("фон под открытым окном недоступен (inert), после закрытия снова доступен", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<Host />);
+    expect(container).not.toHaveAttribute("inert");
+    await user.click(screen.getByText("Открыть"));
+    expect(container).toHaveAttribute("inert");
+    expect(screen.getByTestId("yk-overlay")).not.toHaveAttribute("inert");
+    await user.keyboard("{Escape}");
+    expect(container).not.toHaveAttribute("inert");
+  });
+
+  it("во вложенных окнах inert получает и нижнее окно; живёт, пока открыто верхнее", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<Nested onCloseOuter={() => {}} onCloseInner={() => {}} />);
+    const [outerOverlay] = screen.getAllByTestId("yk-overlay");
+    expect(container).toHaveAttribute("inert");
+    expect(outerOverlay).not.toHaveAttribute("inert");
+    await user.click(screen.getByRole("button", { name: "Подробнее" }));
+    const [first, second] = screen.getAllByTestId("yk-overlay");
+    expect(first).toHaveAttribute("inert");
+    expect(second).not.toHaveAttribute("inert");
+    await user.keyboard("{Escape}");
+    expect(screen.getByTestId("yk-overlay")).not.toHaveAttribute("inert");
+    expect(container).toHaveAttribute("inert");
+  });
+
+  it("чужой inert на элементе страницы не снимается", async () => {
+    const user = userEvent.setup();
+    const other = document.createElement("aside");
+    other.setAttribute("inert", "");
+    document.body.append(other);
+    render(<Host />);
+    await user.click(screen.getByText("Открыть"));
+    await user.keyboard("{Escape}");
+    expect(other).toHaveAttribute("inert");
+    other.remove();
+  });
+});
+
 describe("Sheet", () => {
   it("те же правила доступности, что у окна", async () => {
     const user = userEvent.setup();

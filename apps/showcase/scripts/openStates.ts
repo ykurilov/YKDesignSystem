@@ -39,10 +39,12 @@ for (const theme of ["light", "dark"] as const) {
   await page.keyboard.press("Tab");
   check((await focusedName(page)) === "Отмена", "Tab в окне ходит по кругу");
   check((await page.evaluate("document.body.style.overflow")) === "hidden", "фон не прокручивается");
+  check((await page.evaluate("document.getElementById('root').hasAttribute('inert')")) === true, "страница под окном отключена (inert)");
   await shot(page, "dialog", theme);
   await page.keyboard.press("Escape");
   check(!(await page.getByRole("dialog").count()), "Esc закрыл окно");
   check((await focusedName(page)) === "Окно", "фокус вернулся на «Окно»");
+  check((await page.evaluate("document.getElementById('root').hasAttribute('inert')")) === false, "после закрытия страница снова доступна");
 
   // Шторка
   await page.getByRole("button", { name: "Шторка", exact: true }).click();
@@ -92,6 +94,7 @@ for (const theme of ["light", "dark"] as const) {
 
   // Уведомление
   await section(page).scrollIntoViewIfNeeded();
+  check((await page.locator(".yk-toast-region").getAttribute("aria-live")) === "polite", "область уведомлений живая (aria-live=polite) ещё до первого сообщения");
   await page.getByRole("button", { name: "Показать уведомление" }).click();
   check(await page.getByRole("status").filter({ hasText: "Проект удалён" }).first().isVisible(), "уведомление появилось");
   await shot(page, "toast", theme);

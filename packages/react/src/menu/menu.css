@@ -18,7 +18,7 @@
 .yk-menu__item:focus-visible { outline: none; background: var(--yk-surface-2); }
 .yk-menu__item[aria-disabled="true"] { opacity: .4; cursor: not-allowed; }
 .yk-menu__item--danger { color: var(--yk-danger); }
-.yk-menu__kbd { margin-left: auto; font-family: var(--yk-font-mono); font-size: 10.5px; color: var(--yk-faint); }
+.yk-menu__kbd { margin-left: auto; font-family: var(--yk-font-mono); font-size: 10.5px; color: var(--yk-muted); }
 @media (hover: hover) {
   .yk-menu__item:hover:not([aria-disabled="true"]) { background: var(--yk-surface-2); }
 }

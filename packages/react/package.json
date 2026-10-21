@@ -25,7 +25,7 @@
   },
   "peerDependencies": {
     "@phosphor-icons/react": "^2.1.0",
-    "@ykurilov/ds-tokens": "workspace:^",
+    "@ykurilov/ds-tokens": "^0.1.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
@@ -34,6 +34,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@ykurilov/ds-tokens": "workspace:^",

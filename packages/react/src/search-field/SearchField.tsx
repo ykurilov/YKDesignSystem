@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
-import { forwardRef, useRef, useState, type ChangeEvent, type InputHTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
+import { forwardRef, useMemo, useRef, useState, type ChangeEvent, type InputHTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
 import { FieldFrame } from "../field/FieldFrame.js";
 import { useField, type FieldBaseProps } from "../field/useField.js";
 import { Icon } from "../icon/Icon.js";
@@ -26,6 +26,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
 ) {
   const { controlProps, frameProps } = useField({ id, label, hint, error, "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"], "aria-describedby": rest["aria-describedby"] });
   const inner = useRef<HTMLInputElement>(null);
+  const mergedRef = useMemo(() => mergeRefs(inner, ref), [ref]);
   const [typed, setTyped] = useState(String(defaultValue ?? ""));
   const hasValue = (value !== undefined ? String(value) : typed) !== "";
 
@@ -61,7 +62,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
   return (
     <FieldFrame {...frameProps} size={size} disabled={disabled} icon={MagnifyingGlassIcon} className={className} trailing={trailing}>
       <input
-        ref={mergeRefs(inner, ref)}
+        ref={mergedRef}
         type="search"
         className="yk-input__control"
         disabled={disabled}

@@ -16,6 +16,11 @@ const READABLE_PAIRS: Array<[ColorName, ColorName]> = [
   ["onInk", "ink"],
   ["accentText", "bg"],
   ["onDanger", "danger"],
+  ["danger", "bg"],
+  ["danger", "dangerSoft"],
+  ["success", "bg"],
+  ["success", "successSoft"],
+  ["accentText", "accentSoft"],
 ];
 const THEMES: ThemeName[] = ["light", "dark"];
 
@@ -27,5 +32,14 @@ describe("контраст текста не ниже 4.5", () => {
         expect(contrastRatio(palette[fg], palette[bg])).toBeGreaterThanOrEqual(4.5);
       });
     }
+  }
+});
+
+describe("декоративный faint — не ниже 3:1 к фону", () => {
+  for (const theme of THEMES) {
+    it(`${theme}: faint на bg`, () => {
+      const palette = tokens.color[theme];
+      expect(contrastRatio(palette.faint, palette.bg)).toBeGreaterThanOrEqual(3);
+    });
   }
 });

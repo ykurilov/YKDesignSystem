@@ -22,7 +22,10 @@ interface ActiveToast extends ToastOptions {
   id: string;
 }
 
-/** Корень уведомлений: рисует их стопкой внизу по центру. Ставится один раз в корне приложения. */
+/**
+ * Корень уведомлений: рисует их стопкой внизу по центру. Ставится один раз в корне приложения.
+ * Живая область создаётся сразу: экранный диктор зачитывает только то, что появилось в уже существующей области.
+ */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ActiveToast[]>([]);
   const counter = useRef(0);
@@ -42,7 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="yk-toast-region">
+      <div className="yk-toast-region" role="status" aria-live="polite">
         {toasts.map((toast) => (
           <TimedToast key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
         ))}

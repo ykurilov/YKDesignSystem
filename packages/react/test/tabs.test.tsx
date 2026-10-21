@@ -104,4 +104,40 @@ describe("Tabs", () => {
     render(<Project />);
     expect(screen.getByRole("tab", { name: "Файлы" })).toBeDisabled();
   });
+
+  describe("без value и defaultValue", () => {
+    it("выбрана первая доступная вкладка и показана её панель", () => {
+      render(<Project defaultValue={undefined} />);
+      const first = screen.getByRole("tab", { name: "Обзор" });
+      expect(first).toHaveAttribute("aria-selected", "true");
+      expect(first).toHaveAttribute("tabindex", "0");
+      expect(screen.getByRole("tabpanel")).toHaveTextContent("Обзор проекта");
+    });
+
+    it("отключённая первая вкладка пропускается", () => {
+      render(
+        <Tabs>
+          <TabList aria-label="Проект">
+            <Tab value="a" disabled>А</Tab>
+            <Tab value="b">Б</Tab>
+          </TabList>
+          <TabPanel value="a">панель А</TabPanel>
+          <TabPanel value="b">панель Б</TabPanel>
+        </Tabs>,
+      );
+      expect(screen.getByRole("tab", { name: "Б" })).toHaveAttribute("aria-selected", "true");
+    });
+
+    it("Tab с клавиатуры попадает в список вкладок", async () => {
+      render(<Project defaultValue={undefined} />);
+      await userEvent.tab();
+      expect(screen.getByRole("tab", { name: "Обзор" })).toHaveFocus();
+    });
+
+    it("выбор на старте не вызывает onValueChange", () => {
+      const onValueChange = vi.fn();
+      render(<Project defaultValue={undefined} onValueChange={onValueChange} />);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+  });
 });

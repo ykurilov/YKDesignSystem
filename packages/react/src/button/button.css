@@ -41,4 +41,4 @@
 /* У значков Phosphor внутри рамки поле в 1/8 размера: без поправки рисунок отстоит от края дальше, чем текст справа */
 .yk-button--leading:not(.yk-button--icon-only) { padding-left: calc(var(--yk-button-pad-x) - var(--yk-button-icon) / 8); }
 
-.yk-button__kbd { font-family: var(--yk-font-mono); font-size: 10px; font-weight: 400; opacity: .6; }
+.yk-button__kbd { font-family: var(--yk-font-mono); font-size: 11px; font-weight: 400; opacity: .9; }
