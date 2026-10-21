@@ -42,7 +42,7 @@ const light: ColorPalette = {
   bg: "#FFFFFF", surface: "#FFFFFF", surface2: "#F4F4F3", surface3: "#EBEBE9", sidebar: "#FAFAF9",
   text: "#141414", muted: "#6E6E6B", faint: "#A3A3A0", border: "#E9E9E6", borderStrong: "#D6D6D2",
   ink: "#141414", onInk: "#FFFFFF",
-  accent: "#EE6A3C", accentText: "#C9502A", accentSoft: "#FCEBE3",
+  accent: "#EE6A3C", accentText: "#BE4824", accentSoft: "#FCEBE3",
   // Ошибка — холоднее и темнее акцента, чтобы не путать «важно» и «сломалось»
   danger: "#C8283A", dangerSoft: "#FBE7E9",
   success: "#1E8A55", successSoft: "#E3F4EA",

@@ -22,7 +22,7 @@ public enum YKTokens {
         public static let ink = adaptive(light: 0x141414, dark: 0xF2F2F0)
         public static let onInk = adaptive(light: 0xFFFFFF, dark: 0x0F0F0F)
         public static let accent = adaptive(light: 0xEE6A3C, dark: 0xF27D52)
-        public static let accentText = adaptive(light: 0xC9502A, dark: 0xF7A07E)
+        public static let accentText = adaptive(light: 0xBE4824, dark: 0xF7A07E)
         public static let accentSoft = adaptive(light: 0xFCEBE3, dark: 0x3A2219)
         public static let danger = adaptive(light: 0xC8283A, dark: 0xFF5C6C)
         public static let dangerSoft = adaptive(light: 0xFBE7E9, dark: 0x3D1A1E)
