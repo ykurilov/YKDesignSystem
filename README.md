@@ -46,7 +46,7 @@ export function Composer({ busy }: { busy: boolean }) {
 
 Тема: светлая по умолчанию, тёмная — сама по системной настройке. Задать вручную: `<html data-theme="dark">` или `data-theme="light"`.
 
-Компоненты: `Icon`, `Sphere`, `NewDot`, `MonoLabel`, `MonoNum`, `Button`, `Chip`, `Tag`, `Steps`, `Avatar`. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
+Компоненты: `Icon`, `Sphere`, `NewDot`, `MonoLabel`, `MonoNum`, `Button`, `Chip`, `Tag`, `Steps`, `Avatar`, `Card`, `Stat`, `StatGroup`, `List`, `ListRow`, `Table*`, `Dialog`, `Sheet`, `Menu`, `Toast` (`ToastProvider` + `useToast`), `Banner`, `EmptyState`, `Skeleton`. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
 
 ## Витрина
 
@@ -55,7 +55,7 @@ pnpm --filter @ykurilov/ds-showcase dev        # http://localhost:5173, комп
 pnpm --filter @ykurilov/ds-showcase snapshots http://localhost:5173/   # снимки светлой и тёмной темы в apps/showcase/snapshots/
 ```
 
-Новый раздел — новый файл `apps/showcase/src/sections/NN-название.tsx` с `export default { order, title, description, Demo } satisfies ShowcaseSection`. Список разделов собирается сам, общий файл править не нужно. Номера: 01 цвета, 02 шрифт, 03 кнопки, 04 поля, 05 выбор, 06 метки, 07 карточки и списки, 08 всплывающее, 09 пусто и загрузка. Строка примеров — `DemoLine` и `DemoStack` из `src/layout/Demo.tsx`.
+Новый раздел — новый файл `apps/showcase/src/sections/NN-название.tsx` с `export default { order, title, description, Demo } satisfies ShowcaseSection`. Список разделов собирается сам, общий файл править не нужно. Номера: 01 цвета, 02 шрифт, 03 кнопки, 04 поля, 05 выбор, 06 метки, 07 карточки и списки, 08 всплывающее, 09 пусто и загрузка (раздел 07 включает счётчики и таблицу). Строка примеров — `DemoLine` и `DemoStack` из `src/layout/Demo.tsx`.
 
 ## Команды
 

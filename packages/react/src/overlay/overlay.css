@@ -1,0 +1,11 @@
+.yk-overlay {
+  position: fixed; inset: 0; z-index: 100; display: flex; justify-content: center; padding: 24px;
+  /* Подложка всегда чёрная: «чернила» в тёмной теме светлые и осветляли бы страницу. */
+  background: rgb(0 0 0 / 0.5);
+  animation: yk-overlay-in .18s ease-out;
+}
+.yk-overlay--center { align-items: center; }
+.yk-overlay--bottom { align-items: flex-end; padding: 0; }
+.yk-overlay [role="dialog"]:focus { outline: none; }
+@keyframes yk-overlay-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .yk-overlay { animation: none; } }

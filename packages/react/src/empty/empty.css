@@ -1,0 +1,7 @@
+.yk-empty {
+  border: 1px dashed var(--yk-border-strong); border-radius: var(--yk-radius-xl); padding: 36px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+}
+.yk-empty__title { margin: 0; font-size: 17px; font-weight: 600; }
+.yk-empty__description { margin: 0; max-width: 320px; color: var(--yk-muted); line-height: 1.5; font-size: 14px; }
+.yk-empty__actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
