@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Набросок 03 — фирменный угол и живая точка</title>
+<style>
+  /* ---------- Основа из наброска 02 ---------- */
+  .base {
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F4F3;
+    --text: #141414; --muted: #6E6E6B; --border: #E9E9E6;
+    --primary: #141414; --on-primary: #FFFFFF;
+    --spark: #EE6A3C; --spark-soft: #FCEBE3;
+    --sharp: 4px; --ease-out: cubic-bezier(.22, 1, .36, 1);
+    --font: system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+  }
+  .theme-dark .base {
+    --bg: #0F0F0F; --surface: #181818; --surface-2: #222222;
+    --text: #F2F2F0; --muted: #9B9B97; --border: #2A2A2A;
+    --primary: #F2F2F0; --on-primary: #0F0F0F;
+    --spark: #F27D52; --spark-soft: #3A2219;
+  }
+
+  /* ---------- Фирменный угол: один угол почти прямой, остальные скруглены ---------- */
+  /* Порядок углов в CSS: левый верхний, правый верхний, правый нижний, левый нижний */
+  .corner-tl {
+    --shape-card:   var(--sharp) 20px 20px 20px;
+    --shape-button: var(--sharp) 23px 23px 23px;
+    --shape-send:   var(--sharp) 18px 18px 18px;
+    --shape-input:  var(--sharp) 23px 23px 23px;
+    --shape-big:    var(--sharp) 28px 28px 28px;
+  }
+  .corner-br {
+    --shape-card:   20px 20px var(--sharp) 20px;
+    --shape-button: 23px 23px var(--sharp) 23px;
+    --shape-send:   18px 18px var(--sharp) 18px;
+    --shape-input:  23px 23px var(--sharp) 23px;
+    --shape-big:    28px 28px var(--sharp) 28px;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #DCDCD9; color: #222; padding: 32px; -webkit-font-smoothing: antialiased; }
+  body.theme-dark { background: #050505; color: #ddd; }
+  .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .page-head h1 { font-size: 18px; font-weight: 600; }
+  .toggle { border: 0; padding: 8px 14px; border-radius: 8px; background: #222; color: #fff; font: inherit; cursor: pointer; }
+  .theme-dark .toggle { background: #eee; color: #111; }
+  .columns { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+  .column-label { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .column-label span { font-weight: 400; opacity: .6; }
+
+  /* ---------- Живая точка ---------- */
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--spark); flex: none; }
+  .dot.live { animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--spark) 45%, transparent); }
+    50% { transform: scale(.8); box-shadow: 0 0 0 6px color-mix(in srgb, var(--spark) 0%, transparent); }
+  }
+  @media (prefers-reduced-motion: reduce) { .dot.live { animation: none; } }
+
+  /* ---------- Экран телефона ---------- */
+  .phone {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden;
+    background: var(--bg); color: var(--text); font-family: var(--font);
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+  }
+  .status-bar { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; font-size: 15px; font-weight: 600; }
+  .screen { flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 18px; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .title { font-weight: 600; letter-spacing: -0.025em; font-size: 32px; line-height: 1.1; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+
+  .segmented { display: flex; background: var(--surface-2); padding: 3px; border-radius: 999px; }
+  .segmented button { flex: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 500; padding: 7px 0; border-radius: 999px; cursor: pointer; }
+  .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .theme-dark .segmented button.on { background: #333; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--shape-card); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-size: 13px; color: var(--muted); }
+  .chip { font-size: 12px; font-weight: 500; padding: 4px 10px 4px 8px; border-radius: 999px; background: var(--surface-2); display: inline-flex; align-items: center; gap: 6px; }
+  .chip .dot { width: 6px; height: 6px; }
+  .progress { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 62%; background: var(--text); border-radius: 99px; }
+
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--shape-card); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .icon { width: 32px; height: 32px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; font-size: 15px; }
+  .row .grow { flex: 1; font-size: 15px; }
+  .row .chev { color: var(--muted); }
+
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field input { width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--shape-input); padding: 12px 16px; outline: none; }
+  .field input:focus { border-color: var(--text); }
+
+  .btn {
+    flex: 1; border: 0; font: inherit; font-size: 15px; font-weight: 600; height: 46px; cursor: pointer;
+    border-radius: var(--shape-button);
+    transition: border-radius .35s var(--ease-out), transform .2s var(--ease-out);
+  }
+  .btn:active, .btn.is-pressed { border-radius: 14px; transform: scale(.98); }
+  .btn.primary { background: var(--primary); color: var(--on-primary); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); border-radius: 999px; }
+  .buttons { display: flex; gap: 10px; }
+
+  .agent-status { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); margin-top: auto; padding-left: 4px; }
+  .composer { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--shape-big); padding: 8px 8px 8px 16px; box-shadow: 0 4px 16px rgba(0,0,0,.05); margin-top: -8px; }
+  .composer span { flex: 1; color: var(--muted); font-size: 15px; }
+  .send {
+    width: 36px; height: 36px; border: 0; border-radius: var(--shape-send); background: var(--primary); color: var(--on-primary); font-size: 18px; cursor: pointer;
+    transition: border-radius .35s var(--ease-out), transform .2s var(--ease-out);
+  }
+  .send:active { border-radius: 11px; transform: scale(.94); }
+
+  .tabbar { display: flex; justify-content: space-around; padding: 10px 12px 28px; border-top: 1px solid var(--border); background: var(--surface); margin-top: 14px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); position: relative; }
+  .tab b { font-size: 20px; font-weight: 400; line-height: 1; padding: 4px 18px; border-radius: 99px; }
+  .tab.on { color: var(--text); }
+  .tab.on b { background: var(--surface-2); }
+  .tab .dot { position: absolute; top: 2px; right: 14px; width: 7px; height: 7px; }
+
+  /* ---------- Панель деталей ---------- */
+  .details { width: 300px; padding: 20px; border-radius: 20px; background: var(--bg); color: var(--text); display: flex; flex-direction: column; gap: 16px; font-family: var(--font); }
+  .details h4 { font-size: 13px; font-weight: 600; }
+  .details p { font-size: 12px; color: var(--muted); margin-top: -10px; line-height: 1.4; }
+  .icons { display: flex; gap: 16px; }
+  .app-icon { width: 72px; height: 72px; background: var(--primary); position: relative; }
+  .app-icon .dot { position: absolute; width: 16px; height: 16px; right: 16px; bottom: 16px; }
+  .corner-tl .app-icon { border-radius: 6px 22px 22px 22px; }
+  .corner-br .app-icon { border-radius: 22px 22px 6px 22px; }
+  .corner-br .app-icon .dot { left: 16px; top: 16px; right: auto; bottom: auto; }
+  .dot-uses { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+  .dot-uses div { display: flex; align-items: center; gap: 10px; }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Набросок 03 — фирменный угол + живая точка</h1>
+    <button class="toggle" onclick="document.body.classList.toggle('theme-dark')">Светлая / тёмная</button>
+  </div>
+
+  <div class="columns" id="columns"></div>
+
+  <template id="phone">
+    <div class="phone">
+      <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="screen">
+        <div class="top"><div class="title">Проекты</div><div class="avatar">ЮК</div></div>
+        <div class="segmented"><button class="on">Все</button><button>Мои</button><button>Архив</button></div>
+        <div class="card">
+          <div class="card-top"><h3>Лендинг вебинара</h3><span class="chip"><i class="dot live"></i>В работе</span></div>
+          <div class="meta">Обновлено 2 часа назад · 5 задач</div>
+          <div class="progress"><i></i></div>
+        </div>
+        <div class="list">
+          <div class="row"><div class="icon">✦</div><div class="grow">Идеи для рассылки</div><i class="dot"></i><div class="chev">›</div></div>
+          <div class="row"><div class="icon">◐</div><div class="grow">Обложки курса</div><div class="chev">›</div></div>
+        </div>
+        <div class="field"><label>Название проекта</label><input placeholder="Например, «Марафон»"></div>
+        <div class="buttons"><button class="btn secondary">Отмена</button><button class="btn primary">Создать</button></div>
+        <div class="agent-status"><i class="dot live"></i>Агент собирает план рассылки…</div>
+        <div class="composer"><span>Спросить агента…</span><button class="send">↑</button></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><b>◇</b>Проекты</div><div class="tab"><b>◯</b>Чат<i class="dot"></i></div><div class="tab"><b>☰</b>Ещё</div>
+      </div>
+    </div>
+  </template>
+
+  <template id="details">
+    <div class="details">
+      <h4>Иконка приложения</h4>
+      <div class="icons"><div class="app-icon"><i class="dot"></i></div></div>
+      <p>Тот же угол и та же точка — система узнаётся уже на домашнем экране.</p>
+      <h4>Где появляется точка</h4>
+      <div class="dot-uses">
+        <div><i class="dot live"></i>дышит — агент или процесс работает</div>
+        <div><i class="dot"></i>горит — есть новое, не просмотрено</div>
+      </div>
+      <p>Больше нигде оранжевого нет. Главная кнопка и прогресс — чёрные.</p>
+    </div>
+  </template>
+
+  <script>
+    const variants = [
+      ['base corner-tl', 'A · Угол слева сверху', 'как закладка'],
+      ['base corner-br', 'B · Угол справа снизу', 'как реплика в чате'],
+    ];
+    const columns = document.getElementById('columns');
+    for (const [cls, name, note] of variants) {
+      const col = document.createElement('div');
+      col.className = cls;
+      col.innerHTML = `<div class="column-label">${name} <span>— ${note}</span></div>`;
+      col.appendChild(document.getElementById('phone').content.cloneNode(true));
+      columns.appendChild(col);
+    }
+    for (const [cls, name] of variants) {
+      const col = document.createElement('div');
+      col.className = cls;
+      col.innerHTML = `<div class="column-label">${name.split(' · ')[0]} · детали</div>`;
+      col.appendChild(document.getElementById('details').content.cloneNode(true));
+      columns.appendChild(col);
+    }
+  </script>
+</body>
+</html>
