@@ -9,7 +9,7 @@ export type ColorName =
   | "text" | "muted" | "faint" | "border" | "borderStrong"
   | "ink" | "onInk"
   | "accent" | "accentText" | "accentSoft"
-  | "danger" | "dangerSoft"
+  | "danger" | "onDanger" | "dangerSoft"
   | "success" | "successSoft";
 
 export type ThemeName = "light" | "dark";
@@ -44,7 +44,7 @@ const light: ColorPalette = {
   ink: "#141414", onInk: "#FFFFFF",
   accent: "#EE6A3C", accentText: "#BE4824", accentSoft: "#FCEBE3",
   // Ошибка — холоднее и темнее акцента, чтобы не путать «важно» и «сломалось»
-  danger: "#C8283A", dangerSoft: "#FBE7E9",
+  danger: "#C8283A", onDanger: "#FFFFFF", dangerSoft: "#FBE7E9",
   success: "#1E8A55", successSoft: "#E3F4EA",
 };
 
@@ -53,7 +53,7 @@ const dark: ColorPalette = {
   text: "#F2F2F0", muted: "#9B9B97", faint: "#5E5E5B", border: "#262626", borderStrong: "#3A3A3A",
   ink: "#F2F2F0", onInk: "#0F0F0F",
   accent: "#F27D52", accentText: "#F7A07E", accentSoft: "#3A2219",
-  danger: "#FF5C6C", dangerSoft: "#3D1A1E",
+  danger: "#FF5C6C", onDanger: "#0F0F0F", dangerSoft: "#3D1A1E",
   success: "#4CC88A", successSoft: "#16301F",
 };
 

@@ -1,0 +1,4 @@
+.yk-steps { display: flex; gap: 3px; width: 140px; flex: none; }
+.yk-steps__step { flex: 1; height: 5px; border-radius: 2px; background: var(--yk-surface-2); }
+.yk-steps__step--done { background: var(--yk-text); }
+.yk-steps--live .yk-steps__step--done { background: var(--yk-accent); }

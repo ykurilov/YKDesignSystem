@@ -9,7 +9,7 @@ struct ButtonTests {
         #expect(YKButtonVariant.secondary.palette == .init(background: .surface2, foreground: .text, border: nil))
         #expect(YKButtonVariant.outline.palette == .init(background: .clear, foreground: .text, border: .borderStrong))
         #expect(YKButtonVariant.ghost.palette == .init(background: .clear, foreground: .text, border: nil))
-        #expect(YKButtonVariant.danger.palette == .init(background: .danger, foreground: .white, border: nil))
+        #expect(YKButtonVariant.danger.palette == .init(background: .danger, foreground: .onDanger, border: nil))
         #expect(YKButtonVariant.link.palette == .init(background: .clear, foreground: .accentText, border: nil))
     }
 

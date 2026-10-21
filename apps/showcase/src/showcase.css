@@ -1,0 +1,49 @@
+/* Раскладка витрины (по образцу наброска 09). Стили компонентов — в @ykurilov/ds-react */
+* { box-sizing: border-box; margin: 0; }
+body {
+  font-family: var(--yk-font-sans); background: var(--yk-bg); color: var(--yk-text);
+  font-size: 14px; -webkit-font-smoothing: antialiased;
+}
+.sc-page { max-width: 1240px; margin: 0 auto; padding: 40px 40px 80px; }
+.sc-page__head { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 36px; }
+.sc-page__head h1 { font-size: var(--yk-text-display-size); font-weight: 600; letter-spacing: var(--yk-text-display-tracking); margin-top: 6px; }
+.sc-theme { margin-left: auto; display: flex; gap: 4px; }
+
+.sc-section { border-top: 1px solid var(--yk-border); padding: 28px 0; display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+.sc-section > header h2 { font-size: var(--yk-text-heading-size); font-weight: 600; letter-spacing: var(--yk-text-heading-tracking); margin-top: 6px; }
+.sc-section > header p { font-size: 13px; color: var(--yk-muted); margin-top: 6px; line-height: 1.45; }
+.sc-section__demo { min-width: 0; }
+
+.sc-stack { display: flex; flex-direction: column; gap: 18px; }
+.sc-line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sc-line__label { width: 96px; flex: none; }
+
+@media (max-width: 760px) {
+  .sc-page { padding: 24px 16px 60px; }
+  .sc-page__head { flex-wrap: wrap; }
+  .sc-section { grid-template-columns: 1fr; gap: 14px; }
+}
+
+/* Цвета */
+.sc-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.sc-swatch { border: 1px solid var(--yk-border); border-radius: var(--yk-radius-md); overflow: hidden; }
+.sc-swatch i { display: block; height: 56px; }
+.sc-swatch div { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.sc-swatch b { font-size: 12px; font-weight: 500; }
+
+/* Шрифт */
+.sc-type { gap: 0; }
+.sc-type__row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; gap: 16px; padding: 6px 0; }
+.sc-t-display { font-size: var(--yk-text-display-size); font-weight: 600; letter-spacing: var(--yk-text-display-tracking); line-height: var(--yk-text-display-line-height); }
+.sc-t-title { font-size: var(--yk-text-title-size); font-weight: 600; letter-spacing: var(--yk-text-title-tracking); }
+.sc-t-heading { font-size: var(--yk-text-heading-size); font-weight: 600; letter-spacing: var(--yk-text-heading-tracking); }
+.sc-t-body { font-size: var(--yk-text-body-size); line-height: var(--yk-text-body-line-height); }
+.sc-t-small { font-size: var(--yk-text-small-size); color: var(--yk-muted); }
+.sc-t-num { font-family: var(--yk-font-mono); font-size: var(--yk-text-number-size); font-weight: 500; letter-spacing: var(--yk-text-number-tracking); }
+
+.sc-muted-num { font-size: 12px; color: var(--yk-muted); }
+.sc-inline { display: inline-flex; align-items: center; gap: 8px; }
+
+@media (max-width: 760px) {
+  .sc-swatches { grid-template-columns: repeat(3, 1fr); }
+}

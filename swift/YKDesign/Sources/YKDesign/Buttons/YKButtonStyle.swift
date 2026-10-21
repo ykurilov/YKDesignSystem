@@ -17,7 +17,7 @@ public enum YKButtonVariant: CaseIterable, Sendable {
         case .secondary: Palette(background: .surface2, foreground: .text, border: nil)
         case .outline: Palette(background: .clear, foreground: .text, border: .borderStrong)
         case .ghost: Palette(background: .clear, foreground: .text, border: nil)
-        case .danger: Palette(background: .danger, foreground: .white, border: nil)
+        case .danger: Palette(background: .danger, foreground: .onDanger, border: nil)
         case .link: Palette(background: .clear, foreground: .accentText, border: nil)
         }
     }

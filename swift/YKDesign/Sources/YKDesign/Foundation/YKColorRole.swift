@@ -7,9 +7,9 @@ public enum YKColorRole: String, CaseIterable, Sendable {
     case text, muted, faint, border, borderStrong
     case ink, onInk
     case accent, accentText, accentSoft
-    case danger, dangerSoft
+    case danger, dangerSoft, onDanger
     case success, successSoft
-    /// Белый в обеих темах — текст на кнопке «Удалить».
+    /// Белый в обеих темах — галочка флажка, кружок переключателя.
     case white
     case clear
 
@@ -35,6 +35,7 @@ public enum YKColorRole: String, CaseIterable, Sendable {
         case .accentSoft: YKTokens.Colors.accentSoft
         case .danger: YKTokens.Colors.danger
         case .dangerSoft: YKTokens.Colors.dangerSoft
+        case .onDanger: YKTokens.Colors.onDanger
         case .success: YKTokens.Colors.success
         case .successSoft: YKTokens.Colors.successSoft
         case .white: .white
