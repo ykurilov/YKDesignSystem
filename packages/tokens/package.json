@@ -1,6 +1,6 @@
 {
   "name": "@ykurilov/ds-tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Переменные YKDesignSystem: один источник для CSS, JS и SwiftUI",
   "license": "MIT",
   "type": "module",

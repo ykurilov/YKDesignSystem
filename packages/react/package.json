@@ -1,6 +1,6 @@
 {
   "name": "@ykurilov/ds-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React-компоненты YKDesignSystem на переменных @ykurilov/ds-tokens",
   "license": "MIT",
   "type": "module",
@@ -26,7 +26,7 @@
   },
   "peerDependencies": {
     "@phosphor-icons/react": "^2.1.0",
-    "@ykurilov/ds-tokens": "^0.1.0",
+    "@ykurilov/ds-tokens": "^0.2.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },

@@ -75,7 +75,13 @@ export const tokens = {
   },
 
   /** Радиусы углов в px: карточки — lg, кнопки и поля — md. */
-  radius: { sm: 6, md: 10, lg: 12, xl: 16 },
+  radius: { sm: 6, md: 10, lg: 12, xl: 16, studioPanel: 20, composer: 18, message: 16 },
+
+  /** Композиция «Студия». Размеры в px; bodyLineHeight — безразмерный. */
+  studio: {
+    navigationWidth: 64, inspectorWidth: 300, threadWidth: 730,
+    panelGap: 16, scrollbarGap: 16, bodySize: 15, bodyLineHeight: 1.8,
+  },
 
   easing: { out: "cubic-bezier(.22, 1, .36, 1)" },
 

@@ -31,3 +31,5 @@ export { ToastProvider, useToast, type ToastApi, type ToastOptions } from "./toa
 export { Banner, type BannerProps, type BannerTone } from "./banner/Banner.js";
 export { EmptyState, type EmptyStateProps } from "./empty/EmptyState.js";
 export { Skeleton, type SkeletonProps } from "./skeleton/Skeleton.js";
+export { StudioLayout, type StudioLayoutProps, type StudioInspector } from "./studio/StudioLayout.js";
+export { ScrollArea, type ScrollAreaProps } from "./studio/ScrollArea.js";

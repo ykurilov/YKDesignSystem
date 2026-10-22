@@ -37,6 +37,9 @@ public enum YKTokens {
         public static let md: CGFloat = 10
         public static let lg: CGFloat = 12
         public static let xl: CGFloat = 16
+        public static let studioPanel: CGFloat = 20
+        public static let composer: CGFloat = 18
+        public static let message: CGFloat = 16
     }
 
     /// Отступы в точках, шаг 4: s1 = 4 … s10 = 40.
@@ -49,6 +52,17 @@ public enum YKTokens {
         public static let s6: CGFloat = 24
         public static let s8: CGFloat = 32
         public static let s10: CGFloat = 40
+    }
+
+    /// Компоновка Студия: размеры в точках; bodyLineHeight — множитель.
+    public enum Studio {
+        public static let navigationWidth: CGFloat = 64
+        public static let inspectorWidth: CGFloat = 300
+        public static let threadWidth: CGFloat = 730
+        public static let panelGap: CGFloat = 16
+        public static let scrollbarGap: CGFloat = 16
+        public static let bodySize: CGFloat = 15
+        public static let bodyLineHeight: CGFloat = 1.8
     }
 
     /// Размеры шрифта в точках. label и number — моноширинные.

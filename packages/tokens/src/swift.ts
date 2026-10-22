@@ -23,6 +23,7 @@ export function renderTokensSwift(tokens: Tokens): string {
   });
   const radii = Object.entries(tokens.radius).map(([name, px]) => constant(name, px));
   const spaces = Object.entries(tokens.space).map(([step, px]) => constant(`s${step}`, px));
+  const studio = Object.entries(tokens.studio).map(([name, value]) => constant(name, value));
   const fontSizes = Object.entries(tokens.text).map(([name, style]) => constant(name, style.size));
   const textStyles = Object.entries(tokens.text).map(([name, style]) => `public static let ${name} = ${textStyle(style)}`);
   const shadows = Object.entries(tokens.shadow).map(
@@ -44,6 +45,8 @@ ${namespace("Colors", "Цвета: светлая и тёмная тема, пе
 ${namespace("Radius", "Радиусы углов в точках: карточки — lg, кнопки и поля — md.", radii)}
 
 ${namespace("Space", "Отступы в точках, шаг 4: s1 = 4 … s10 = 40.", spaces)}
+
+${namespace("Studio", "Компоновка Студия: размеры в точках; bodyLineHeight — множитель.", studio)}
 
 ${namespace("FontSize", "Размеры шрифта в точках. label и number — моноширинные.", fontSizes)}
 

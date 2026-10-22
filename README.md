@@ -41,7 +41,7 @@ import "@ykurilov/ds-react/styles.css";
 import { ArrowUpIcon } from "@phosphor-icons/react";
 import { Button, Chip, Sphere } from "@ykurilov/ds-react";
 
-export function Composer({ busy }: { busy: boolean }) {
+export function AgentStatusExample({ busy }: { busy: boolean }) {
   return (
     <>
       <Chip tone="live">В работе</Chip>
@@ -63,8 +63,58 @@ export function Composer({ busy }: { busy: boolean }) {
 - Карточки и списки: `Card`, `Stat`, `StatGroup`, `List`, `ListRow`, `Table*` (`Table`, `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell`, `TableCell`).
 - Всплывающее: `Dialog`, `Sheet`, `Menu`, `Toast` (`ToastProvider` + `useToast`).
 - Сообщения и пустота: `Banner`, `EmptyState`, `Skeleton`.
+- Рабочие экраны (с 0.2.0): `StudioLayout`, `ScrollArea`; контракт и пример — [STUDIO.md](STUDIO.md).
 
 `ToastProvider` ставится один раз в корне приложения: он держит живую область, которую читает экранный диктор. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
+
+## Чат с агентом
+
+Готовый чат подключается через Agent Chat SDK и скин `@ykurilov/agent-chat-skin-oduvanchik` (первый выпуск — SDK 0.71.0). Поле ввода принадлежит скину SDK; пример `AgentStatusExample` выше показывает отдельные компоненты дизайн-системы.
+
+```bash
+pnpm add @ykurilov/agent-chat-react @ykurilov/agent-chat-skin-oduvanchik
+```
+
+Все пакеты `@ykurilov/agent-chat-*` в приложении должны быть одной версии. В основном CSS приложения с Tailwind CSS 4:
+
+```css
+@import "tailwindcss";
+@import "@ykurilov/agent-chat-skin-oduvanchik/styles.css";
+@source "../node_modules/@ykurilov/agent-chat-skin-oduvanchik/dist";
+@source "../node_modules/@tandem/ui/dist";
+```
+
+Пути `@source` считаются от CSS-файла. При строгой структуре pnpm добавьте прямую зависимость базовых примитивов скина: `pnpm add @tandem/ui@npm:@ykurilov/tandem-ui@^0.7.0`.
+
+```tsx
+import { AgentChat } from "@ykurilov/agent-chat-react";
+import { oduvanchikSkin } from "@ykurilov/agent-chat-skin-oduvanchik";
+
+export function ChatScreen({ chatId }: { chatId: string }) {
+  return (
+    <div className="oduvanchik-chat" style={{ height: "100dvh" }}>
+      <AgentChat api="/api/chat" chatId={chatId} skin={oduvanchikSkin}
+        composerOptions={{ variant: "standard" }} />
+    </div>
+  );
+}
+```
+
+Пример предполагает настроенный сервер SDK по адресу `/api/chat` и существующий чат. Сервер и хранилище подключаются по [инструкции SDK](https://github.com/ykurilov/agent-chat-sdk/blob/main/docs/getting-started.md).
+
+`composerOptions.variant`:
+
+- `compact` — поле текста и отправка;
+- `standard` (по умолчанию) — вложения, контекст и микрофон рядом с отправкой;
+- `extended` — также модель, провайдер, рассуждения и инструменты; на телефоне настройки открываются в шторке.
+
+Вложения и голос требуют подключения `attachments` и `voice` в SDK. Список инструментов и обработчики их переключения передаёт приложение; скин не выдаёт серверных разрешений. Согласованный образец поведения — [набросок 12](sketches/12-composer-variants.html).
+
+Сфера и переменные берутся из опубликованных пакетов дизайн-системы. Сложные виджеты, Markdown, просмотр медиа, редакторы памяти и часть голосового интерфейса пока используют базовые примитивы Тандема с переменными «Одуванчика». Отдельные административные расширения оформляются скином Тандема. Подробности подключения и текущие ограничения — [README скина](https://github.com/ykurilov/agent-chat-sdk/blob/main/skins/oduvanchik/README.md).
+
+## Композиция «Студия»
+
+Для песочниц и рабочих экранов с журналом используйте `StudioLayout` и `ScrollArea` из `@ykurilov/ds-react@^0.2.0` вместе с `@ykurilov/ds-tokens@^0.2.0`. Поверхности, прокрутка, мобильная шторка и интеграция с чатом описаны в [STUDIO.md](STUDIO.md). Утверждённый интерактивный образец — `explorations/sandbox/?v=c&state=dialog`. Компоновка работает без Agent Chat SDK; сам чат подключается через SDK.
 
 ## Витрина
 

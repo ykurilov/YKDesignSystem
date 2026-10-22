@@ -39,6 +39,7 @@ function sharedVariables(tokens: Tokens): string[] {
   return [
     ...Object.entries(tokens.radius).map(([name, px]) => variable(`radius-${name}`, `${px}px`)),
     ...Object.entries(tokens.space).map(([step, px]) => variable(`space-${step}`, `${px}px`)),
+    ...Object.entries(tokens.studio).map(([name, value]) => variable(`studio-${kebabCase(name)}`, name === "bodyLineHeight" ? String(value) : `${value}px`)),
     variable("ease-out", tokens.easing.out),
     ...Object.entries(tokens.fontFamily).map(([name, stack]) => variable(`font-${name}`, stack)),
     ...Object.entries(tokens.text).flatMap(([name, style]) => {

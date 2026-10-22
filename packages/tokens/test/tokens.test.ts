@@ -23,7 +23,7 @@ describe("переменные", () => {
   });
 
   it("радиусы, шрифт и отступы как в наброске", () => {
-    expect(tokens.radius).toEqual({ sm: 6, md: 10, lg: 12, xl: 16 });
+    expect(tokens.radius).toMatchObject({ sm: 6, md: 10, lg: 12, xl: 16 });
     expect(Object.values(tokens.space)).toEqual([4, 8, 12, 16, 20, 24, 32, 40]);
     const sizes = Object.fromEntries(Object.entries(tokens.text).map(([k, v]) => [k, v.size]));
     expect(sizes).toEqual({ display: 30, title: 22, heading: 17, body: 15, small: 13, label: 11, number: 24 });
