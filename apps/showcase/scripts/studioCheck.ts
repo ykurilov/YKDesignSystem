@@ -26,6 +26,8 @@ try {
     await page.evaluate(t => { document.documentElement.dataset.theme = t; }, theme);
     const studio = page.locator(".yk-studio");
     await studio.scrollIntoViewIfNeeded();
+    const radii = await studio.locator(".yk-studio__main, .yk-studio__inspector").evaluateAll(panels => panels.map(panel => getComputedStyle(panel).borderRadius));
+    check(radii.length === 2 && radii.every(radius => radius === "20px"), `${theme}: обе панели имеют фактическое скругление 20px`);
     const areas = studio.locator(".yk-scroll-area");
     check(await areas.count() === 2, `${theme}: две независимые области прокрутки`);
     for (const area of await areas.all()) {

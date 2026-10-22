@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { tokens } from "../src/index.js";
 import { renderTokensCss } from "../src/css.js";
 
@@ -17,6 +18,11 @@ function block(selector: string, source = css): string {
 }
 
 describe("tokens.css", () => {
+  it("объявляет все токены, на которые ссылается CSS Студии", () => {
+    const consumer = readFileSync(new URL("../../react/src/studio/studio.css", import.meta.url), "utf8");
+    const references = new Set([...consumer.matchAll(/var\((--yk-[\w-]+)/g)].map(match => match[1]));
+    for (const name of references) expect(block(":root"), `не объявлен ${name}`).toContain(`${name}:`);
+  });
   it("светлая тема в :root с префиксом --yk-", () => {
     const root = block(":root");
     expect(root).toContain("--yk-bg: #FFFFFF;");

@@ -37,7 +37,7 @@ function themeVariables(tokens: Tokens, theme: ThemeName): string[] {
 
 function sharedVariables(tokens: Tokens): string[] {
   return [
-    ...Object.entries(tokens.radius).map(([name, px]) => variable(`radius-${name}`, `${px}px`)),
+    ...Object.entries(tokens.radius).map(([name, px]) => variable(`radius-${kebabCase(name)}`, `${px}px`)),
     ...Object.entries(tokens.space).map(([step, px]) => variable(`space-${step}`, `${px}px`)),
     ...Object.entries(tokens.studio).map(([name, value]) => variable(`studio-${kebabCase(name)}`, name === "bodyLineHeight" ? String(value) : `${value}px`)),
     variable("ease-out", tokens.easing.out),
