@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Одуванчик · Части чата</title>
+<link rel="stylesheet" href="/packages/tokens/dist/tokens.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:var(--yk-bg);color:var(--yk-text);font:15px/1.8 var(--yk-font-sans);-webkit-font-smoothing:antialiased}
+button,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--yk-accent);outline-offset:3px}
+svg{width:18px;height:18px;display:block;fill:currentColor}.ico{display:inline-flex;flex:none}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* Панель исследования — не часть экрана. */
+.study{position:fixed;z-index:50;right:16px;bottom:16px;display:flex;gap:10px;padding:5px;border-radius:14px;background:var(--yk-ink);color:var(--yk-on-ink);font-size:12px;line-height:1;box-shadow:0 10px 30px #0003}
+.study .group{display:flex;gap:2px}.study button{padding:8px 12px;border-radius:9px;opacity:.6}.study button[aria-pressed=true]{background:color-mix(in srgb,var(--yk-on-ink) 16%,transparent);opacity:1}
+.study .sep{width:1px;background:color-mix(in srgb,var(--yk-on-ink) 20%,transparent)}
+
+/* Экран. */
+.screen{height:100dvh;display:flex;flex-direction:column}
+.column{width:min(100% - 40px,720px);margin:0 auto}
+.top{flex:none;transition:box-shadow .2s}
+.top.scrolled{box-shadow:0 1px 0 var(--yk-border)}
+.top-inner{height:68px;display:flex;align-items:center;gap:12px}
+.top-sphere{--accent:var(--yk-accent)}
+.top h1{margin:0;font-size:15px;font-weight:600;line-height:1.3}
+.progress{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--yk-muted);white-space:nowrap}
+.bar{width:88px;height:4px;border-radius:2px;background:var(--yk-surface-3);overflow:hidden}.bar i{display:block;height:100%;background:var(--yk-accent);border-radius:2px}
+.progress.complete{color:var(--yk-success)}.complete .bar i{background:var(--yk-success)}
+
+.feed{flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable both-edges}
+.messages{padding:28px 0 32px}
+.user{margin:0 0 32px auto;width:fit-content;max-width:85%;padding:10px 18px;border-radius:18px;background:var(--yk-surface-2);line-height:1.6}
+.agent{margin-bottom:24px}.bare .study{display:none}.agent p{margin:0 0 14px}.agent ul{margin:0 0 14px;padding-left:22px}.agent li{margin-bottom:6px}
+.actions{display:flex;gap:2px;margin-left:-8px;opacity:0;transition:opacity .15s}
+.agent:hover .actions,.actions:focus-within{opacity:1}
+@media(hover:none){.actions{opacity:1}}
+.act{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--yk-muted)}.act:hover{background:var(--yk-surface-2);color:var(--yk-text)}.act svg{width:16px;height:16px}
+
+.finish{margin:8px 0 12px;padding:24px;border-radius:20px;background:var(--yk-surface);box-shadow:inset 0 0 0 1px var(--yk-border)}
+.finish-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.finish-mark{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--yk-success) 14%,transparent);color:var(--yk-success)}
+.finish h2{margin:0;font-size:18px;font-weight:600;line-height:1.3}
+.finish>p{margin:0 0 18px 48px;color:var(--yk-muted);font-size:14px;line-height:1.6}
+.saved{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin:0 0 20px 48px;padding:0;list-style:none;font-size:13px;line-height:1.5}
+.saved li{display:flex;gap:8px;align-items:center}.saved svg{width:14px;height:14px;color:var(--yk-success)}.saved .later svg{color:var(--yk-muted)}.saved .later{color:var(--yk-muted)}
+.finish-foot{margin-left:48px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:var(--yk-surface-2);font-size:13px;line-height:1.4}.btn:hover{background:var(--yk-surface-3)}.btn svg{width:16px;height:16px}
+.finish-foot small{font-size:12px;color:var(--yk-muted)}
+
+.dock{flex:none;padding:8px 0 20px}
+.composer{display:flex;align-items:flex-end;gap:6px;padding:8px 8px 8px 20px;border-radius:24px;background:var(--yk-surface-2)}
+.composer textarea{flex:1;border:0;background:none;outline:none!important;resize:none;height:26px;max-height:160px;margin:7px 0;padding:0;font-size:15px;line-height:26px}
+.composer textarea::placeholder{color:var(--yk-muted)}
+.round{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--yk-muted)}.round:hover{background:var(--yk-surface-3);color:var(--yk-text)}
+.send{background:var(--yk-ink);color:var(--yk-on-ink)}.send:disabled{opacity:.25;cursor:default}.send:hover{background:var(--yk-ink);color:var(--yk-on-ink)}
+.done .dock{display:none}.done.adding .dock{display:block}
+
+.tools{display:contents}
+.finish-foot .btn.primary{background:var(--yk-ink);color:var(--yk-on-ink)}
+
+@media(max-width:640px){
+  .top-inner{height:58px}.top h1{font-size:14px}.bar{width:48px}
+  .saved{grid-template-columns:1fr;margin-left:0}.finish>p,.finish-foot{margin-left:0}.finish{padding:20px}
+  .study{right:8px;left:8px;bottom:auto;top:auto;font-size:11px;justify-content:center}.bare .study{display:none}.study button{padding:7px 8px}
+}
+</style>
+</head>
+<body>
+<nav class="study" aria-label="Исследование">
+  <div class="group" data-key="example"><button data-value="shop">Магазин</button><button data-value="form">Анкета</button><button data-value="task">Задача</button></div><span class="sep"></span>
+  <div class="group" data-key="state"><button data-value="dialog">Разговор</button><button data-value="done">Итог</button></div><span class="sep"></span>
+  <div class="group" data-key="theme"><button data-value="light">Светлая</button><button data-value="dark">Тёмная</button></div>
+</nav>
+<div class="screen" id="screen"></div>
+<script>
+// Нейтральная витрина: одни и те же части чата в трёх разных приложениях.
+const icons={};
+const i=n=>`<span class="ico" data-icon="${n}" aria-hidden="true"></span>`;
+const sphere=s=>`<canvas class="sphere" data-size="${s}" aria-hidden="true"></canvas>`;
+const params=new URLSearchParams(location.search);
+const view={example:params.get('example')||'shop',state:params.get('state')||'done',theme:params.get('theme')||'light'};
+const actions=`<div class="actions"><button class="act" aria-label="Скопировать ответ" title="Скопировать">${i('copy')}</button></div>`;
+
+const examples={
+  shop:{title:'Помощник магазина',progress:['Шаг 3 из 3',80],placeholder:'Напишите сообщение',
+    dialog:[['user','Нужен подарок папе, бюджет до 5000 ₽'],['agent','<p>Подобрал три варианта: термокружка с подогревом, набор для заваривания чая и кожаный органайзер. Кружка — самый частый выбор для подарка «на каждый день».</p><p><b>Какой вариант оформить?</b></p>'],['user','Кружку, доставка в пятницу'],['agent','<p>Оформил: термокружка, 4 290 ₽, доставка курьером в пятницу с 10 до 14. Открытку можно добавить позже.</p>']],
+    finish:{title:'Заказ оформлен',text:'Курьер позвонит за час до доставки.',items:[['Термокружка с подогревом',1],['Оплата картой',1],['Доставка в пятницу, 10–14',1],['Открытка',0]],action:['Изменить заказ','pencil-simple'],note:'Номер заказа 48 213'}},
+  form:{title:'Анкета участника',progress:['Вопрос 5 из 6',83],placeholder:'Ответьте текстом или голосом',
+    dialog:[['agent','<p>Почти закончили. <b>Какую цель вы ставите на ближайшие три месяца?</b></p>'],['user','Запустить первый поток курса и набрать 30 человек'],['agent','<p>Записал цель. Последний вопрос — про удобное время созвонов — можно пропустить и ответить позже.</p>'],['user','Пропущу пока']],
+    finish:{title:'Анкета заполнена',text:'Ответы сохранены. Куратор напишет вам в течение дня.',items:[['Контакты',1],['Опыт',1],['Цель на три месяца',1],['Ожидания',1],['Удобное время созвонов',0]],action:['Дополнить ответы','pencil-simple'],note:'Можно вернуться в любой момент'}},
+  task:{title:'Отчёт по продажам',progress:['Готово',100],placeholder:'Что ещё сделать?',
+    dialog:[['user','Собери отчёт по продажам за сентябрь'],['agent','<p>Собрал данные из трёх источников. Выручка за сентябрь — 1,84 млн ₽, на 12% больше августа. Лучше всего продавался тариф «Профессионал».</p><ul><li><b>Заказы:</b> 412, из них 37 возвратов.</li><li><b>Средний чек:</b> 4 470 ₽.</li></ul>'],['user','Добавь сравнение с прошлым годом'],['agent','<p>Добавил. Сентябрь этого года больше прошлогоднего на 41%. Таблица и графики готовы.</p>']],
+    finish:{title:'Отчёт готов',text:'Файл сохранён в папке «Отчёты».',items:[['Выручка и заказы',1],['Сравнение с августом',1],['Сравнение с прошлым годом',1],['Разбивка по менеджерам',0]],action:['Открыть отчёт','arrow-up-right'],note:'sales-2026-09.xlsx'}}
+};
+
+const message=([who,html])=>who==='user'?`<div class="user">${html}</div>`:`<div class="agent">${html}${actions}</div>`;
+const item=([text,done])=>`<li class="${done?'':'later'}">${i(done?'check':'calendar-blank')}${text}${done?'':' — позже'}</li>`;
+const finishCard=f=>`<section class="finish" aria-label="${f.title}">
+  <div class="finish-head"><span class="finish-mark">${i('check')}</span><h2>${f.title}</h2></div>
+  <p>${f.text}</p><ul class="saved">${f.items.map(item).join('')}</ul>
+  <div class="finish-foot"><button class="btn" data-action="add">${i(f.action[1])}${f.action[0]}</button><small>${f.note}</small></div></section>`;
+
+function render(){
+  const ex=examples[view.example]||examples.shop,done=view.state==='done';
+  document.documentElement.dataset.theme=view.theme;
+  const screen=document.getElementById('screen');
+  screen.className=`screen ${done?'done':''}`;
+  const [label,percent]=done?['Готово',100]:ex.progress;
+  screen.innerHTML=`
+  <header class="top"><div class="column top-inner"><span class="top-sphere">${sphere(24)}</span><h1>${ex.title}</h1>
+    <div class="progress ${percent===100?'complete':''}"><span>${label}</span><span class="bar"><i style="width:${percent}%"></i></span></div></div></header>
+  <main class="feed" id="feed"><div class="column messages" aria-live="polite">${ex.dialog.map(message).join('')}${done?finishCard(ex.finish):''}</div></main>
+  <footer class="dock"><div class="column"><div class="composer"><label class="visually-hidden" for="prompt">Сообщение</label>
+    <textarea id="prompt" rows="1" placeholder="${ex.placeholder}"></textarea>
+    <span class="tools"><button class="round" aria-label="Голосовой ввод" title="Голосовой ввод">${i('microphone')}</button><button class="round send" id="send" aria-label="Отправить" disabled>${i('arrow-up')}</button></span></div></div></footer>`;
+  document.querySelectorAll('.study .group').forEach(g=>g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',view[g.dataset.key]===b.dataset.value)));
+  const feed=document.getElementById('feed'),top=document.querySelector('.top'),prompt=document.getElementById('prompt');
+  feed.scrollTop=feed.scrollHeight;
+  const shade=()=>top.classList.toggle('scrolled',feed.scrollTop>4);feed.onscroll=shade;shade();
+  prompt.oninput=()=>{prompt.style.height='auto';prompt.style.height=Math.min(160,prompt.scrollHeight)+'px';document.getElementById('send').disabled=!prompt.value.trim()};
+  screen.querySelector('[data-action=add]')?.addEventListener('click',()=>{screen.classList.add('adding');prompt.focus()});
+  renderIcons();window.YKSphere?.scan(screen);
+}
+async function renderIcons(){await Promise.all([...document.querySelectorAll('[data-icon]:not([data-loaded])')].map(async el=>{el.dataset.loaded='1';const n=el.dataset.icon;icons[n]??=fetch(`/sketches/icons/phosphor-regular/${n}.svg`).then(r=>r.text());el.innerHTML=await icons[n]}));document.body.dataset.ready='true'}
+document.querySelectorAll('.study .group').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view[g.dataset.key]=b.dataset.value;history.replaceState(null,'',`?example=${view.example}&state=${view.state}&theme=${view.theme}`);render()}));
+if(params.has('bare'))document.body.classList.add('bare');
+render();
+</script>
+<script src="/sketches/shared/sphere.js"></script>
+</body></html>

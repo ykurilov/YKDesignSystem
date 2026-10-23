@@ -64,6 +64,7 @@ export function AgentStatusExample({ busy }: { busy: boolean }) {
 - Всплывающее: `Dialog`, `Sheet`, `Menu`, `Toast` (`ToastProvider` + `useToast`).
 - Сообщения и пустота: `Banner`, `EmptyState`, `Skeleton`.
 - Рабочие экраны (с 0.2.0): `StudioLayout`, `ScrollArea`; контракт и пример — [STUDIO.md](STUDIO.md).
+- Части чата (с 0.3.0): колонка `yk-chat-column`, `ChatHeader`, `ChatProgress`, `CompletionCard`; образец — `explorations/chat-parts`.
 
 `ToastProvider` ставится один раз в корне приложения: он держит живую область, которую читает экранный диктор. Значки — только `@phosphor-icons/react` через `Icon` или проп `icon`; символы из шрифта вместо значков не использовать.
 

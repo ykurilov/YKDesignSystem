@@ -33,3 +33,8 @@ export { EmptyState, type EmptyStateProps } from "./empty/EmptyState.js";
 export { Skeleton, type SkeletonProps } from "./skeleton/Skeleton.js";
 export { StudioLayout, type StudioLayoutProps, type StudioInspector } from "./studio/StudioLayout.js";
 export { ScrollArea, type ScrollAreaProps } from "./studio/ScrollArea.js";
+export { ChatHeader, type ChatHeaderProps } from "./chat/ChatHeader.js";
+export { ChatProgress, type ChatProgressProps } from "./chat/ChatProgress.js";
+export {
+  CompletionCard, type CompletionCardProps, type CompletionItem, type CompletionItemStatus,
+} from "./chat/CompletionCard.js";

@@ -82,3 +82,7 @@ body {
 .sc-studio-event { padding:18px 0; border-bottom:1px solid var(--yk-border); }
 .sc-studio-event p { font-size:12px; line-height:1.65; color:var(--yk-muted); margin-top:8px; }
 .sc-studio-footer { flex:none; display:flex; gap:10px; align-items:center; padding:16px 0 0; font-size:12px; color:var(--yk-muted); }
+
+/* Части чата: шапка и итог в общей колонке. */
+.sc-chat-parts { border: 1px solid var(--yk-border); border-radius: var(--yk-radius-studio-panel); overflow: hidden; background: var(--yk-bg); }
+.sc-chat-parts__body { padding: var(--yk-space-6) 0; }
