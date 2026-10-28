@@ -1,0 +1,20 @@
+/* Принятый образец: оболочка «Конструктора приложений». */
+.yk-app-shell{box-sizing:border-box;height:100%;min-height:0;min-width:0;overflow:hidden;display:grid;grid-template-columns:264px minmax(0,1fr);padding:var(--yk-space-6) var(--yk-space-5) var(--yk-space-5) 0;background:var(--yk-sidebar);color:var(--yk-text);font-family:var(--yk-font-sans);transition:grid-template-columns .18s var(--yk-ease-out)}
+.yk-app-shell--collapsed{grid-template-columns:68px minmax(0,1fr)}
+.yk-app-shell__sidebar,.yk-app-shell__mobile-content{display:flex;flex-direction:column;min-height:0;min-width:0;gap:var(--yk-space-2);padding:0 var(--yk-space-3)}
+.yk-app-shell__nav-header{display:flex;align-items:center;justify-content:space-between;min-height:48px;flex:none}
+.yk-app-shell__brand{display:flex;align-items:center;gap:var(--yk-space-2);padding-inline:var(--yk-space-3);min-width:0;text-decoration:none;color:var(--yk-text);font-size:var(--yk-text-small-size);font-weight:500}
+.yk-app-shell__brand>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yk-app-shell__brand>svg{flex:none}.yk-app-shell__nav-header>.yk-button{flex:none}
+.yk-app-shell__items{display:flex;flex-direction:column;gap:var(--yk-space-2);min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin}
+.yk-app-shell__item{box-sizing:border-box;display:flex;flex:none;align-items:center;gap:var(--yk-space-3);min-height:48px;padding:var(--yk-space-3);border:0;border-radius:var(--yk-radius-md);font:inherit;font-size:var(--yk-text-body-size,14px);background:transparent;color:var(--yk-muted);text-decoration:none;text-align:left;cursor:pointer}
+.yk-app-shell__item>svg{flex:none}.yk-app-shell__item>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.yk-app-shell__item:hover{background:var(--yk-surface-2)}.yk-app-shell__item[aria-current=page]{background:var(--yk-accent-soft);color:var(--yk-accent-text)}
+.yk-app-shell__item:focus-visible,.yk-app-shell__brand:focus-visible{outline:2px solid var(--yk-accent);outline-offset:-2px}
+.yk-app-shell__footer{flex:none;min-width:0;padding-top:var(--yk-space-3)}
+.yk-app-shell--collapsed .yk-app-shell__sidebar{padding-inline:10px;align-items:center}.yk-app-shell--collapsed .yk-app-shell__nav-header{justify-content:center;width:48px}.yk-app-shell--collapsed .yk-app-shell__items,.yk-app-shell--collapsed .yk-app-shell__footer{width:48px}.yk-app-shell--collapsed .yk-app-shell__item{width:48px;justify-content:center}
+.yk-app-shell__workspace{display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;border-radius:var(--yk-radius-studio-panel);background:var(--yk-bg)}
+.yk-app-shell__header{display:flex;align-items:center;gap:var(--yk-space-3);min-height:48px;flex:none;padding:var(--yk-space-1) var(--yk-space-6)}
+.yk-app-shell__content{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
+.yk-app-shell--compact{grid-template-columns:minmax(0,1fr);padding:var(--yk-space-3)}.yk-app-shell--compact .yk-app-shell__header{padding-inline:var(--yk-space-2)}
+.yk-app-shell__drawer{box-sizing:border-box;position:fixed;inset:0 auto 0 0;margin:0;padding:var(--yk-space-3) 0 max(var(--yk-space-5),env(safe-area-inset-bottom));border:0;width:min(320px,calc(100vw - 48px));max-width:none;height:100dvh;max-height:100dvh;overflow:hidden;background:var(--yk-sidebar);color:var(--yk-text);box-shadow:var(--yk-shadow-pop)}
+.yk-app-shell__drawer::backdrop{background:var(--yk-text);opacity:.28}.yk-app-shell__mobile-content{height:100%}
+@media(prefers-reduced-motion:reduce){.yk-app-shell{transition:none}}

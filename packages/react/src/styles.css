@@ -26,3 +26,5 @@
 @import "./skeleton/skeleton.css";
 @import "./studio/studio.css";
 @import "./chat/chat.css";
+
+@import "./app-shell/app-shell.css";

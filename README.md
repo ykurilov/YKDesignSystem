@@ -164,3 +164,7 @@ YKIcon(.caretRight, size: 14)
 imac-run --no-setup -- 'bash swift/run-tests.sh'
 imac-run --no-setup --fetch swift/screenshots -- 'bash swift/run-showcase.sh'
 ```
+
+## Навигация приложения
+
+Единая раскрываемая левая панель `AppShell`: [NAVIGATION.md](NAVIGATION.md). Образец - «Конструктор приложений», выбранный Юрием. Компонент добавлен в исходники; опубликованный номер версии уточнять перед подключением.

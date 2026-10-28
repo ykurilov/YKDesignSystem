@@ -38,3 +38,5 @@ export { ChatProgress, type ChatProgressProps } from "./chat/ChatProgress.js";
 export {
   CompletionCard, type CompletionCardProps, type CompletionItem, type CompletionItemStatus,
 } from "./chat/CompletionCard.js";
+
+export { AppShell, type AppShellProps, type AppNavigationItem } from "./app-shell/AppShell.js";
