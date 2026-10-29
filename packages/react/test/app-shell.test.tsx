@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import type { AnchorHTMLAttributes } from "react";
 import userEvent from "@testing-library/user-event";
 import { HouseIcon, FolderSimpleIcon } from "@phosphor-icons/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -49,5 +50,19 @@ describe("навигация приложения", () => {
     expect(select).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(trigger).toHaveFocus();
+  });
+  it("показывает счётчик раздела и в свёрнутом виде называет его в имени значка", async () => {
+    const user = userEvent.setup();
+    render(<AppShell brand={{ label: "Приложение" }} navigation={[{ ...navigation[1], badge: { value: 3, label: "3 без ответа" } }]}>Содержимое</AppShell>);
+    expect(screen.getByRole("link", { name: "Проекты, 3 без ответа" })).toHaveTextContent("3");
+    await user.click(screen.getByRole("button", { name: "Свернуть навигацию" }));
+    expect(screen.getByRole("link", { name: "Проекты, 3 без ответа" })).toHaveTextContent("3");
+  });
+  it("рисует ссылки разделов и названия компонентом роутера приложения", () => {
+    const RouterLink = vi.fn(({ children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => <a data-router="" {...props}>{children}</a>);
+    render(<AppShell brand={{ label: "Приложение", href: "/" }} navigation={navigation} linkComponent={RouterLink}>Содержимое</AppShell>);
+    expect(screen.getByRole("link", { name: "Проекты" })).toHaveAttribute("data-router");
+    expect(screen.getByRole("link", { name: "Приложение" })).toHaveAttribute("data-router");
+    expect(screen.getByRole("button", { name: "Обзор" })).not.toHaveAttribute("data-router");
   });
 });

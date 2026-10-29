@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type AnchorHTMLAttributes, type ComponentType, type ReactNode } from "react";
 import { SidebarSimpleIcon, XIcon } from "@phosphor-icons/react";
 import { Button } from "../button/Button.js";
 import { Icon, type IconComponent } from "../icon/Icon.js";
@@ -13,7 +13,11 @@ export interface AppNavigationItem {
   /** Для маршрутизатора приложения; ссылка с href сохраняет нативные действия браузера. */
   onSelect?: () => void;
   active?: boolean;
+  /** Счётчик справа от подписи, в свёрнутом виде — в углу значка. `label` читает экранный диктор. */
+  badge?: { value: number | string; label: string };
 }
+/** Ссылка роутера приложения (например, Link из Next.js): получает href, className, onClick, aria-атрибуты и детей. */
+export type AppShellLinkComponent = ComponentType<AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>;
 export interface AppShellProps {
   brand: { label: string; logo?: ReactNode; href?: string };
   navigation: readonly AppNavigationItem[];
@@ -29,6 +33,8 @@ export interface AppShellProps {
   storageKey?: string | null;
   labels?: Partial<{ expand: string; collapse: string; open: string; close: string }>;
   className?: string;
+  /** Чем рисовать ссылки разделов и названия. По умолчанию — обычный `<a>`. */
+  linkComponent?: AppShellLinkComponent;
 }
 const query = "(max-width: 700px)";
 function subscribe(listener: () => void) {
@@ -41,7 +47,7 @@ const serverSnapshot = () => false;
 
 /** Стандартная навигация приложения: подписи / иконки на компьютере, модальная панель на телефоне. */
 export function AppShell({ brand, navigation, navigationLabel = "Навигация приложения", footer, header, children,
-  collapsed: controlled, defaultCollapsed = false, onCollapsedChange, storageKey, labels, className }: AppShellProps) {
+  collapsed: controlled, defaultCollapsed = false, onCollapsedChange, storageKey, labels, className, linkComponent: Link = "a" as unknown as AppShellLinkComponent }: AppShellProps) {
   const [localCollapsed, setLocalCollapsed] = useState(defaultCollapsed);
   const [open, setOpen] = useState(false);
   const compact = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
@@ -73,7 +79,7 @@ export function AppShell({ brand, navigation, navigationLabel = "Навигац�
   function content(rail: boolean, mobile: boolean) {
     return <>
       <div className="yk-app-shell__nav-header">
-        {!rail && <a className="yk-app-shell__brand" href={brand.href ?? "/"}>{brand.logo}<span>{brand.label}</span></a>}
+        {!rail && <Link className="yk-app-shell__brand" href={brand.href ?? "/"}>{brand.logo}<span>{brand.label}</span></Link>}
         <Button variant="ghost" icon={mobile ? XIcon : SidebarSimpleIcon}
           aria-label={mobile ? text.close : rail ? text.expand : text.collapse}
           title={mobile ? text.close : rail ? text.expand : text.collapse}
@@ -83,10 +89,12 @@ export function AppShell({ brand, navigation, navigationLabel = "Навигац�
       <nav id={mobile ? `${id}-mobile-navigation` : `${id}-navigation`} aria-label={navigationLabel} className="yk-app-shell__items">
         {navigation.map(item => {
           const props = { className: "yk-app-shell__item", "aria-current": item.active ? "page" as const : undefined,
-            "aria-label": rail ? item.label : undefined, title: rail ? item.label : undefined,
+            "aria-label": rail ? (item.badge ? `${item.label}, ${item.badge.label}` : item.label) : undefined, title: rail ? item.label : undefined,
             onClick: () => { item.onSelect?.(); if (mobile) setOpen(false); } };
-          const inner = <><Icon icon={item.icon} size={20} weight={item.active ? "fill" : "regular"} />{!rail && <span>{item.label}</span>}</>;
-          return item.href ? <a key={item.id} href={item.href} {...props}>{inner}</a>
+          const inner = <><Icon icon={item.icon} size={20} weight={item.active ? "fill" : "regular"} />{!rail && <span>{item.label}</span>}
+            {item.badge && <span className="yk-app-shell__badge"><span aria-hidden="true">{item.badge.value}</span>
+              {!rail && <span className="yk-visually-hidden">, {item.badge.label}</span>}</span>}</>;
+          return item.href ? <Link key={item.id} href={item.href} {...props}>{inner}</Link>
             : <button key={item.id} type="button" {...props}>{inner}</button>;
         })}
       </nav>
