@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "snapshots": "tsx scripts/snapshots.ts",
     "open-states": "tsx scripts/openStates.ts",
-    "navigation:check": "node scripts/navigation.mjs"
+    "navigation:check": "node scripts/navigation.mjs",
+    "navigation:neutral": "node scripts/neutral-navigation.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
