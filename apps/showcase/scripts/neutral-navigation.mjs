@@ -14,7 +14,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
    const token=async value=>page.evaluate(value=>{const e=document.createElement('div');e.style.backgroundColor=`var(${value})`;document.body.append(e);const color=getComputedStyle(e).backgroundColor;e.remove();return color;},value);
    const surface3=await token('--yk-surface-3'),surface2=await token('--yk-surface-2'),text=await token('--yk-text');
    const style=locator=>locator.evaluate(e=>{const s=getComputedStyle(e);return {background:s.backgroundColor,color:s.color,radius:s.borderRadius,padding:s.padding,bottom:getComputedStyle(e,'::after').content};});
-   const settled=async(locator,expected)=>page.waitForFunction(({element,expected})=>getComputedStyle(element).backgroundColor===expected,{element:await locator.elementHandle(),expected});
+   const settled=async(locator,expected,property="backgroundColor")=>page.waitForFunction(({element,expected,property})=>getComputedStyle(element)[property]===expected,{element:await locator.elementHandle(),expected,property});
    const nav=()=>page.getByRole('navigation',{name:'Навигация приложения'}).filter({visible:true});
    const active=()=>nav().locator('[aria-current=page]');
    const assertActive=async()=>{const s=await style(active());assert.equal(s.background,surface3);assert.equal(s.color,text);assert.equal(await active().locator('svg').evaluate(e=>getComputedStyle(e).color),text);};
@@ -28,10 +28,10 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
    await assertActive();await active().hover();await assertActive();
    const other=nav().getByRole('button',{name:'Проекты',exact:true});await other.hover();assert.equal((await style(other)).background,surface2);
    const tab=page.getByRole('tab',{name:'Обзор раздела',exact:true}),next=page.getByRole('tab',{name:'Параметры',exact:true});
-   await settled(tab,surface3);assert.equal((await style(tab)).background,surface3);assert.equal((await style(tab)).color,text);assert.equal((await style(tab)).bottom,'none');assert.equal((await style(tab)).padding,'6px 12px');
+   await settled(tab,surface3);await settled(tab,text,"color");assert.equal((await style(tab)).background,surface3);assert.equal((await style(tab)).color,text);assert.equal((await style(tab)).bottom,'none');assert.equal((await style(tab)).padding,'6px 12px');
    await next.hover();await settled(next,surface2);assert.equal((await style(next)).background,surface2);await tab.focus();await page.keyboard.press('ArrowRight');assert.equal(await next.getAttribute('aria-selected'),'true');await settled(next,surface3);assert.equal((await style(next)).background,surface3);
    await page.keyboard.press('ArrowRight');assert.equal(await tab.getAttribute('aria-selected'),'true'); // disabled skipped, wraps
-   const expanded=await footerWidth();await page.screenshot({path:`${shots}/${name}-${theme}-expanded.png`});
+   const expanded=await footerWidth();await settled(tab,surface3);await settled(tab,text,"color");await settled(next,"rgba(0, 0, 0, 0)");await page.screenshot({path:`${shots}/${name}-${theme}-expanded.png`});
    await page.getByRole('button',{name:'Свернуть навигацию',exact:true}).click();await page.waitForTimeout(220);await assertActive();const collapsed=await footerWidth();await page.screenshot({path:`${shots}/${name}-${theme}-collapsed.png`});
    await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Открыть навигацию',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Навигация приложения',exact:true});await dialog.waitFor();await assertActive();const mobile=await footerWidth();await dialog.waitFor();await page.screenshot({path:`${shots}/${name}-${theme}-mobile.png`});
    await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});assert.deepEqual(errors,[]);
