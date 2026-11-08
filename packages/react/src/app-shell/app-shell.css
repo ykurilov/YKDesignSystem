@@ -1,26 +1,67 @@
-/* Принятый образец: оболочка «Конструктора приложений». */
-.yk-app-shell{box-sizing:border-box;height:100%;min-height:0;min-width:0;overflow:hidden;display:grid;grid-template-columns:264px minmax(0,1fr);padding:var(--yk-space-6) var(--yk-space-5) var(--yk-space-5) 0;background:var(--yk-sidebar);color:var(--yk-text);font-family:var(--yk-font-sans);transition:grid-template-columns .18s var(--yk-ease-out)}
+/* Стандартная панель приложения — вариант A (утверждён Юрием 8 ноября 2026):
+   плоская панель на фоне --yk-sidebar, без карточки и рамок. Поле 12px, строка 40px,
+   центр значков на x=34 в раскрытом и свёрнутом виде. */
+.yk-app-shell{box-sizing:border-box;height:100%;min-height:0;min-width:0;overflow:hidden;display:grid;grid-template-columns:264px minmax(0,1fr);background:var(--yk-sidebar);color:var(--yk-text);font-family:var(--yk-font-sans);transition:grid-template-columns .18s var(--yk-ease-out)}
 .yk-app-shell--collapsed{grid-template-columns:68px minmax(0,1fr)}
-.yk-app-shell__sidebar,.yk-app-shell__mobile-content{display:flex;flex-direction:column;min-height:0;min-width:0;gap:var(--yk-space-2);padding:0 var(--yk-space-3)}
-.yk-app-shell__nav-header{display:flex;align-items:center;justify-content:space-between;min-height:48px;flex:none}
-.yk-app-shell__brand{display:flex;align-items:center;gap:var(--yk-space-2);padding-inline:var(--yk-space-3);min-width:0;text-decoration:none;color:var(--yk-text);font-size:var(--yk-text-small-size);font-weight:500}
-.yk-app-shell__brand>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yk-app-shell__brand>svg{flex:none}.yk-app-shell__nav-header>.yk-button{flex:none}
-.yk-app-shell__items{display:flex;flex-direction:column;gap:var(--yk-space-2);min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin}
-.yk-app-shell__item{box-sizing:border-box;display:flex;flex:none;align-items:center;gap:var(--yk-space-3);min-height:48px;padding:var(--yk-space-3);border:0;border-radius:var(--yk-radius-md);font:inherit;font-size:var(--yk-text-body-size,14px);background:transparent;color:var(--yk-muted);text-decoration:none;text-align:left;cursor:pointer}
-.yk-app-shell__item>svg{flex:none}.yk-app-shell__item>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.yk-app-shell__item:hover{background:var(--yk-surface-2)}.yk-app-shell__item[aria-current=page]{background:var(--yk-surface-3);color:var(--yk-text)}
-.yk-app-shell__item:focus-visible,.yk-app-shell__brand:focus-visible{outline:2px solid var(--yk-accent);outline-offset:-2px}
-.yk-app-shell__item{position:relative}.yk-app-shell__badge{margin-left:auto;flex:none;font:var(--yk-text-label-size) var(--yk-font-mono);color:var(--yk-accent-text)}
-.yk-app-shell--collapsed .yk-app-shell__badge{position:absolute;top:4px;right:4px;margin:0}
-.yk-app-shell__footer{flex:none;min-width:0;padding-top:var(--yk-space-3)}
-.yk-app-shell--collapsed .yk-app-shell__sidebar{padding-inline:10px;align-items:center}.yk-app-shell--collapsed .yk-app-shell__nav-header{justify-content:center;width:48px}.yk-app-shell--collapsed .yk-app-shell__items,.yk-app-shell--collapsed .yk-app-shell__footer{width:48px}.yk-app-shell--collapsed .yk-app-shell__item{width:48px;justify-content:center}
-.yk-app-shell__workspace{display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;border-radius:var(--yk-radius-studio-panel);background:var(--yk-bg)}
-.yk-app-shell__header{display:flex;align-items:center;gap:var(--yk-space-3);min-height:48px;flex:none;padding:var(--yk-space-1) var(--yk-space-6)}
-.yk-app-shell__content{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
-.yk-app-shell--compact{grid-template-columns:minmax(0,1fr);padding:var(--yk-space-3)}.yk-app-shell--compact .yk-app-shell__header{padding-inline:var(--yk-space-2)}
-.yk-app-shell__drawer{box-sizing:border-box;position:fixed;inset:0 auto 0 0;margin:0;padding:var(--yk-space-3) 0 max(var(--yk-space-5),env(safe-area-inset-bottom));border:0;width:min(320px,calc(100vw - 48px));max-width:none;height:100dvh;max-height:100dvh;overflow:hidden;background:var(--yk-sidebar);color:var(--yk-text);box-shadow:var(--yk-shadow-pop)}
-.yk-app-shell__drawer::backdrop{background:var(--yk-text);opacity:.28}.yk-app-shell__mobile-content{height:100%}
-@media(prefers-reduced-motion:reduce){.yk-app-shell{transition:none}}
+.yk-app-shell__sidebar,.yk-app-shell__mobile-content{box-sizing:border-box;display:flex;flex-direction:column;min-height:0;min-width:0;padding:0 var(--yk-space-3);overflow:hidden;white-space:nowrap}
 
-/* Menu в нижнем слоте занимает ту же ширину, что и разделы, включая панель значков. */
-.yk-app-shell__footer>.yk-menu-anchor{display:flex;width:100%;min-width:0}
+/* Верх: логотип и название слева, поиск и сворачивание справа */
+.yk-app-shell__nav-header{display:flex;align-items:center;justify-content:space-between;gap:var(--yk-space-1);height:60px;flex:none}
+.yk-app-shell__brand{display:flex;align-items:center;gap:10px;padding-left:10px;min-width:0;text-decoration:none;color:var(--yk-text);font-size:16px;font-weight:600;letter-spacing:-.01em}
+.yk-app-shell__brand>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yk-app-shell__brand>svg,.yk-app-shell__brand>canvas{flex:none}
+.yk-app-shell__top-actions{display:flex;flex:none}.yk-app-shell__top-actions>.yk-button{color:var(--yk-muted)}.yk-app-shell__top-actions>.yk-button:hover{color:var(--yk-text)}
+
+/* Навигация: ведущий блок и прокручиваемая середина */
+.yk-app-shell__nav{display:flex;flex-direction:column;flex:1;min-height:0}
+.yk-app-shell__items{display:flex;flex-direction:column;gap:2px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;padding-bottom:var(--yk-space-2)}
+.yk-app-shell__nav--grouped>.yk-app-shell__items{flex:0 1 auto}
+.yk-app-shell__groups{flex:1 1 0;min-height:96px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--yk-border-strong) transparent;margin:0 calc(-1*var(--yk-space-3));padding:0 var(--yk-space-3) var(--yk-space-3)}
+.yk-app-shell__group{display:flex;flex-direction:column;padding-top:var(--yk-space-4)}
+.yk-app-shell__group-title{margin:0;padding:0 var(--yk-space-3);height:28px;display:flex;align-items:center;font:var(--yk-text-label-weight) var(--yk-text-label-size)/1 var(--yk-font-mono);letter-spacing:var(--yk-text-label-tracking);text-transform:uppercase;color:var(--yk-muted)}
+
+/* Строки */
+.yk-app-shell__item{box-sizing:border-box;position:relative;display:flex;flex:none;align-items:center;gap:var(--yk-space-3);width:100%;height:40px;padding:0 var(--yk-space-3);border:0;border-radius:var(--yk-radius-md);font:inherit;font-size:14px;background:transparent;color:var(--yk-text);text-decoration:none;text-align:left;cursor:pointer;transition:background .12s}
+.yk-app-shell__item>svg{flex:none;color:var(--yk-muted)}.yk-app-shell__label{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.yk-app-shell__item:hover{background:var(--yk-surface-2)}
+.yk-app-shell__item[aria-current=page]{background:var(--yk-surface-3);color:var(--yk-text);font-weight:500}.yk-app-shell__item[aria-current=page]>svg{color:var(--yk-text)}
+.yk-app-shell__group .yk-app-shell__item{height:36px}
+.yk-app-shell__primary{background:var(--yk-surface-3);font-weight:500;margin-bottom:6px}.yk-app-shell__primary>svg{color:var(--yk-text)}.yk-app-shell__primary:hover{background:var(--yk-border-strong)}
+.yk-app-shell__more{color:var(--yk-muted);font-size:13px}.yk-app-shell__more-icon--open{transform:rotate(180deg)}
+.yk-app-shell__item:focus-visible,.yk-app-shell__brand:focus-visible,.yk-app-shell__account:focus-visible{outline:2px solid var(--yk-accent);outline-offset:-2px}
+.yk-app-shell__badge{margin-left:auto;flex:none;font:var(--yk-text-label-size) var(--yk-font-mono);color:var(--yk-accent-text)}
+.yk-app-shell__new{flex:none}
+
+/* Низ: аватар, имя, вторая строка, справа шестерёнка */
+.yk-app-shell__footer{flex:none;min-width:0;padding:10px 0 var(--yk-space-3)}
+.yk-app-shell__footer--account{display:flex;align-items:center;gap:var(--yk-space-1)}
+.yk-app-shell__footer--account>.yk-button{flex:none;color:var(--yk-muted)}.yk-app-shell__footer--account>.yk-button:hover{color:var(--yk-text)}
+.yk-app-shell__account{box-sizing:border-box;flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:6px;border:0;border-radius:var(--yk-radius-md);background:transparent;color:var(--yk-text);font:inherit;text-align:left;cursor:pointer}
+.yk-app-shell__account:hover{background:var(--yk-surface-2)}.yk-app-shell__account>.yk-avatar{background:var(--yk-surface-3)}
+.yk-app-shell__who{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:14px;font-weight:500}
+.yk-app-shell__who>*{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yk-app-shell__who small{font-size:12px;font-weight:400;color:var(--yk-muted)}
+
+/* Свёрнуто: только значки и аватар */
+.yk-app-shell--collapsed .yk-app-shell__nav-header{justify-content:flex-start}
+.yk-app-shell--collapsed .yk-app-shell__top-actions>.yk-button{width:44px}
+.yk-app-shell--collapsed .yk-app-shell__item{width:44px}
+.yk-app-shell--collapsed .yk-app-shell__badge{position:absolute;top:4px;right:4px;margin:0}
+.yk-app-shell--collapsed .yk-app-shell__new{position:absolute;top:8px;right:8px}
+.yk-app-shell--collapsed .yk-app-shell__group{padding-top:var(--yk-space-3)}
+.yk-app-shell--collapsed .yk-app-shell__footer{width:44px}
+.yk-app-shell--collapsed .yk-app-shell__account{flex:none}
+
+/* Рабочая область — плоская, отличается от панели только фоном */
+.yk-app-shell__workspace{display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;background:var(--yk-bg)}
+.yk-app-shell__header{display:flex;align-items:center;gap:var(--yk-space-3);height:60px;flex:none;padding:0 var(--yk-space-5)}
+.yk-app-shell__content{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
+.yk-app-shell--compact{grid-template-columns:minmax(0,1fr)}.yk-app-shell--compact .yk-app-shell__header{padding-inline:var(--yk-space-2)}
+
+/* Телефон: панель слева поверх содержимого */
+.yk-app-shell__drawer{box-sizing:border-box;position:fixed;inset:0 auto 0 0;margin:0;padding:0 0 env(safe-area-inset-bottom);border:0;width:min(300px,86vw);max-width:none;height:100dvh;max-height:100dvh;overflow:hidden;background:var(--yk-sidebar);color:var(--yk-text);box-shadow:var(--yk-shadow-pop)}
+.yk-app-shell__drawer::backdrop{background:#000;opacity:.32}.yk-app-shell__mobile-content{height:100%}
+@media(prefers-reduced-motion:reduce){.yk-app-shell,.yk-app-shell__item{transition:none}}
+
+/* Menu в нижнем слоте занимает ширину строки, включая панель значков. */
+.yk-app-shell__footer>.yk-menu-anchor{display:flex;flex:1;width:100%;min-width:0}
 .yk-app-shell__footer>.yk-menu-anchor>button{box-sizing:border-box;width:100%;min-width:0}
+.yk-app-shell .yk-menu{min-width:220px}
