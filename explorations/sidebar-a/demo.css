@@ -1,0 +1,31 @@
+*{box-sizing:border-box}html,body,#root{height:100%}body{margin:0;background:var(--yk-bg);color:var(--yk-text);font-family:var(--yk-font-sans);-webkit-font-smoothing:antialiased}
+/* Панель прототипа — не часть стандарта */
+.proto{height:100dvh;display:flex;flex-direction:column}
+.proto__bar{flex:none;height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--yk-border);background:var(--yk-bg)}
+.proto__title{font-size:13px;font-weight:600;margin-right:auto}.proto__title small{font-weight:400;color:var(--yk-muted);margin-left:6px}
+.proto__stage{flex:1;min-height:0}.proto__stage .shell{height:100%}
+.proto__stage.is-phone{display:grid;place-items:center;background:var(--yk-surface-2);padding:16px}
+.proto__stage.is-phone iframe{width:390px;height:min(844px,100%);border:0;border-radius:28px;box-shadow:var(--yk-shadow-pop);background:var(--yk-bg)}
+/* Пустой экран чата */
+.model-pick{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--yk-text);font:inherit;font-size:16px;font-weight:500;padding:6px 10px;border-radius:var(--yk-radius-md);cursor:pointer}
+.model-pick span{color:var(--yk-muted);font-weight:400}.model-pick:hover{background:var(--yk-surface-2)}
+.empty-chat{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:24px 24px 15vh}
+.empty-chat__hello{display:flex;flex-direction:column;align-items:center;text-align:center}
+.empty-chat h1{font-size:var(--yk-text-display-size);font-weight:var(--yk-text-display-weight);letter-spacing:var(--yk-text-display-tracking);margin:20px 0 8px}
+.empty-chat p{margin:0;color:var(--yk-muted);font-size:15px}
+.composer{width:min(720px,100%);border:1px solid var(--yk-border-strong);border-radius:var(--yk-radius-composer);background:var(--yk-surface);padding:14px 14px 10px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.composer__text{color:var(--yk-muted);font-size:15px;min-height:28px}
+.composer__row{display:flex;justify-content:space-between;align-items:center;margin-left:-8px}
+.composer__send{width:36px;height:36px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--yk-ink);color:var(--yk-on-ink);opacity:.35}
+.shell--phone .empty-chat{justify-content:flex-end;padding:16px 12px 16px}.shell--phone .empty-chat__hello{margin:auto 0}
+
+/* Кабинет школы */
+.page-title{font-size:15px;font-weight:500;padding-left:10px}.shell--phone .page-title{padding-left:2px}
+.school-logo{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--yk-ink);color:var(--yk-on-ink)}
+.cabinet{flex:1;min-height:0;overflow:auto;padding:24px 48px 48px;max-width:1040px;width:100%}
+.cabinet h1{font-size:var(--yk-text-display-size);font-weight:var(--yk-text-display-weight);letter-spacing:var(--yk-text-display-tracking);margin:12px 0 28px}
+.cabinet__stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.cabinet__stat{border:1px solid var(--yk-border);border-radius:var(--yk-radius-lg);padding:20px}.cabinet__stat strong{display:block;font-size:var(--yk-text-number-size);font-weight:var(--yk-text-number-weight);letter-spacing:var(--yk-text-number-tracking);margin-top:12px}
+.cabinet__table{border:1px solid var(--yk-border);border-radius:var(--yk-radius-lg)}.cabinet__row{padding:14px 20px;font-size:14px}.cabinet__row+.cabinet__row{border-top:1px solid var(--yk-border)}
+.shell--phone .cabinet{padding:12px 16px 32px}
+.proto__bar{overflow-x:auto}.proto__bar>*{flex:none}
