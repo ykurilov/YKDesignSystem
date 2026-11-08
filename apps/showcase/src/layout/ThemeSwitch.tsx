@@ -1,47 +1,19 @@
 import { CircleHalfIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
-import { Button, type IconComponent } from "@ykurilov/ds-react";
-import { useState } from "react";
+import { Button, useThemePreference, type IconComponent, type ThemePreference } from "@ykurilov/ds-react";
 
-type ThemeChoice = "light" | "dark" | "system";
-
-const CHOICES: Array<{ value: ThemeChoice; label: string; icon: IconComponent }> = [
+const CHOICES: Array<{ value: ThemePreference; label: string; icon: IconComponent }> = [
   { value: "light", label: "Светлая", icon: SunIcon },
   { value: "dark", label: "Тёмная", icon: MoonIcon },
   { value: "system", label: "Как в системе", icon: CircleHalfIcon },
 ];
 
-function savedChoice(): ThemeChoice {
-  const saved = localStorage.getItem("yk-theme");
-  return saved === "light" || saved === "dark" ? saved : "system";
-}
-
-function applyTheme(choice: ThemeChoice) {
-  const root = document.documentElement;
-  if (choice === "system") {
-    delete root.dataset.theme;
-    localStorage.removeItem("yk-theme");
-  } else {
-    root.dataset.theme = choice;
-    localStorage.setItem("yk-theme", choice);
-  }
-}
-
+/** Инструмент витрины для просмотра частей в обеих темах. В приложениях тема выбирается только в настройках (ThemeSettings). */
 export function ThemeSwitch() {
-  const [choice, setChoice] = useState(savedChoice);
+  const { theme, setTheme } = useThemePreference();
   return (
-    <div className="sc-theme" role="group" aria-label="Тема">
+    <div className="sc-theme" role="group" aria-label="Тема витрины">
       {CHOICES.map(({ value, label, icon }) => (
-        <Button
-          key={value}
-          size="sm"
-          variant={choice === value ? "secondary" : "ghost"}
-          icon={icon}
-          aria-pressed={choice === value}
-          onClick={() => {
-            applyTheme(value);
-            setChoice(value);
-          }}
-        >
+        <Button key={value} size="sm" variant={theme === value ? "secondary" : "ghost"} icon={icon} aria-pressed={theme === value} onClick={() => setTheme(value)}>
           {label}
         </Button>
       ))}
