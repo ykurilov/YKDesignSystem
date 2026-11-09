@@ -17,6 +17,11 @@ const originalDialogMethods = ["showModal", "close"].map(name => [name, Object.g
 afterEach(() => { vi.restoreAllMocks(); for (const [name, d] of originalDialogMethods) { if (d) Object.defineProperty(HTMLDialogElement.prototype, name, d); else delete (HTMLDialogElement.prototype as unknown as Record<string, unknown>)[name]; } });
 
 describe("стандартная панель: верх и главное действие", () => {
+  it("полное название приложения лежит в подсказке ссылки-названия", () => {
+    render(<AppShell brand={{ label: "Очень длинное название приложения" }} navigation={navigation}>x</AppShell>);
+    expect(screen.getAllByTitle("Очень длинное название приложения").length).toBeGreaterThan(0);
+  });
+
   it("поиск появляется, только если приложение передало onSearch", async () => {
     const search = vi.fn(), user = userEvent.setup();
     const { rerender } = render(<AppShell brand={{ label: "Агент" }} navigation={navigation}>x</AppShell>);

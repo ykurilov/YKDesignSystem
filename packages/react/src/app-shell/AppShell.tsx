@@ -144,7 +144,7 @@ export function AppShell({ brand, navigation, navigationLabel = "Навигац�
     const secondLine = account && ({ email: account.email, plan: account.plan, name: undefined })[account.show ?? "email"];
     return <>
       <div className="yk-app-shell__nav-header">
-        {!rail && <Link className="yk-app-shell__brand" href={brand.href ?? "/"}>{brand.logo}<span>{brand.label}</span></Link>}
+        {!rail && <Link className="yk-app-shell__brand" href={brand.href ?? "/"} title={brand.label}>{brand.logo}<span>{brand.label}</span></Link>}
         <div className="yk-app-shell__top-actions">
           {onSearch && !rail && <Button variant="ghost" icon={MagnifyingGlassIcon} aria-label={text.search} title={text.search} onClick={after(onSearch)} />}
           <Button variant="ghost" icon={mobile ? XIcon : SidebarSimpleIcon}

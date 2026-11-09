@@ -7,7 +7,7 @@
 
 /* Верх: логотип и название слева, поиск и сворачивание справа */
 .yk-app-shell__nav-header{display:flex;align-items:center;justify-content:space-between;gap:var(--yk-space-1);height:60px;flex:none}
-.yk-app-shell__brand{display:flex;align-items:center;gap:10px;padding-left:10px;min-width:0;text-decoration:none;color:var(--yk-text);font-size:16px;font-weight:600;letter-spacing:-.01em}
+.yk-app-shell__brand{display:flex;align-items:center;gap:10px;padding-left:10px;min-width:0;text-decoration:none;color:var(--yk-text);font-size:14px;font-weight:600;letter-spacing:-.01em}
 .yk-app-shell__brand>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yk-app-shell__brand>svg,.yk-app-shell__brand>canvas{flex:none}
 .yk-app-shell__top-actions{display:flex;flex:none}.yk-app-shell__top-actions>.yk-button{color:var(--yk-muted)}.yk-app-shell__top-actions>.yk-button:hover{color:var(--yk-text)}
 

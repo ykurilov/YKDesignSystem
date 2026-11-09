@@ -11,6 +11,7 @@
     "snapshots": "tsx scripts/snapshots.ts",
     "open-states": "tsx scripts/openStates.ts",
     "navigation:check": "node scripts/navigation.mjs",
+    "brand:fit": "node scripts/brand-fit.mjs",
     "navigation:neutral": "node scripts/neutral-navigation.mjs"
   },
   "dependencies": {
