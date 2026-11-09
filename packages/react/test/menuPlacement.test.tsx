@@ -28,9 +28,24 @@ describe("placeMenu", () => {
     expect(placeMenu({ anchor: anchorAt(30, 100, 40), menu: { width: 220, height: 100 }, viewport: { width: 150, height: 800 } }).align).toBe("start");
   });
 
-  it("ручное выравнивание сильнее автоматики", () => {
-    expect(placeMenu({ anchor: anchorAt(900, 100), menu, viewport, align: "start" }).align).toBe("start");
-    expect(placeMenu({ anchor: anchorAt(100, 100), menu, viewport, align: "end" }).align).toBe("end");
+  it("заданное выравнивание — предпочтение: влезает — остаётся", () => {
+    expect(placeMenu({ anchor: anchorAt(500, 100), menu, viewport, align: "end" }).align).toBe("end");
+    expect(placeMenu({ anchor: anchorAt(400, 100), menu, viewport, align: "start" }).align).toBe("start");
+  });
+
+  it("заданное выравнивание не влезает, а другой край влезает — переворачивается", () => {
+    // телефон 390: кнопка у левого края, align=end вывел бы меню за левый край
+    const phone = { width: 390, height: 800 };
+    expect(placeMenu({ anchor: anchorAt(20, 100, 40), menu, viewport: phone, align: "end" }).align).toBe("start");
+    expect(placeMenu({ anchor: anchorAt(900, 100), menu, viewport, align: "start" }).align).toBe("end");
+  });
+
+  it("не влезает ни так ни так — сдвигается в пределы экрана с отступом", () => {
+    const narrow = { width: 240, height: 800 };
+    const result = placeMenu({ anchor: anchorAt(100, 100, 40), menu, viewport: narrow, align: "end" });
+    const left = result.align === "end" ? 140 - menu.width + (result.shift ?? 0) : 100 + (result.shift ?? 0);
+    expect(left).toBeGreaterThanOrEqual(8);
+    expect(left + menu.width).toBeLessThanOrEqual(240 - 8);
   });
 
   it("отступ от края экрана учитывается", () => {

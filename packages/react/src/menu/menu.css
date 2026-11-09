@@ -1,6 +1,6 @@
 .yk-menu-anchor { position: relative; display: inline-flex; }
 .yk-menu {
-  position: absolute; top: calc(100% + 6px); z-index: 50; width: 220px; box-sizing: border-box; padding: 6px;
+  position: absolute; top: calc(100% + 6px); z-index: 50; width: 220px; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 6px;
   background: var(--yk-surface); border-radius: var(--yk-radius-lg); box-shadow: var(--yk-shadow-pop);
   display: flex; flex-direction: column; animation: yk-menu-in .14s var(--yk-ease-out);
 }

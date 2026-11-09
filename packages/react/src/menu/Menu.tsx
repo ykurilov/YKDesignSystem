@@ -25,7 +25,7 @@ export interface MenuProps {
   /** Кнопка, открывающая меню. Должна принимать onClick, onKeyDown и aria-атрибуты (подходит Button). */
   trigger: ReactElement<TriggerProps>;
   entries: MenuEntry[];
-  /** Ручное выравнивание по краю кнопки. Без него меню само выбирает сторону, где оно помещается. */
+  /** Предпочтительный край кнопки. Если там меню не влезает в экран — открывается от другого края или сдвигается в экран. Без него меню само выбирает сторону, где оно помещается. */
   align?: "start" | "end";
 }
 
@@ -156,6 +156,7 @@ export function Menu({ label, trigger, entries, align }: MenuProps) {
           role="menu"
           aria-label={label}
           className={classNames("yk-menu", `yk-menu--${placement.align}`, placement.vertical === "up" && "yk-menu--up")}
+          style={placement.shift ? (placement.align === "end" ? { right: -placement.shift } : { left: placement.shift }) : undefined}
           onKeyDown={handleMenuKeyDown}
         >
           {entries.map((entry, index) =>
