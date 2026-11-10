@@ -1,5 +1,10 @@
 # Изменения «Одуванчика»
 
+## 0.6.4 — 2026-11-10 (только `@ykurilov/ds-react`)
+
+- Новый подпуть `@ykurilov/ds-react/theme-script` без `"use client"`: `themeScript()` можно вызывать в серверном `layout.tsx` Next.js (раньше — ошибка 500). Основной экспорт не менялся.
+- `<meta name="theme-color">` (одна, без `media`) теперь следует действующей теме: в начальном скрипте, при выборе темы и при смене системной темы в режиме «как в системе». Если тега нет, он не создаётся.
+
 ## ds-react 0.6.3, ds-tokens 0.2.1 — 2026-11-10
 
 - Только метаданные и документы, код не менялся: в `package.json` обоих пакетов `repository`, `homepage`, `bugs` на GitHub; в README пакетов ссылки на `NAVIGATION.md`, `DECISIONS.md`, `STUDIO.md`, `CHANGELOG.md`; у `ds-tokens` появился README.
