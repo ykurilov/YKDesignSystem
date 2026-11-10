@@ -66,3 +66,32 @@ describe("навигация приложения", () => {
     expect(screen.getByRole("button", { name: "Обзор" })).not.toHaveAttribute("data-router");
   });
 });
+
+describe("название приложения в шапке на телефоне", () => {
+  const mockPhone = (matches: boolean) => {
+    Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value: function(this: HTMLDialogElement) { this.open = true; } });
+    Object.defineProperty(HTMLDialogElement.prototype, "close", { configurable: true, value: function(this: HTMLDialogElement) { this.open = false; } });
+    vi.spyOn(window, "matchMedia").mockImplementation(() => ({ matches, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList);
+  };
+  it("на телефоне рядом с кнопкой меню стоит название, и оно после кнопки", () => {
+    mockPhone(true);
+    const { container } = render(<AppShell brand={{ label: "Живые лидмагниты" }} navigation={navigation}>Содержимое</AppShell>);
+    const header = container.querySelector("header.yk-app-shell__header")!;
+    const title = header.querySelector(".yk-app-shell__header-title");
+    expect(title).toHaveTextContent("Живые лидмагниты");
+    expect(title).toHaveAttribute("title", "Живые лидмагниты");
+    expect(header.firstElementChild).toBe(screen.getByRole("button", { name: "Открыть навигацию" }));
+  });
+  it("кнопки приложения из header стоят справа от названия", () => {
+    mockPhone(true);
+    const { container } = render(<AppShell brand={{ label: "Приложение" }} navigation={navigation} header={<button type="button">Делиться</button>}>Содержимое</AppShell>);
+    const children = [...container.querySelector("header.yk-app-shell__header")!.children];
+    expect(children.map(el => el.textContent || el.getAttribute("aria-label"))).toEqual(["Открыть навигацию", "Приложение", "Делиться"]);
+  });
+  it("на широком экране шапки с названием нет", () => {
+    mockPhone(false);
+    const { container } = render(<AppShell brand={{ label: "Приложение" }} navigation={navigation}>Содержимое</AppShell>);
+    expect(container.querySelector(".yk-app-shell__header-title")).toBeNull();
+    expect(container.querySelector("header")).toBeNull();
+  });
+});

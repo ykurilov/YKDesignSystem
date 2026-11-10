@@ -182,7 +182,8 @@ export function AppShell({ brand, navigation, navigationLabel = "Навигац�
     <div className="yk-app-shell__workspace">
       {(header || compact) && <header className="yk-app-shell__header">
         {compact && <Button ref={mobileTrigger} variant="ghost" icon={ListIcon} aria-label={text.open}
-          aria-expanded={open} aria-controls={`${id}-dialog`} onClick={() => setOpen(true)} />}{header}
+          aria-expanded={open} aria-controls={`${id}-dialog`} onClick={() => setOpen(true)} />}
+        {compact && <span className="yk-app-shell__header-title" title={brand.label}>{brand.label}</span>}{header}
       </header>}
       <main className="yk-app-shell__content">{children}</main>
     </div>

@@ -54,6 +54,8 @@
 .yk-app-shell__workspace{display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;background:var(--yk-bg)}
 .yk-app-shell__header{display:flex;align-items:center;gap:var(--yk-space-3);height:60px;flex:none;padding:0 var(--yk-space-5)}
 .yk-app-shell__content{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
+.yk-app-shell__header-title{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600;letter-spacing:-.01em;color:var(--yk-text)}
+.yk-app-shell__header>:not(.yk-app-shell__header-title){flex-shrink:0}
 .yk-app-shell--compact{grid-template-columns:minmax(0,1fr)}.yk-app-shell--compact .yk-app-shell__header{padding-inline:var(--yk-space-2)}
 
 /* Телефон: панель слева поверх содержимого */
