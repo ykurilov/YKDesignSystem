@@ -61,7 +61,16 @@ import { AppShell, Dialog, ThemeSettings, type AppNavigationGroup } from "@ykuri
 
 Пункт навигации и группы — `href` (ссылка) или `onSelect` (кнопка). Ссылку роутера (например, `Link` из Next.js) передают в `linkComponent`, иначе ссылки — обычные `<a>`. Роутер, права доступа и состав разделов остаются у приложения.
 
-Чтобы сохранённая тема применилась до первой отрисовки, без вспышки, в `<head>` ставят `<script>{themeScript()}</script>`. Ключ хранения по умолчанию `yk-theme`; свой — `storageKey` у `ThemeSettings`, `useThemePreference` и `themeScript`, одинаковый у всех трёх.
+Чтобы сохранённая тема применилась до первой отрисовки, без вспышки, в `<head>` ставят `<script>{themeScript()}</script>`. Скрипт заодно красит строку статуса браузера: берёт фон действующей темы и ставит его в `<meta name="theme-color">` (при выборе темы и при смене системной). Саму meta добавляет приложение, например `<meta name="theme-color" content="#FFFFFF" />`; без неё скрипт ничего не создаёт, а meta с атрибутом `media` не трогает.
+
+В серверном `layout.tsx` Next.js (App Router) `themeScript` берут из серверного подпути: основной вход пакета помечен `"use client"`, и вызов оттуда на сервере падает.
+
+```tsx
+import { themeScript } from "@ykurilov/ds-react/theme-script";
+
+// <html lang="ru" suppressHydrationWarning>
+//   <head><script dangerouslySetInnerHTML={{ __html: themeScript() }} /></head>
+``` Ключ хранения по умолчанию `yk-theme`; свой — `storageKey` у `ThemeSettings`, `useThemePreference` и `themeScript`, одинаковый у всех трёх.
 
 Свёрнутость: по умолчанию панель раскрыта. `collapsed` и `onCollapsedChange` — для управляемого состояния, `defaultCollapsed` — начальное. `storageKey` запоминает выбор; без ключа записи в localStorage нет.
 

@@ -11,7 +11,7 @@ export const canvasContext = {
   globalAlpha: 1,
   fillStyle: "",
 };
-HTMLCanvasElement.prototype.getContext = vi.fn(() => canvasContext) as never;
+if (typeof HTMLCanvasElement !== "undefined") HTMLCanvasElement.prototype.getContext = vi.fn(() => canvasContext) as never;
 
 type ChangeListener = (event: { matches: boolean }) => void;
 const media = { reduce: false, dark: false, listeners: new Map<string, Set<ChangeListener>>() };

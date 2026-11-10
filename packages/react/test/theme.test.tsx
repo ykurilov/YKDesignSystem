@@ -61,3 +61,66 @@ describe("тема в настройках", () => {
     expect(html.dataset.theme).toBeUndefined();
   });
 });
+
+describe("цвет строки статуса браузера (theme-color)", () => {
+  const dark = "#0F0F0F", light = "#FFFFFF";
+  const addMeta = (media?: string) => {
+    const meta = document.createElement("meta");
+    meta.name = "theme-color"; meta.content = "#123456";
+    if (media) meta.setAttribute("media", media);
+    document.head.appendChild(meta);
+    return meta;
+  };
+  afterEach(() => { document.head.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove()); });
+
+  it("начальный скрипт красит строку под сохранённую тему", () => {
+    const meta = addMeta();
+    localStorage.setItem("yk-theme", "dark");
+    new Function(themeScript())();
+    expect(meta.content.toUpperCase()).toBe(dark);
+  });
+
+  it("без meta скрипт ничего не создаёт", () => {
+    localStorage.setItem("yk-theme", "dark");
+    new Function(themeScript())();
+    expect(document.head.querySelector('meta[name="theme-color"]')).toBeNull();
+  });
+
+  it("при выборе темы в настройках цвет меняется, при «как в системе» следует системе", async () => {
+    const user = userEvent.setup();
+    const meta = addMeta();
+    render(<ThemeSettings />);
+    await user.click(screen.getByRole("radio", { name: "Тёмная" }));
+    expect(meta.content.toUpperCase()).toBe(dark);
+    await user.click(screen.getByRole("radio", { name: "Светлая" }));
+    expect(meta.content.toUpperCase()).toBe(light);
+    await user.click(screen.getByRole("radio", { name: "Как в системе" }));
+    expect(meta.content.toUpperCase()).toBe(light); // в jsdom система светлая
+  });
+
+  it("смена системной темы в режиме «как в системе» перекрашивает строку", () => {
+    let listener: (() => void) | undefined;
+    let systemDark = false;
+    const original = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      get matches() { return systemDark && q.includes("dark"); },
+      media: q,
+      addEventListener: (_: string, l: () => void) => { listener = l; },
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia;
+    try {
+      const meta = addMeta();
+      new Function(themeScript())();
+      expect(meta.content.toUpperCase()).toBe(light);
+      systemDark = true; listener?.();
+      expect(meta.content.toUpperCase()).toBe(dark);
+    } finally { window.matchMedia = original; }
+  });
+
+  it("meta с media (пара для светлой и тёмной) не трогаем", () => {
+    const meta = addMeta("(prefers-color-scheme: dark)");
+    localStorage.setItem("yk-theme", "dark");
+    new Function(themeScript())();
+    expect(meta.content).toBe("#123456");
+  });
+});

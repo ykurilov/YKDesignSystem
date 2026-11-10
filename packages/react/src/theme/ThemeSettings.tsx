@@ -1,8 +1,9 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { RadioGroup, Radio } from "../radio/Radio.js";
 
-export type ThemePreference = "system" | "light" | "dark";
-export const DEFAULT_THEME_STORAGE_KEY = "yk-theme";
+import { applyThemeColor, DEFAULT_THEME_STORAGE_KEY, themeScript, type ThemePreference } from "./themeScript.js";
+
+export { themeScript, DEFAULT_THEME_STORAGE_KEY, type ThemePreference };
 
 const listeners = new Set<() => void>();
 const isStored = (value: unknown): value is "light" | "dark" => value === "light" || value === "dark";
@@ -14,6 +15,7 @@ function apply(theme: ThemePreference) {
   if (typeof document === "undefined") return;
   if (theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
+  applyThemeColor(theme);
 }
 function subscribe(listener: () => void) {
   listeners.add(listener);
@@ -25,18 +27,20 @@ function subscribe(listener: () => void) {
 /** Выбор темы пользователем: общий для всех частей приложения, запоминается в localStorage. По умолчанию — как в системе. */
 export function useThemePreference(storageKey: string = DEFAULT_THEME_STORAGE_KEY) {
   const theme = useSyncExternalStore(subscribe, () => read(storageKey), () => "system" as ThemePreference);
-  useEffect(() => apply(theme), [theme]);
+  useEffect(() => {
+    apply(theme);
+    if (theme !== "system" || typeof matchMedia !== "function") return;
+    const query = matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyThemeColor("system");
+    query.addEventListener?.("change", onChange);
+    return () => query.removeEventListener?.("change", onChange);
+  }, [theme]);
   const setTheme = (next: ThemePreference) => {
     try { if (next === "system") localStorage.removeItem(storageKey); else localStorage.setItem(storageKey, next); } catch { /* тема применится до перезагрузки */ }
     apply(next);
     listeners.forEach(listener => listener());
   };
   return { theme, setTheme };
-}
-
-/** Строка для встроенного <script> в <head>: применяет сохранённую тему до первой отрисовки, без вспышки. */
-export function themeScript(storageKey: string = DEFAULT_THEME_STORAGE_KEY): string {
-  return `try{var t=localStorage.getItem(${JSON.stringify(storageKey)});if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 }
 
 export interface ThemeSettingsProps {

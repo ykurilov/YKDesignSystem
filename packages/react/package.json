@@ -20,6 +20,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./theme-script": {
+      "types": "./dist/theme/themeScript.d.ts",
+      "import": "./dist/theme-script.js"
+    },
     "./styles.css": "./dist/styles.css"
   },
   "files": [
