@@ -1,7 +1,7 @@
 # «Одуванчик»: React-компоненты
 
 ```sh
-pnpm add @ykurilov/ds-react@^0.2.0 @ykurilov/ds-tokens@^0.2.0 @phosphor-icons/react
+pnpm add @ykurilov/ds-react @ykurilov/ds-tokens @phosphor-icons/react
 ```
 
 ```tsx
@@ -26,6 +26,8 @@ import { StudioLayout, ScrollArea } from "@ykurilov/ds-react";
 
 Контейнеру компоновки требуется заданная высота, flex/grid-предкам — `min-height: 0`. Содержимое основного слота — flex-column с одной прокручиваемой областью и закреплённым footer. Чат предоставляет Agent Chat SDK со скином `@ykurilov/agent-chat-skin-oduvanchik`; его ленту нельзя оборачивать во второй `ScrollArea`, поскольку SDK управляет её ref и виртуализацией.
 
-Сфера из точек (`Sphere`) по умолчанию оранжевая, значки — Phosphor. Тема по умолчанию системная; пользователь меняет её только в настройках через `ThemeSettings` («Как в системе / Светлая / Тёмная», выбор запоминается), без вспышки — `themeScript()` в `<head>`. Технически — `data-theme="light"` / `"dark"` на корне. Стандартная левая панель — `AppShell`, правила — `NAVIGATION.md` в репозитории дизайн-системы.
+Сфера из точек (`Sphere`) по умолчанию оранжевая, значки — Phosphor. Тема по умолчанию системная; пользователь меняет её только в настройках через `ThemeSettings` («Как в системе / Светлая / Тёмная», выбор запоминается), без вспышки — `themeScript()` в `<head>`. Технически — `data-theme="light"` / `"dark"` на корне. Стандартная левая панель — `AppShell`, правила — [NAVIGATION.md](https://github.com/ykurilov/YKDesignSystem/blob/main/NAVIGATION.md) в репозитории дизайн-системы.
 
 Версия 0.2.0 добавляет компоновку и роли размеров. Обычные поля, карточки и существующие компоненты сохраняют прежние размеры. Для новых компонентов требуется `ds-tokens@^0.2.0`.
+
+Канонические документы (ссылки на GitHub, работают и со страницы npm): [NAVIGATION.md](https://github.com/ykurilov/YKDesignSystem/blob/main/NAVIGATION.md) — стандарт левой панели и навигации; [DECISIONS.md](https://github.com/ykurilov/YKDesignSystem/blob/main/DECISIONS.md) — принятые решения; [STUDIO.md](https://github.com/ykurilov/YKDesignSystem/blob/main/STUDIO.md) — рабочий экран с журналом; [CHANGELOG.md](https://github.com/ykurilov/YKDesignSystem/blob/main/CHANGELOG.md) — история версий; [README репозитория](https://github.com/ykurilov/YKDesignSystem/blob/main/README.md).

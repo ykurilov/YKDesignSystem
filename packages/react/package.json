@@ -1,8 +1,17 @@
 {
   "name": "@ykurilov/ds-react",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "React-компоненты YKDesignSystem на переменных @ykurilov/ds-tokens",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ykurilov/YKDesignSystem.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/ykurilov/YKDesignSystem#readme",
+  "bugs": {
+    "url": "https://github.com/ykurilov/YKDesignSystem/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
