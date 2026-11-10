@@ -1,5 +1,5 @@
-import { ArrowRightIcon, ArrowUpIcon, PlusIcon, StopIcon, TrashIcon } from "@phosphor-icons/react";
-import { Button, Icon } from "@ykurilov/ds-react";
+import { ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, DotsThreeIcon, HeartIcon, PlusIcon, ShareNetworkIcon, StopIcon, TrashIcon } from "@phosphor-icons/react";
+import { Button, Icon, MonoLabel } from "@ykurilov/ds-react";
 import { useState } from "react";
 import { DemoLine, DemoStack } from "../layout/Demo.js";
 import type { ShowcaseSection } from "../layout/sectionRegistry.js";
@@ -13,6 +13,27 @@ function LoadingOnClick() {
   );
 }
 
+/** Шапка поста: «назад» над заголовком и действия под ним. */
+function PostExample({ wrong }: { wrong?: boolean }) {
+  return (
+    <div className="sc-post">
+      <MonoLabel>{wrong ? "Не так · ghost с текстом" : "Так"}</MonoLabel>
+      {wrong
+        ? <span className="sc-old-ghost"><Icon icon={ArrowLeftIcon} size={16} />Лента</span>
+        : <Button href="#" variant="outline" size="sm" icon={ArrowLeftIcon} onClick={(e) => e.preventDefault()}>Лента</Button>}
+      <h3 className="sc-post__title">Как мы запускали клуб</h3>
+      <div className="sc-post__actions">
+        {wrong
+          ? <span className="sc-old-ghost"><Icon icon={HeartIcon} size={16} />0</span>
+          : <Button variant="secondary" size="sm" icon={HeartIcon} aria-label="Нравится, 0">0</Button>}
+        <span className="sc-post__spacer" />
+        <Button variant="ghost" size="sm" icon={ShareNetworkIcon} aria-label="Поделиться" />
+        <Button variant="ghost" size="sm" icon={DotsThreeIcon} aria-label="Ещё" />
+      </div>
+    </div>
+  );
+}
+
 function ButtonsDemo() {
   return (
     <DemoStack>
@@ -20,7 +41,7 @@ function ButtonsDemo() {
         <Button>Создать проект</Button>
         <Button variant="secondary">Импорт</Button>
         <Button variant="outline">Настроить</Button>
-        <Button variant="ghost">Отмена</Button>
+        <Button variant="ghost" icon={DotsThreeIcon} aria-label="Ещё" />
         <Button variant="danger">Удалить</Button>
         <Button variant="link">Шаблоны <Icon icon={ArrowRightIcon} size={14} /></Button>
       </DemoLine>
@@ -50,6 +71,12 @@ function ButtonsDemo() {
         <Button size="lg" icon={StopIcon} aria-label="Остановить" />
         <Button loading icon={ArrowUpIcon} aria-label="Отправляется" />
       </DemoLine>
+      <DemoLine label="Ghost">
+        <div className="sc-posts">
+          <PostExample />
+          <PostExample wrong />
+        </div>
+      </DemoLine>
     </DemoStack>
   );
 }
@@ -57,6 +84,6 @@ function ButtonsDemo() {
 export default {
   order: 3,
   title: "Кнопки",
-  description: "Главная — всегда чёрная. Одна главная кнопка на экран. Фокус — оранжевое кольцо (Tab).",
+  description: "Главная — всегда чёрная. Одна главная кнопка на экран. Фокус — оранжевое кольцо (Tab). Невидимая (ghost) — только значок без текста; действие с текстом всегда с фоном или рамкой, «назад» — маленькая с рамкой и стрелкой.",
   Demo: ButtonsDemo,
 } satisfies ShowcaseSection;

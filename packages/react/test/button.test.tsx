@@ -13,7 +13,7 @@ describe("Button", () => {
     expect(button).toHaveClass("yk-button", "yk-button--primary", "yk-button--md");
   });
 
-  it.each(["primary", "secondary", "outline", "ghost", "danger", "link"] as const)("вид %s", (variant) => {
+  it.each(["primary", "secondary", "outline", "danger", "link"] as const)("вид %s", (variant) => {
     render(<Button variant={variant}>Кнопка</Button>);
     expect(screen.getByRole("button")).toHaveClass(`yk-button--${variant}`);
   });

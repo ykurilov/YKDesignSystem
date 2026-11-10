@@ -46,7 +46,7 @@ function OverlaysDemo() {
             <span className="yk-mono-label">Удаление</span>
             <h3 className="yk-dialog__title">Удалить «Квиз по уроку 7»?</h3>
             <div className="yk-dialog__body">Проект и 5 задач исчезнут. Вернуть их можно в течение 30 дней из архива.</div>
-            <div className="yk-dialog__actions"><Button variant="ghost" tabIndex={-1}>Отмена</Button><Button variant="danger" tabIndex={-1}>Удалить</Button></div>
+            <div className="yk-dialog__actions"><Button variant="secondary" tabIndex={-1}>Отмена</Button><Button variant="danger" tabIndex={-1}>Удалить</Button></div>
           </div>
           <div className="yk-menu sc-static sc-static--menu" aria-hidden="true">
             {MENU_ENTRIES.map((entry, i) =>
@@ -82,7 +82,7 @@ function OverlaysDemo() {
         onClose={() => setDialog(false)}
         eyebrow="Удаление"
         title="Удалить «Квиз по уроку 7»?"
-        actions={<><Button variant="ghost" onClick={() => setDialog(false)}>Отмена</Button><Button variant="danger" onClick={() => setDialog(false)}>Удалить</Button></>}
+        actions={<><Button variant="secondary" onClick={() => setDialog(false)}>Отмена</Button><Button variant="danger" onClick={() => setDialog(false)}>Удалить</Button></>}
       >
         Проект и 5 задач исчезнут. Вернуть их можно в течение 30 дней из архива.
       </Dialog>

@@ -15,7 +15,7 @@ function Host({ onClose = () => {}, closeOnBackdrop }: { onClose?: () => void; c
         title="Удалить проект?"
         eyebrow="Удаление"
         closeOnBackdrop={closeOnBackdrop}
-        actions={<><Button variant="ghost" onClick={() => setOpen(false)}>Отмена</Button><Button variant="danger">Удалить</Button></>}
+        actions={<><Button variant="secondary" onClick={() => setOpen(false)}>Отмена</Button><Button variant="danger">Удалить</Button></>}
       >
         Проект исчезнет.
       </Dialog>

@@ -1,7 +1,7 @@
 import { CircleHalfIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
-import { Button, useThemePreference, type IconComponent, type ThemePreference } from "@ykurilov/ds-react";
+import { SegmentedControl, useThemePreference, type SegmentOption, type ThemePreference } from "@ykurilov/ds-react";
 
-const CHOICES: Array<{ value: ThemePreference; label: string; icon: IconComponent }> = [
+const CHOICES: SegmentOption[] = [
   { value: "light", label: "Светлая", icon: SunIcon },
   { value: "dark", label: "Тёмная", icon: MoonIcon },
   { value: "system", label: "Как в системе", icon: CircleHalfIcon },
@@ -11,12 +11,8 @@ const CHOICES: Array<{ value: ThemePreference; label: string; icon: IconComponen
 export function ThemeSwitch() {
   const { theme, setTheme } = useThemePreference();
   return (
-    <div className="sc-theme" role="group" aria-label="Тема витрины">
-      {CHOICES.map(({ value, label, icon }) => (
-        <Button key={value} size="sm" variant={theme === value ? "secondary" : "ghost"} icon={icon} aria-pressed={theme === value} onClick={() => setTheme(value)}>
-          {label}
-        </Button>
-      ))}
+    <div className="sc-theme">
+      <SegmentedControl size="sm" aria-label="Тема витрины" options={CHOICES} value={theme} onValueChange={(value) => setTheme(value as ThemePreference)} />
     </div>
   );
 }

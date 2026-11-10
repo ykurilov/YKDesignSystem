@@ -1,14 +1,14 @@
-import { forwardRef, useEffect, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type HTMLAttributes, type MouseEvent, type ReactElement, type ReactNode, type Ref, type RefAttributes } from "react";
+import { forwardRef, isValidElement, useEffect, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type HTMLAttributes, type MouseEvent, type ReactElement, type ReactNode, type Ref, type RefAttributes } from "react";
 import { classNames } from "../classNames.js";
 import { Icon, type IconComponent } from "../icon/Icon.js";
 import { Sphere } from "../sphere/Sphere.js";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "link";
+/** Виды кнопки с текстом. `ghost` (без фона и рамки) — только у кнопки-значка: текст без формы не узнаётся как кнопка. */
+export type TextButtonVariant = Exclude<ButtonVariant, "ghost">;
 export type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonOwnProps {
-  /** primary — всегда «чернила» (чёрная, в тёмной теме светлая). Одна главная кнопка на экран. */
-  variant?: ButtonVariant;
   /** sm — 32px, md — 40px, lg — 48px (телефон). */
   size?: ButtonSize;
   /** Занята: сфера цвета текста, `aria-busy`, клики не проходят, фокус остаётся. */
@@ -19,11 +19,24 @@ interface ButtonOwnProps {
   kbd?: ReactNode;
 }
 
-/** Либо текст, либо только значок (тогда имя обязательно). */
+/** Либо текст (счётчик тоже текст), либо только значок (тогда имя обязательно). */
 type ButtonContent =
-  | { children: ReactNode }
+  | {
+      children: ReactNode;
+      /** primary — всегда «чернила» (чёрная, в тёмной теме светлая). Одна главная кнопка на экран. `ghost` с текстом нельзя. */
+      variant?: TextButtonVariant;
+    }
+  | {
+      /** Свой значок элементом (svg) без текста — для невидимой кнопки-значка. */
+      children: ReactElement;
+      variant: "ghost";
+      icon?: undefined;
+      "aria-label": string;
+    }
   | {
       children?: undefined;
+      /** `ghost` — невидимая кнопка-значок для панелей инструментов. */
+      variant?: ButtonVariant;
       icon: IconComponent;
       /** Кнопке без текста имя обязательно. */
       "aria-label": string;
@@ -47,10 +60,21 @@ interface ButtonComponent {
   displayName?: string;
 }
 
+/** Есть ли в содержимом буквы или цифры. Значок (svg, компонент без текста внутри) текстом не считается. */
+function containsText(node: ReactNode): boolean {
+  if (node === null || node === undefined || typeof node === "boolean") return false;
+  if (typeof node === "string") return node.trim() !== "";
+  if (typeof node === "number" || typeof node === "bigint") return true;
+  if (Array.isArray(node)) return node.some(containsText);
+  if (isValidElement<{ children?: ReactNode }>(node)) return containsText(node.props.children);
+  return false;
+}
+
 const ICON_SIZE: Record<ButtonSize, number> = { sm: 14, md: 16, lg: 18 };
 
 /** Общий вид свойств под капотом: наружу Button показывает перегрузки ButtonAsButtonProps / ButtonAsLinkProps. */
 type AnyProps = ButtonOwnProps & Omit<HTMLAttributes<HTMLElement>, "children"> & {
+  variant?: ButtonVariant;
   href?: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
@@ -65,10 +89,18 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, AnyProps
 ) {
   const iconOnly = children === undefined || children === null;
   const missingLabel = iconOnly && !rest["aria-label"] && !rest["aria-labelledby"];
+  const ghostWithText = variant === "ghost" && containsText(children);
+  const shownVariant: ButtonVariant = ghostWithText ? "secondary" : variant;
 
   useEffect(() => {
     if (missingLabel) console.warn("YKDesignSystem: у кнопки без текста должен быть aria-label.");
   }, [missingLabel]);
+
+  useEffect(() => {
+    if (ghostWithText) {
+      console.warn("YKDesignSystem: variant=\"ghost\" только у кнопки-значка без текста. Кнопка с текстом показана как secondary; задайте secondary или outline.");
+    }
+  }, [ghostWithText]);
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     if (loading || (href !== undefined && disabled)) {
@@ -85,7 +117,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, AnyProps
   const shared = {
     className: classNames(
       "yk-button",
-      `yk-button--${variant}`,
+      `yk-button--${shownVariant}`,
       `yk-button--${size}`,
       iconOnly && "yk-button--icon-only",
       leading && "yk-button--leading",
