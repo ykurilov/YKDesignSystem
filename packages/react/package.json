@@ -1,6 +1,6 @@
 {
   "name": "@ykurilov/ds-react",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "React-компоненты YKDesignSystem на переменных @ykurilov/ds-tokens",
   "license": "MIT",
   "repository": {
